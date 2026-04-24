@@ -1,0 +1,19 @@
+# ── Uploaded files (binary / user content) ───────────────────────────────────
+uploads/*
+!uploads/.gitkeep
+
+# ── Sensitive config (keep the template, not the real credentials) ────────────
+# config/db.php   ← uncomment this line if you store real credentials there
+
+# ── OS / Editor noise ─────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+.vscode/
+.idea/
+
+# ── PHP logs ──────────────────────────────────────────────────────────────────
+*.log
+error_log
