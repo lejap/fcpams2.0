@@ -63,8 +63,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!$error) {
         $stmt = $conn->prepare("
             INSERT INTO complaints 
-            (user_name, user_phone, user_email, user_branch, complaint_details, transaction_type, description, raised_previously, previous_details, desired_resolution, has_documents, document_path)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            (user_name, user_phone, user_email, user_branch, complaint_details, transaction_type, description, raised_previously, previous_details, desired_resolution, has_documents, document_path, complexity)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL)
         ");
         $stmt->bind_param(
             "sssssssissis",

@@ -19,7 +19,14 @@ if ($f_to)         $where .= " AND DATE(created_at) <= '$f_to'";
 
 // ── KPIs (unfiltered) ─────────────────────────────────────────────────────────
 $kpi = [];
-foreach(['total'=>"status!='SPAM'",'open'=>"status='OPEN'",'resolved'=>"status='RESOLVED'",'closed'=>"status='CLOSED'",'complex'=>"complexity='COMPLEX'",'simple'=>"complexity='SIMPLE'"] as $k=>$c)
+foreach([
+    'total'   => "status!='SPAM'",
+    'open'    => "status='OPEN'",
+    'resolved'=> "status='RESOLVED'",
+    'closed'  => "status='CLOSED'",
+    'complex' => "complexity='COMPLEX' AND status!='SPAM'",
+    'simple'  => "complexity='SIMPLE'  AND status!='SPAM'"
+] as $k=>$c)
     $kpi[$k] = $conn->query("SELECT COUNT(*) c FROM complaints WHERE $c")->fetch_assoc()['c'];
 
 $cs_rows = $conn->query("SELECT status, COUNT(*) cnt FROM complaints WHERE status!='SPAM' GROUP BY status");
@@ -119,7 +126,7 @@ include '../includes/admin_sidebar.php';
 <div class="kpi-row">
     <div class="kpi"><div class="kpi-lbl">Total</div><div class="kpi-val" style="color:#ef4444;"><?php echo $kpi['total']; ?></div></div>
     <div class="kpi"><div class="kpi-lbl">Open</div><div class="kpi-val" style="color:#eab308;"><?php echo $kpi['open']; ?></div></div>
-    <div class="kpi"><div class="kpi-lbl">Resolved</div><div class="kpi-val" style="color:#10b981;"><?php echo $kpi['resolved']; ?></div></div>
+    <div class="kpi"><div class="kpi-lbl" style="font-size:.6rem;">Resolved (Not Confirmed)</div><div class="kpi-val" style="color:#10b981;"><?php echo $kpi['resolved']; ?></div></div>
     <div class="kpi"><div class="kpi-lbl">Closed</div><div class="kpi-val" style="color:#8b5cf6;"><?php echo $kpi['closed']; ?></div></div>
     <div class="kpi"><div class="kpi-lbl">Complex</div><div class="kpi-val" style="color:#ef4444;"><?php echo $kpi['complex']; ?></div></div>
     <div class="kpi"><div class="kpi-lbl">Simple</div><div class="kpi-val" style="color:#10b981;"><?php echo $kpi['simple']; ?></div></div>
@@ -188,7 +195,7 @@ include '../includes/admin_sidebar.php';
             <tr>
                 <th>#</th><th>Member</th><th>Phone</th><th>Branch</th><th>Complaint Type</th>
                 <th>Transaction</th><th>Complexity</th><th>Status</th>
-                <th>Date Filed</th><th>Date Resolved</th><th>Resolved By</th><th>Confirmed By</th>
+                <th>Date Filed</th><th>Date Resolved</th><th>Resolved By</th><th>Confirmed By</th><th>Resolution Remark</th>
             </tr>
         </thead>
         <tbody>
@@ -213,9 +220,10 @@ include '../includes/admin_sidebar.php';
             <td style="white-space:nowrap;font-size:.8rem;"><?php echo $c['resolved_at']?date('M d, Y',strtotime($c['resolved_at'])):'-';?></td>
             <td style="font-size:.8rem;"><?php echo htmlspecialchars($c['resolved_by_name']??'-');?></td>
             <td style="font-size:.8rem;"><?php echo htmlspecialchars($c['confirmed_by_name']??'-');?></td>
+            <td style="font-size:.78rem;max-width:180px;color:#334155;"><?php echo $c['admin_remark'] ? nl2br(htmlspecialchars(mb_substr($c['admin_remark'],0,120).(strlen($c['admin_remark'])>120?'...':''))) : '<span style="color:#94a3b8;">—</span>'; ?></td>
         </tr>
         <?php endwhile; else: ?>
-        <tr><td colspan="12" style="text-align:center;padding:2rem;color:#94a3b8;">No records match the selected filters.</td></tr>
+        <tr><td colspan="13" style="text-align:center;padding:2rem;color:#94a3b8;">No records match the selected filters.</td></tr>
         <?php endif; ?>
         </tbody>
     </table>

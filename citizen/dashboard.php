@@ -65,8 +65,18 @@ include '../includes/citizen_sidebar.php';
         <p style="color:rgba(255,255,255,0.75);font-size:0.95rem;margin:0;">What would you like to do today?</p>
     </div>
 
-    <!-- 5-card action grid matching Node.js dashboard -->
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.25rem;margin-bottom:2.5rem;">
+    <!-- Action cards grid — File a Complaint first -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.25rem;margin-bottom:2.5rem;">
+
+        <!-- Complaint — FIRST -->
+        <a href="submit_complaint.php" class="glass-card" style="display:flex;flex-direction:column;align-items:center;gap:0.85rem;padding:1.5rem;border-bottom:4px solid #f43f5e;text-decoration:none;">
+            <i class="fas fa-exclamation-triangle" style="font-size:2.5rem;color:#f43f5e;"></i>
+            <div style="text-align:center;">
+                <h3 style="color:#1e293b;font-size:1.1rem;margin-bottom:0.2rem;">File a Complaint</h3>
+                <p style="font-size:0.82rem;color:#64748b;margin:0;">Report issues or staff concerns.</p>
+            </div>
+            <span class="btn btn-primary" style="width:100%;text-align:center;padding:0.55rem;font-size:0.9rem;margin-top:auto;background:linear-gradient(135deg,#f43f5e,#e11d48);">File Complaint</span>
+        </a>
 
         <!-- Inquiry -->
         <a href="submit_ticket.php?type=INQUIRY" class="glass-card" style="display:flex;flex-direction:column;align-items:center;gap:0.85rem;padding:1.5rem;border-bottom:4px solid #3b82f6;text-decoration:none;">
@@ -108,17 +118,9 @@ include '../includes/citizen_sidebar.php';
             <span class="btn btn-primary" style="width:100%;text-align:center;padding:0.55rem;font-size:0.9rem;margin-top:auto;background:linear-gradient(135deg,#f59e0b,#d97706);">Go to Request</span>
         </a>
 
-        <!-- Complaint -->
-        <a href="submit_complaint.php" class="glass-card" style="display:flex;flex-direction:column;align-items:center;gap:0.85rem;padding:1.5rem;border-bottom:4px solid #f43f5e;border:2px solid rgba(244,63,94,0.2);border-bottom:4px solid #f43f5e;background:rgba(244,63,94,0.05);text-decoration:none;">
-            <i class="fas fa-exclamation-triangle" style="font-size:2.5rem;color:#f43f5e;"></i>
-            <div style="text-align:center;">
-                <h3 style="color:#fb7185;font-size:1.1rem;margin-bottom:0.2rem;">File a Complaint</h3>
-                <p style="font-size:0.82rem;color:#64748b;margin:0;">Report issues or staff concerns.</p>
-            </div>
-            <span class="btn" style="width:100%;text-align:center;padding:0.55rem;font-size:0.9rem;margin-top:auto;background:#f43f5e;color:white;border:none;">File Complaint</span>
-        </a>
-
     </div>
+
+
 
 
 

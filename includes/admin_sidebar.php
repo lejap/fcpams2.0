@@ -5,6 +5,8 @@ $is_admin = isset($_SESSION['role']) && $_SESSION['role'] === 'ADMIN';
 // Notification counts
 $open_submissions = $conn->query("SELECT COUNT(*) as c FROM tickets WHERE status='OPEN'")->fetch_assoc()['c'];
 $open_complaints  = $conn->query("SELECT COUNT(*) as c FROM complaints WHERE status='OPEN'")->fetch_assoc()['c'];
+$closed_total     = $conn->query("SELECT COUNT(*) as c FROM tickets WHERE status IN ('RESOLVED','CLOSED')")->fetch_assoc()['c']
+                  + $conn->query("SELECT COUNT(*) as c FROM complaints WHERE status IN ('RESOLVED','CLOSED')")->fetch_assoc()['c'];
 $pending_users    = $is_admin ? $conn->query("SELECT COUNT(*) as c FROM users WHERE is_approved=0")->fetch_assoc()['c'] : 0;
 ?>
 
@@ -32,6 +34,13 @@ $pending_users    = $is_admin ? $conn->query("SELECT COUNT(*) as c FROM users WH
 
     <a href="/fcpamsweb/admin/spam.php" class="admin-nav-link <?php echo $current_page === 'spam.php' ? 'active' : ''; ?>" style="color:rgba(255,180,180,0.95) !important;">
         <i class="fas fa-ban"></i> Spam
+    </a>
+
+    <a href="/fcpamsweb/admin/closed.php" class="admin-nav-link <?php echo $current_page === 'closed.php' ? 'active' : ''; ?>" style="color:rgba(200,180,255,0.95) !important;">
+        <i class="fas fa-archive"></i> Closed Records
+        <?php if ($closed_total > 0): ?>
+        <span style="margin-left:auto;background:#8b5cf6;color:white;border-radius:9px;min-width:18px;height:18px;font-size:0.65rem;font-weight:800;display:inline-flex;align-items:center;justify-content:center;padding:0 4px;"><?php echo $closed_total; ?></span>
+        <?php endif; ?>
     </a>
 
     <?php if ($is_admin): ?>

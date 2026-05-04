@@ -7,7 +7,7 @@ auth_guard('ADMIN');
 // confirm_resolution.php now works directly on the tickets table (no resolutions table needed)
 // The admin confirms a RESOLVED ticket by marking it CLOSED
 
-$ticket_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+$ticket_id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 
 if ($ticket_id > 0) {
     $conn->begin_transaction();
@@ -37,4 +37,3 @@ if ($ticket_id > 0) {
     exit();
 }
 ?>
-

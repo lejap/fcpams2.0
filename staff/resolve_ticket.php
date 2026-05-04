@@ -20,7 +20,7 @@ if (!$ticket) {
 
 $error = '';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ticket['status'] === 'OPEN') {
     $note        = sanitize($_POST['note']);
     $staff_name  = $_SESSION['name'];
 
@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->bind_param("ssi", $note, $staff_name, $id);
     
     if ($stmt->execute()) {
-        header("Location: dashboard.php?success=1");
+        header("Location: submissions.php?view=$id&resolved=1");
         exit();
     } else {
         $error = "Failed to save resolution. Please try again.";
@@ -51,7 +51,8 @@ if ($ticket['option_id']) {
 }
 
 $page_title = "Resolve Ticket";
-include '../includes/header.php';
+include '../includes/staff_header.php';
+include '../includes/staff_sidebar.php';
 ?>
 
 <style>
@@ -61,11 +62,11 @@ include '../includes/header.php';
 
 <div style="max-width:960px;margin:0 auto;" class="fade-in">
     <div style="margin-bottom:2rem;">
-        <a href="dashboard.php" style="color:rgba(255,255,255,0.7);text-decoration:none;font-size:0.9rem;display:inline-flex;align-items:center;gap:0.4rem;">
+        <a href="submissions.php" style="color:#64748b;text-decoration:none;font-size:0.9rem;display:inline-flex;align-items:center;gap:0.4rem;">
             <i class="fas fa-arrow-left"></i> Back to Dashboard
         </a>
-        <h1 style="margin-top:0.75rem;color:white;">Ticket Resolution</h1>
-        <p style="color:rgba(255,255,255,0.7);">Providing a solution for <strong><?php echo htmlspecialchars($ticket['ref_no']); ?></strong></p>
+        <h1 style="margin-top:0.75rem;color:#0e83b5;">Ticket Resolution</h1>
+        <p style="color:#64748b;">Providing a solution for <strong><?php echo htmlspecialchars($ticket['ref_no']); ?></strong></p>
     </div>
 
     <?php if ($error): ?>
@@ -126,9 +127,11 @@ include '../includes/header.php';
             </div>
         </div>
 
-        <!-- Resolution Form -->
+        <!-- Resolution Form or Resolved Details -->
         <div class="glass-card">
             <h4 style="margin-bottom:1.25rem;color:#0e83b5;">Resolution Details</h4>
+            
+            <?php if ($ticket['status'] === 'OPEN'): ?>
             <form action="resolve_ticket.php?id=<?php echo $id; ?>" method="POST">
                 <div class="form-group">
                     <label class="form-label">Resolution / Admin Remark <span style="color:#ef4444;">*</span></label>
@@ -146,8 +149,19 @@ include '../includes/header.php';
                     <i class="fas fa-check-circle"></i> Submit Resolution
                 </button>
             </form>
+            <?php else: ?>
+            <div style="background:rgba(16,185,129,0.07);border:1px solid rgba(16,185,129,0.25);padding:1rem;border-radius:0.75rem;margin-bottom:1.5rem;">
+                <h5 style="color:#047857;margin-bottom:0.5rem;"><i class="fas fa-check-circle"></i> Resolved by <?php echo htmlspecialchars($ticket['resolved_by_name'] ?? 'Admin'); ?></h5>
+                <p style="font-size:0.85rem;color:#065f46;margin-bottom:0;">On <?php echo $ticket['resolved_at'] ? date('M d, Y H:i', strtotime($ticket['resolved_at'])) : '-'; ?></p>
+            </div>
+            
+            <div>
+                <div class="detail-label" style="margin-bottom:0.5rem;">Staff/Admin Remark</div>
+                <p style="color:#1e293b;line-height:1.6;font-size:0.9rem;white-space:pre-wrap;background:#f8fafc;padding:1rem;border-radius:0.5rem;border:1px solid #e2e8f0;"><?php echo htmlspecialchars($ticket['admin_remark'] ?? 'No remark provided.'); ?></p>
+            </div>
+            <?php endif; ?>
         </div>
     </div>
 </div>
 
-<?php include '../includes/footer.php'; ?>
+<?php include '../includes/admin_footer.php'; ?>
