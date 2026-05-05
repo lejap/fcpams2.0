@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS branches (
 -- 2. Dropdown Options Table (for Inquiries / Suggestions / Requests)
 CREATE TABLE IF NOT EXISTS dropdown_options (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    type ENUM('INQUIRY', 'SUGGESTION', 'REQUEST') NOT NULL,
+    type ENUM('INQUIRY', 'SUGGESTION', 'REQUEST', 'COMPLAINT_DETAIL', 'TRANSACTION_TYPE') NOT NULL,
     label VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -174,6 +174,28 @@ INSERT IGNORE INTO dropdown_options (type, label) VALUES
     ('REQUEST', 'Passbook Replacement'),
     ('REQUEST', 'ATM Card Request'),
     ('REQUEST', 'Other Document');
+
+-- Add Dropdown Options (COMPLAINT_DETAIL)
+INSERT IGNORE INTO dropdown_options (type, label) VALUES 
+    ('COMPLAINT_DETAIL', 'SERVICE ISSUE'),
+    ('COMPLAINT_DETAIL', 'PRODUCT QUALITY'),
+    ('COMPLAINT_DETAIL', 'STAFF BEHAVIOR'),
+    ('COMPLAINT_DETAIL', 'POLICY/PROCEDURE'),
+    ('COMPLAINT_DETAIL', 'PHYSICAL INFRASTRUCTURE'),
+    ('COMPLAINT_DETAIL', 'OTHER');
+
+-- Add Dropdown Options (TRANSACTION_TYPE)
+INSERT IGNORE INTO dropdown_options (type, label) VALUES 
+    ('TRANSACTION_TYPE', 'DEPOSIT'),
+    ('TRANSACTION_TYPE', 'PAYMENT'),
+    ('TRANSACTION_TYPE', 'WITHDRAWAL'),
+    ('TRANSACTION_TYPE', 'LOAN APPLICATION'),
+    ('TRANSACTION_TYPE', 'LOAN PROCESSING'),
+    ('TRANSACTION_TYPE', 'OPENING SAVINGS ACCOUNT'),
+    ('TRANSACTION_TYPE', 'MEMBERSHIP APPLICATION'),
+    ('TRANSACTION_TYPE', 'GENERAL INQUIRY'),
+    ('TRANSACTION_TYPE', 'INSURANCE RELATED'),
+    ('TRANSACTION_TYPE', 'OTHERS');
 
 -- Add Default Admin Account (Password: password)
 -- bcrypt hash for "password"
