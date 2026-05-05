@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->close();
         // PRG: redirect to prevent re-submission on refresh
         $type_lower = strtolower($post_type);
-        header("Location: /fcpamsweb/citizen/dashboard.php?success=" . urlencode($type_lower));
+        header("Location: " . BASE_URL . "citizen/dashboard.php?success=" . urlencode($type_lower));
         exit();
     } else {
         $error = "Failed to submit ticket. Please try again.";

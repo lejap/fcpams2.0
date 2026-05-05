@@ -160,7 +160,7 @@ include '../includes/staff_sidebar.php';
                 <p style="font-size:0.85rem;color:#065f46;margin-bottom:1.25rem;">On <?php echo $detail['confirmed_at'] ? date('M d, Y H:i', strtotime($detail['confirmed_at'])) : '-'; ?></p>
 
                 <!-- Generate button -->
-                <a href="/fcpamsweb/admin/complaint_resolution_doc.php?id=<?php echo $detail['id']; ?>" target="_blank"
+                <a href="<?php echo BASE_URL; ?>admin/complaint_resolution_doc.php?id=<?php echo $detail['id']; ?>" target="_blank"
                    style="display:flex;align-items:center;justify-content:center;gap:0.6rem;width:100%;padding:0.75rem;border-radius:0.6rem;background:linear-gradient(135deg,#0e83b5,#3b82f6);color:white;font-weight:700;font-size:0.9rem;text-decoration:none;margin-bottom:1rem;">
                     <i class="fas fa-file-alt"></i> Generate Resolution Document
                 </a>
@@ -169,7 +169,7 @@ include '../includes/staff_sidebar.php';
                 <?php if (!empty($detail['signed_doc_path'])): ?>
                 <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:0.6rem;padding:0.85rem;margin-bottom:0.75rem;">
                     <div style="font-size:0.8rem;font-weight:700;color:#15803d;margin-bottom:0.5rem;"><i class="fas fa-check-circle"></i> Signed Document Uploaded</div>
-                    <a href="/fcpamsweb/<?php echo htmlspecialchars($detail['signed_doc_path']); ?>" target="_blank"
+                    <a href="<?php echo BASE_URL; ?><?php echo htmlspecialchars($detail['signed_doc_path']); ?>" target="_blank"
                        style="display:inline-flex;align-items:center;gap:0.4rem;font-size:0.85rem;color:#0e83b5;font-weight:600;text-decoration:none;">
                         <i class="fas fa-eye"></i> View Signed Document
                     </a>

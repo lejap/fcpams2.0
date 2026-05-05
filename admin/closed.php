@@ -322,7 +322,7 @@ include '../includes/admin_sidebar.php';
                             <i class="fas fa-file-alt"></i> Generate
                         </a>
                         <?php if (!empty($c['signed_doc_path'])): ?>
-                        <a href="/fcpamsweb/<?php echo htmlspecialchars($c['signed_doc_path']); ?>" target="_blank"
+                        <a href="<?php echo BASE_URL; ?><?php echo htmlspecialchars($c['signed_doc_path']); ?>" target="_blank"
                            class="btn btn-outline" style="padding:.2rem .6rem;font-size:.8rem;border-radius:2rem;color:#15803d;border-color:#15803d;">
                             <i class="fas fa-eye"></i> Signed Doc
                         </a>

@@ -266,11 +266,11 @@ include '../includes/staff_sidebar.php';
                     <td style="display:flex;gap:0.3rem;flex-wrap:wrap;">
                         <a href="complaints.php?view=<?php echo $c['id']; ?>" class="btn btn-outline" style="padding:.2rem .6rem;font-size:.8rem;border-radius:2rem;color:#b91c1c;border-color:#b91c1c;">View</a>
                         <?php if ($c['status']==='CLOSED'): ?>
-                        <a href="/fcpamsweb/admin/complaint_resolution_doc.php?id=<?php echo $c['id']; ?>" target="_blank" class="btn btn-outline" style="padding:.2rem .6rem;font-size:.8rem;border-radius:2rem;color:#0e83b5;border-color:#0e83b5;">
+                        <a href="<?php echo BASE_URL; ?>admin/complaint_resolution_doc.php?id=<?php echo $c['id']; ?>" target="_blank" class="btn btn-outline" style="padding:.2rem .6rem;font-size:.8rem;border-radius:2rem;color:#0e83b5;border-color:#0e83b5;">
                             <i class="fas fa-file-alt"></i> Generate
                         </a>
                         <?php if (!empty($c['signed_doc_path'])): ?>
-                        <a href="/fcpamsweb/<?php echo htmlspecialchars($c['signed_doc_path']); ?>" target="_blank"
+                        <a href="<?php echo BASE_URL; ?><?php echo htmlspecialchars($c['signed_doc_path']); ?>" target="_blank"
                            class="btn btn-outline" style="padding:.2rem .6rem;font-size:.8rem;border-radius:2rem;color:#15803d;border-color:#15803d;">
                             <i class="fas fa-eye"></i> Signed Doc
                         </a>

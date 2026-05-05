@@ -10,7 +10,7 @@ if (session_status() === PHP_SESSION_NONE) {
 if (!function_exists('auth_guard')) {
     function auth_guard($required_role = null) {
         if (!isset($_SESSION['user_id'])) {
-            header("Location: /fcpamsweb/login.php");
+            header("Location: " . BASE_URL . "login.php");
             exit();
         }
 
@@ -19,9 +19,9 @@ if (!function_exists('auth_guard')) {
             // ADMIN can also access STAFF pages
             if ($required_role === 'STAFF' && ($role === 'STAFF' || $role === 'ADMIN')) return;
             if ($role !== $required_role) {
-                if ($role === 'ADMIN')    { header("Location: /fcpamsweb/admin/dashboard.php"); }
-                elseif ($role === 'STAFF')  { header("Location: /fcpamsweb/staff/dashboard.php"); }
-                else                       { header("Location: /fcpamsweb/citizen/dashboard.php"); }
+                if ($role === 'ADMIN')    { header("Location: " . BASE_URL . "admin/dashboard.php"); }
+                elseif ($role === 'STAFF')  { header("Location: " . BASE_URL . "staff/dashboard.php"); }
+                else                       { header("Location: " . BASE_URL . "citizen/dashboard.php"); }
                 exit();
             }
         }

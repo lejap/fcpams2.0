@@ -198,7 +198,7 @@ include '../includes/admin_sidebar.php';
                 <?php if (!empty($detail['signed_doc_path'])): ?>
                 <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:0.6rem;padding:0.85rem;margin-bottom:0.75rem;">
                     <div style="font-size:0.8rem;font-weight:700;color:#15803d;margin-bottom:0.5rem;"><i class="fas fa-check-circle"></i> Signed Document Uploaded</div>
-                    <a href="/fcpamsweb/<?php echo htmlspecialchars($detail['signed_doc_path']); ?>" target="_blank"
+                    <a href="<?php echo BASE_URL; ?><?php echo htmlspecialchars($detail['signed_doc_path']); ?>" target="_blank"
                        style="display:inline-flex;align-items:center;gap:0.4rem;font-size:0.85rem;color:#0e83b5;font-weight:600;text-decoration:none;">
                         <i class="fas fa-eye"></i> View Signed Document
                     </a>

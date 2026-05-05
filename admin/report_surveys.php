@@ -512,7 +512,7 @@ include '../includes/admin_sidebar.php';
                                     <?php echo date('M d, Y', strtotime($r['created_at'])); ?>
                                 </td>
                                 <td class="no-print">
-                                    <a href="/fcpamsweb/admin/survey_response.php?id=<?php echo $r['id']; ?>"
+                                    <a href="<?php echo BASE_URL; ?>admin/survey_response.php?id=<?php echo $r['id']; ?>"
                                         class="btn btn-outline" style="padding:.2rem .6rem;font-size:.75rem;">View</a>
                                 </td>
                             </tr>

@@ -1,6 +1,6 @@
 <div class="dashboard-layout container animate-fade-in relative z-10" style="position: relative;">
     <button id="nav-toggle" class="btn btn-outline" style="position: absolute; top: 1rem; left: 1rem; z-index: 100; padding: 0.5rem; border-radius: 0.5rem; background: rgba(255,255,255,0.8); border: none; box-shadow: 0 2px 5px rgba(0,0,0,0.1);" onclick="toggleNav()" title="Toggle Navigation">
-        <img src="/fcpamsweb/images/proflogo.png" alt="Menu" style="width: 24px; height: 24px; object-fit: contain;">
+        <img src="<?php echo BASE_URL; ?>images/proflogo.png" alt="Menu" style="width: 24px; height: 24px; object-fit: contain;">
     </button>
     <aside class="sidebar glass-card" id="citizen-sidebar">
         <!-- User Avatar + Info -->
@@ -16,29 +16,29 @@
 
         <!-- Nav Links -->
         <nav class="sidebar-nav">
-            <a href="/fcpamsweb/citizen/dashboard.php" class="sidebar-link">
+            <a href="<?php echo BASE_URL; ?>citizen/dashboard.php" class="sidebar-link">
                 <i class="fas fa-home"></i> Home
             </a>
-            <a href="/fcpamsweb/citizen/submit_ticket.php?type=INQUIRY" class="sidebar-link">
+            <a href="<?php echo BASE_URL; ?>citizen/submit_ticket.php?type=INQUIRY" class="sidebar-link">
                 <i class="fas fa-comment-dots"></i> Inquiries
             </a>
-            <a href="/fcpamsweb/citizen/submit_ticket.php?type=SUGGESTION" class="sidebar-link">
+            <a href="<?php echo BASE_URL; ?>citizen/submit_ticket.php?type=SUGGESTION" class="sidebar-link">
                 <i class="fas fa-lightbulb"></i> Suggestions
             </a>
-            <a href="/fcpamsweb/citizen/submit_ticket.php?type=REQUEST" class="sidebar-link">
+            <a href="<?php echo BASE_URL; ?>citizen/submit_ticket.php?type=REQUEST" class="sidebar-link">
                 <i class="fas fa-file-alt"></i> Requests
             </a>
-            <a href="/fcpamsweb/citizen/submit_complaint.php" class="sidebar-link">
+            <a href="<?php echo BASE_URL; ?>citizen/submit_complaint.php" class="sidebar-link">
                 <i class="fas fa-exclamation-triangle"></i> Complaints
             </a>
-            <a href="/fcpamsweb/citizen/surveys.php" class="sidebar-link">
+            <a href="<?php echo BASE_URL; ?>citizen/surveys.php" class="sidebar-link">
                 <i class="fas fa-poll"></i> Surveys
             </a>
         </nav>
 
         <!-- Logout -->
         <div style="margin-top:auto;padding-top:2rem;">
-            <a href="/fcpamsweb/logout.php" class="sidebar-link" style="color:#f43f5e;background:rgba(244,63,94,0.1);justify-content:center;display:flex;align-items:center;gap:0.5rem;text-decoration:none;border-radius:0.6rem;">
+            <a href="<?php echo BASE_URL; ?>logout.php" class="sidebar-link" style="color:#f43f5e;background:rgba(244,63,94,0.1);justify-content:center;display:flex;align-items:center;gap:0.5rem;text-decoration:none;border-radius:0.6rem;">
                 <i class="fas fa-sign-out-alt"></i> Logout
             </a>
         </div>

@@ -242,7 +242,7 @@ $filed_date = date('F j, Y', strtotime($c['created_at']));
 
     <!-- Header image — OUTSIDE the border, full width -->
     <div class="doc-header-img">
-        <img src="/fcpamsweb/images/bcheader.png" alt="Bansalan Cooperative Header">
+        <img src="<?php echo BASE_URL; ?>images/bcheader.png" alt="Bansalan Cooperative Header">
     </div>
 
     <!-- Content area -->
