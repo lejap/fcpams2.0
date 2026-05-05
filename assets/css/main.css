@@ -186,7 +186,7 @@ a {
 /* Body: background image for citizen/login pages */
 body {
   font-family: var(--font-family);
-  background: url('/fcpamsweb/images/bcbldg.jpg') no-repeat center center fixed;
+  background: url('../../images/bcbldg.jpg') no-repeat center center fixed;
   background-size: cover;
   color: var(--text-primary);
   line-height: 1.6;
