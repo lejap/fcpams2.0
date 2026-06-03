@@ -1,0 +1,5 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home3/bansala1/fcpams.bansalancoop.com
+    - /bin/cp -R . $DEPLOYPATH
