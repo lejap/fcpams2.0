@@ -86,12 +86,13 @@ include '../includes/citizen_sidebar.php';
                     <?php
                     // Twemoji codepoints for: 😄 🙂 😐 😕 😞 (5 → 1, best first)
                     $smiley_cp = ['5'=>'1f604','4'=>'1f642','3'=>'1f610','2'=>'1f615','1'=>'1f61e'];
-                    $labels    = ['5'=>'Excellent','4'=>'Good','3'=>'Neutral','2'=>'Bad','1'=>'Very Bad'];
+                    $labels    = ['5'=>'Strongly Agree','4'=>'Agree','3'=>'Neutral','2'=>'Disagree','1'=>'Strongly Disagree'];
+                    $scores    = ['5'=>'(5)','4'=>'(4)','3'=>'(3)','2'=>'(2)','1'=>'(1)'];
                     $tw_base   = 'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/';
                     ?>
-                    <div style="display:flex;gap:1.25rem;margin-top:0.75rem;flex-wrap:wrap;">
+                    <div style="display:flex;gap:1rem;margin-top:0.75rem;flex-wrap:wrap;justify-content:center;">
                         <?php foreach($smiley_cp as $r=>$cp): ?>
-                        <label style="display:flex;flex-direction:column;align-items:center;cursor:pointer;gap:0.4rem;">
+                        <label style="display:flex;flex-direction:column;align-items:center;cursor:pointer;gap:0.35rem;min-width:80px;">
                             <input type="radio" name="q_<?php echo $q['id']; ?>" value="<?php echo $r; ?>" required
                                    id="r_<?php echo $q['id'].'_'.$r; ?>"
                                    style="display:none;"
@@ -100,10 +101,11 @@ include '../includes/citizen_sidebar.php';
                                  class="smiley-btn"
                                  id="smiley_<?php echo $q['id'].'_'.$r; ?>"
                                  onclick="selectSmiley(<?php echo $q['id']; ?>, <?php echo $r; ?>)"
-                                 width="52" height="52"
+                                 width="48" height="48"
                                  style="opacity:0.32;cursor:pointer;transition:opacity 0.18s,transform 0.18s,filter 0.18s;filter:grayscale(30%);display:block;"
                                  alt="<?php echo $labels[$r]; ?>">
-                            <span style="font-size:0.68rem;color:#94a3b8;font-weight:600;"><?php echo $labels[$r]; ?></span>
+                            <span style="font-size:0.7rem;color:#334155;font-weight:700;text-align:center;line-height:1.2;"><?php echo $labels[$r]; ?></span>
+                            <span style="font-size:0.65rem;color:#94a3b8;font-weight:600;"><?php echo $scores[$r]; ?></span>
                         </label>
                         <?php endforeach; ?>
                     </div>

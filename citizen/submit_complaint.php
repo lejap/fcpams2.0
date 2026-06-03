@@ -125,21 +125,20 @@ include '../includes/citizen_sidebar.php';
     ">
         <!-- Modal Header -->
         <div style="background:linear-gradient(135deg,#0e83b5,#1e40af);padding:1.25rem 1.75rem;border-radius:1.25rem 1.25rem 0 0;">
-            <div style="text-align:right;font-size:0.7rem;color:rgba(255,255,255,0.7);font-weight:700;letter-spacing:.05em;margin-bottom:.25rem;">ANNEX B</div>
-            <h2 style="color:white;font-size:1.1rem;font-weight:800;margin:0 0 .15rem;">NAME OF CDARE</h2>
-            <p style="color:rgba(255,255,255,0.9);font-size:.9rem;font-weight:600;margin:0;">Sample Confidentiality Clause</p>
+            <h2 style="color:white;font-size:1.15rem;font-weight:800;margin:0 0 .15rem;">Bansalan Coop</h2>
+            <p style="color:rgba(255,255,255,0.9);font-size:.9rem;font-weight:600;margin:0;">Confidentiality Clause</p>
         </div>
 
         <!-- Modal Body — scrollable -->
         <div id="modal-body" style="padding:1.5rem 1.75rem;overflow-y:auto;flex:1;line-height:1.75;color:#1e293b;font-size:.92rem;" onscroll="checkScroll()">
             <p style="text-align:justify;margin-bottom:1rem;">
-                All information obtained, processed, and documented during the handling of financial consumer complaints and requests under the Financial Consumer Protection Assistance Management System (FCPAMS) shall be treated with strict confidentiality. The CDA-Regulated Entity (CDARE) shall ensure that the identity, personal information, and transaction details of the financial consumer are safeguarded and used solely for the purpose of resolving the complaint or request.
+                All information obtained, processed, and documented during the handling of financial consumer complaints and requests under the Financial Consumer Protection Assistance Management System (FCPAMS) shall be treated with strict confidentiality. Bansalan Coop shall ensure that the identity, personal information, and transaction details of the financial consumer are safeguarded and used solely for the purpose of resolving the complaint or request.
             </p>
             <p style="text-align:justify;margin-bottom:1rem;">
                 Access to confidential information shall be limited to authorized personnel directly involved in the assessment, investigation, and resolution of the complaint. Any disclosure of information to third parties shall require the explicit consent of the financial consumer, except when disclosure is necessary to comply with legal or regulatory requirements.
             </p>
             <p style="text-align:justify;margin-bottom:1.5rem;">
-                The CDARE shall adopt appropriate data privacy and security measures in accordance with the RA 10173 or the Data Privacy Act of 2012 and its implementing rules and regulations. Unauthorized disclosure, misuse, or mishandling of confidential information shall be subject to disciplinary action and applicable penalties under existing laws and cooperative policies.
+                Bansalan Coop shall adopt appropriate data privacy and security measures in accordance with the RA 10173 or the Data Privacy Act of 2012 and its implementing rules and regulations. Unauthorized disclosure, misuse, or mishandling of confidential information shall be subject to disciplinary action and applicable penalties under existing laws and cooperative policies.
             </p>
             <div id="scroll-hint" style="text-align:center;color:#94a3b8;font-size:.8rem;padding:.5rem 0;">
                 <i class="fas fa-chevron-down"></i> Scroll down to read the full clause before proceeding
