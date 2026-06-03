@@ -193,9 +193,9 @@ include '../includes/admin_sidebar.php';
     <table class="rtbl">
         <thead>
             <tr>
-                <th>#</th><th>Member</th><th>Phone</th><th>Branch</th><th>Complaint Type</th>
+                <th>CRN</th><th>Member</th><th>Phone</th><th>Branch</th><th>Complaint Type</th>
                 <th>Transaction</th><th>Complexity</th><th>Status</th>
-                <th>Date Filed</th><th>Date Resolved</th><th>Resolved By</th><th>Confirmed By</th><th>Resolution Remark</th>
+                <th>Date Filed</th><th>Date Resolved</th><th>Aging (Days)</th><th>Resolved By</th><th>Confirmed By</th><th>Resolution Remark (Staff)</th><th>Resolution of Complaint (Admin)</th>
             </tr>
         </thead>
         <tbody>
@@ -208,7 +208,7 @@ include '../includes/admin_sidebar.php';
             $xcol=$xc[$c['complexity']]??'#94a3b8';
         ?>
         <tr>
-            <td style="color:#94a3b8;"><?php echo $c['id'];?></td>
+            <td style="font-weight:700;color:#ef4444;white-space:nowrap;">CRN-<?php echo $c['id'];?></td>
             <td style="font-weight:600;"><?php echo htmlspecialchars($c['user_name']);?></td>
             <td style="font-size:.78rem;"><?php echo htmlspecialchars($c['user_phone']??'-');?></td>
             <td><?php echo htmlspecialchars($c['user_branch']??'-');?></td>
@@ -218,12 +218,26 @@ include '../includes/admin_sidebar.php';
             <td><span class="badge" style="background:<?php echo $scol;?>22;color:<?php echo $scol;?>;"><?php echo $c['status'];?></span></td>
             <td style="white-space:nowrap;font-size:.8rem;"><?php echo date('M d, Y',strtotime($c['created_at']));?></td>
             <td style="white-space:nowrap;font-size:.8rem;"><?php echo $c['resolved_at']?date('M d, Y',strtotime($c['resolved_at'])):'-';?></td>
+            <td style="text-align:center;">
+                <?php
+                if ($c['resolved_at'] && $c['created_at']) {
+                    $filed   = new DateTime($c['created_at']);
+                    $resolved = new DateTime($c['resolved_at']);
+                    $days = max(1, (int)$filed->diff($resolved)->days);
+                    $color = $days <= 3 ? '#10b981' : ($days <= 7 ? '#eab308' : '#ef4444');
+                    echo '<span class="badge" style="background:'.$color.'22;color:'.$color.';font-weight:700;">'.$days.' day'.($days!=1?'s':'').'</span>';
+                } else {
+                    echo '<span style="color:#94a3b8;">—</span>';
+                }
+                ?>
+            </td>
             <td style="font-size:.8rem;"><?php echo htmlspecialchars($c['resolved_by_name']??'-');?></td>
             <td style="font-size:.8rem;"><?php echo htmlspecialchars($c['confirmed_by_name']??'-');?></td>
-            <td style="font-size:.78rem;max-width:180px;color:#334155;"><?php echo $c['admin_remark'] ? nl2br(htmlspecialchars(mb_substr($c['admin_remark'],0,120).(strlen($c['admin_remark'])>120?'...':''))) : '<span style="color:#94a3b8;">—</span>'; ?></td>
+            <td style="font-size:.78rem;max-width:160px;color:#334155;"><?php echo $c['admin_remark'] ? nl2br(htmlspecialchars(mb_substr($c['admin_remark'],0,100).(strlen($c['admin_remark'])>100?'...':''))) : '<span style="color:#94a3b8;">—</span>'; ?></td>
+            <td style="font-size:.78rem;max-width:180px;color:#334155;"><?php echo !empty($c['confirm_remark']) ? nl2br(htmlspecialchars(mb_substr($c['confirm_remark'],0,120).(strlen($c['confirm_remark'])>120?'...':''))) : '<span style="color:#94a3b8;">—</span>'; ?></td>
         </tr>
         <?php endwhile; else: ?>
-        <tr><td colspan="13" style="text-align:center;padding:2rem;color:#94a3b8;">No records match the selected filters.</td></tr>
+        <tr><td colspan="15" style="text-align:center;padding:2rem;color:#94a3b8;">No records match the selected filters.</td></tr>
         <?php endif; ?>
         </tbody>
     </table>

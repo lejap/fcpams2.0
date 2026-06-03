@@ -176,7 +176,7 @@ include '../includes/staff_sidebar.php';
                 <?php if ($complaints->num_rows > 0): ?>
                 <?php while ($c = $complaints->fetch_assoc()): ?>
                 <tr>
-                    <td>#<?php echo $c['id']; ?></td>
+                    <td style="font-weight:700;color:#ef4444;">CRN-<?php echo $c['id']; ?></td>
                     <td style="font-weight:600;">
                         <div><?php echo htmlspecialchars($c['user_name']); ?></div>
                         <div style="font-size:0.7rem;color:#64748b;"><?php echo htmlspecialchars($c['user_phone']); ?></div>

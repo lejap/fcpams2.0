@@ -66,7 +66,7 @@ include '../includes/staff_sidebar.php';
 <!-- Detail View -->
 <div class="fade-in">
     <a href="complaints.php" style="color:#64748b;text-decoration:none;font-size:0.9rem;"><i class="fas fa-arrow-left"></i> Back to Complaints</a>
-    <h1 style="font-size:1.75rem;color:#ef4444;margin:0.5rem 0 1.5rem;">Complaint #<?php echo $detail['id']; ?></h1>
+    <h1 style="font-size:1.75rem;color:#ef4444;margin:0.5rem 0 1.5rem;">CRN-<?php echo $detail['id']; ?></h1>
 
     <?php if (isset($_GET['resolved'])): ?>
     <div style="background:rgba(16,185,129,0.1);border:1px solid #10b981;color:#065f46;padding:1rem;border-radius:0.5rem;margin-bottom:1.5rem;">
@@ -248,7 +248,7 @@ include '../includes/staff_sidebar.php';
                 <?php if ($complaints->num_rows > 0): ?>
                 <?php while ($c = $complaints->fetch_assoc()): ?>
                 <tr>
-                    <td>#<?php echo $c['id']; ?></td>
+                    <td style="font-weight:700;color:#ef4444;">CRN-<?php echo $c['id']; ?></td>
                     <td style="font-weight:600;"><?php echo htmlspecialchars($c['user_name']); ?></td>
                     <td><?php echo htmlspecialchars($c['user_branch']); ?></td>
                     <td><span style="background:#fee2e2;color:#dc2626;padding:.2rem .5rem;border-radius:.25rem;font-size:.75rem;font-weight:bold;"><?php echo htmlspecialchars(mb_substr($c['complaint_details']??'',0,20)).(strlen($c['complaint_details']??'')>20?'...':''); ?></span></td>

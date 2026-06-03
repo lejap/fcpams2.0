@@ -101,7 +101,7 @@ include '../includes/admin_sidebar.php';
 <!-- Detail View -->
 <div class="fade-in">
     <a href="complaints.php" style="color:#64748b;text-decoration:none;font-size:0.9rem;"><i class="fas fa-arrow-left"></i> Back to Complaints</a>
-    <h1 style="font-size:1.75rem;color:#ef4444;margin:0.5rem 0 1.5rem;">Complaint #<?php echo $detail['id']; ?></h1>
+    <h1 style="font-size:1.75rem;color:#ef4444;margin:0.5rem 0 1.5rem;">CRN-<?php echo $detail['id']; ?></h1>
     <div style="display:grid;grid-template-columns:1fr 1.5fr;gap:1.5rem;">
         <div>
             <div class="glass-card" style="margin-bottom:1rem;">
@@ -286,13 +286,13 @@ include '../includes/admin_sidebar.php';
         <div style="overflow-x:auto;">
         <table class="admin-table">
             <thead>
-                <tr><th>ID</th><th>Member</th><th>Branch</th><th>Complaint Type</th><th>Complexity</th><th>Date Filed</th><th>Date Resolved</th><th>Resolved By</th><th>Status</th><th>Action</th></tr>
+                <tr><th>CRN</th><th>Member</th><th>Branch</th><th>Complaint Type</th><th>Complexity</th><th>Date Filed</th><th>Date Resolved</th><th>Aging (Days)</th><th>Resolved By</th><th>Resolution of Complaint</th><th>Status</th><th>Action</th></tr>
             </thead>
             <tbody>
                 <?php if ($complaints->num_rows > 0): ?>
                 <?php while ($c = $complaints->fetch_assoc()): ?>
                 <tr>
-                    <td>#<?php echo $c['id']; ?></td>
+                    <td style="font-weight:700;color:#ef4444;">CRN-<?php echo $c['id']; ?></td>
                     <td style="font-weight:600;"><?php echo htmlspecialchars($c['user_name']); ?></td>
                     <td><?php echo htmlspecialchars($c['user_branch']); ?></td>
                     <td><span style="background:#fee2e2;color:#dc2626;padding:.2rem .5rem;border-radius:.25rem;font-size:.75rem;font-weight:bold;"><?php echo htmlspecialchars(mb_substr($c['complaint_details']??'',0,20)).(strlen($c['complaint_details']??'')>20?'...':''); ?></span></td>
@@ -312,8 +312,22 @@ include '../includes/admin_sidebar.php';
                     </td>
                     <td><?php echo date('M d, Y', strtotime($c['created_at'])); ?></td>
                     <td><?php echo $c['resolved_at'] ? date('M d, Y', strtotime($c['resolved_at'])) : '-'; ?></td>
+                    <td style="text-align:center;">
+                        <?php
+                        if ($c['resolved_at'] && $c['created_at']) {
+                            $filed   = new DateTime($c['created_at']);
+                            $res     = new DateTime($c['resolved_at']);
+                            $days    = max(1, (int)$filed->diff($res)->days);
+                            $color   = $days <= 3 ? '#10b981' : ($days <= 7 ? '#eab308' : '#ef4444');
+                            echo '<span style="background:'.$color.'22;color:'.$color.';padding:.15rem .5rem;border-radius:.25rem;font-size:.75rem;font-weight:700;">'.$days.'d</span>';
+                        } else {
+                            echo '<span style="color:#94a3b8;">—</span>';
+                        }
+                        ?>
+                    </td>
                     <td><?php echo $c['resolved_by_name'] ? '<span style="background:#dbeafe;color:#1e40af;padding:.15rem .5rem;border-radius:.25rem;font-size:.75rem;font-weight:600;">'.htmlspecialchars($c['resolved_by_name']).'</span>' : '-'; ?></td>
-                    <td><span class="badge" style="background:<?php echo $c['status']==='OPEN'?'#eab308':($c['status']==='CLOSED'?'#8b5cf6':'#10b981'); ?>;"><?php echo $c['status']; ?></span></td>
+                    <td style="font-size:.78rem;max-width:180px;color:#334155;"><?php echo !empty($c['confirm_remark']) ? nl2br(htmlspecialchars(mb_substr($c['confirm_remark'],0,80).(strlen($c['confirm_remark'])>80?'...':''))) : '<span style="color:#94a3b8;font-size:.8rem;">—</span>'; ?></td>
+                    <td><span class="badge" style="background:<?php echo $c['status']==='OPEN'?'#eab308':($c['status']==='CLOSED'?'#8b5cf6':'#10b981'); ?>;"> <?php echo $c['status']; ?></span></td>
                     <td style="display:flex;gap:0.3rem;">
                         <a href="complaints.php?view=<?php echo $c['id']; ?>" class="btn btn-outline" style="padding:.25rem .5rem;font-size:.8rem;color:#b91c1c;border-color:#b91c1c;">Review</a>
                         <form method="POST" style="margin:0;" onsubmit="return confirm('Mark this complaint as SPAM?');">
@@ -324,7 +338,7 @@ include '../includes/admin_sidebar.php';
                 </tr>
                 <?php endwhile; ?>
                 <?php else: ?>
-                <tr><td colspan="10" style="text-align:center;padding:2rem;color:#94a3b8;">No complaints filed yet.</td></tr>
+                <tr><td colspan="12" style="text-align:center;padding:2rem;color:#94a3b8;">No complaints filed yet.</td></tr>
                 <?php endif; ?>
             </tbody>
         </table>

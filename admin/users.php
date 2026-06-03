@@ -77,13 +77,20 @@ include '../includes/admin_sidebar.php';
                     <td><?php echo htmlspecialchars($u['email']); ?></td>
                     <td>
                         <?php if ($u['id'] !== $_SESSION['user_id']): ?>
-                        <form method="POST" style="display:inline-flex;gap:0.3rem;align-items:center;">
-                            <input type="hidden" name="id" value="<?php echo $u['id']; ?>">
+                        <form method="POST" style="display:inline-flex;gap:0.4rem;align-items:center;"
+                              onsubmit="return confirmRoleChange(this)">
+                            <input type="hidden" name="id"     value="<?php echo $u['id']; ?>">
                             <input type="hidden" name="action" value="role">
-                            <select name="role" style="padding:0.2rem 0.4rem;border:1px solid #e2e8f0;border-radius:0.4rem;font-size:0.8rem;background:white;color:#1e293b;" onchange="this.form.submit()">
+                            <input type="hidden" name="user_name_label" value="<?php echo htmlspecialchars($u['name']); ?>">
+                            <select name="role"
+                                    style="padding:0.25rem 0.5rem;border:1px solid #cbd5e1;border-radius:0.4rem;font-size:0.8rem;background:white;color:#1e293b;font-weight:600;cursor:pointer;">
                                 <option value="STAFF" <?php echo $u['role']==='STAFF'?'selected':''; ?>>STAFF</option>
                                 <option value="ADMIN" <?php echo $u['role']==='ADMIN'?'selected':''; ?>>ADMIN</option>
                             </select>
+                            <button type="submit"
+                                    style="background:#0e83b5;color:white;border:none;border-radius:0.4rem;padding:0.25rem 0.65rem;font-size:0.78rem;cursor:pointer;font-weight:700;white-space:nowrap;">
+                                <i class="fas fa-save"></i> Save
+                            </button>
                         </form>
                         <?php else: ?>
                             <span style="background:#dbeafe;color:#1d4ed8;padding:0.2rem 0.6rem;border-radius:0.3rem;font-size:0.78rem;font-weight:700;"><?php echo $u['role']; ?> (You)</span>
@@ -129,5 +136,14 @@ include '../includes/admin_sidebar.php';
         </div>
     </div>
 </div>
+
+<script>
+function confirmRoleChange(form) {
+    var select   = form.querySelector('select[name="role"]');
+    var newRole  = select.value;
+    var userName = form.querySelector('input[name="user_name_label"]').value;
+    return confirm('Change role of "' + userName + '" to ' + newRole + '?\n\nThis will immediately update their access level.');
+}
+</script>
 <?php include '../includes/admin_footer.php'; ?>
 

@@ -65,10 +65,10 @@ include '../includes/citizen_sidebar.php';
         <p style="color:rgba(255,255,255,0.75);font-size:0.95rem;margin:0;">What would you like to do today?</p>
     </div>
 
-    <!-- Action cards grid — File a Complaint first -->
+    <!-- Action cards grid -->
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.25rem;margin-bottom:2.5rem;">
 
-        <!-- Complaint — FIRST -->
+        <!-- 1. Complaint — FIRST -->
         <a href="submit_complaint.php" class="glass-card" style="display:flex;flex-direction:column;align-items:center;gap:0.85rem;padding:1.5rem;border-bottom:4px solid #f43f5e;text-decoration:none;">
             <i class="fas fa-exclamation-triangle" style="font-size:2.5rem;color:#f43f5e;"></i>
             <div style="text-align:center;">
@@ -78,7 +78,7 @@ include '../includes/citizen_sidebar.php';
             <span class="btn btn-primary" style="width:100%;text-align:center;padding:0.55rem;font-size:0.9rem;margin-top:auto;background:linear-gradient(135deg,#f43f5e,#e11d48);">File Complaint</span>
         </a>
 
-        <!-- Inquiry -->
+        <!-- 2. Inquiry -->
         <a href="submit_ticket.php?type=INQUIRY" class="glass-card" style="display:flex;flex-direction:column;align-items:center;gap:0.85rem;padding:1.5rem;border-bottom:4px solid #3b82f6;text-decoration:none;">
             <i class="fas fa-comment-dots" style="font-size:2.5rem;color:#3b82f6;"></i>
             <div style="text-align:center;">
@@ -88,7 +88,17 @@ include '../includes/citizen_sidebar.php';
             <span class="btn btn-primary" style="width:100%;text-align:center;padding:0.55rem;font-size:0.9rem;margin-top:auto;">Go to Inquiry</span>
         </a>
 
-        <!-- Suggestion -->
+        <!-- 3. Request -->
+        <a href="submit_ticket.php?type=REQUEST" class="glass-card" style="display:flex;flex-direction:column;align-items:center;gap:0.85rem;padding:1.5rem;border-bottom:4px solid #f59e0b;text-decoration:none;">
+            <i class="fas fa-file-alt" style="font-size:2.5rem;color:#f59e0b;"></i>
+            <div style="text-align:center;">
+                <h3 style="color:#1e293b;font-size:1.1rem;margin-bottom:0.2rem;">Submit Request</h3>
+                <p style="font-size:0.82rem;color:#64748b;margin:0;">Need specific assistance?</p>
+            </div>
+            <span class="btn btn-primary" style="width:100%;text-align:center;padding:0.55rem;font-size:0.9rem;margin-top:auto;background:linear-gradient(135deg,#f59e0b,#d97706);">Go to Request</span>
+        </a>
+
+        <!-- 4. Suggestion -->
         <a href="submit_ticket.php?type=SUGGESTION" class="glass-card" style="display:flex;flex-direction:column;align-items:center;gap:0.85rem;padding:1.5rem;border-bottom:4px solid #6366f1;text-decoration:none;">
             <i class="fas fa-lightbulb" style="font-size:2.5rem;color:#6366f1;"></i>
             <div style="text-align:center;">
@@ -98,7 +108,7 @@ include '../includes/citizen_sidebar.php';
             <span class="btn btn-primary" style="width:100%;text-align:center;padding:0.55rem;font-size:0.9rem;margin-top:auto;background:linear-gradient(135deg,#6366f1,#8b5cf6);">Go to Suggestions</span>
         </a>
 
-        <!-- Survey -->
+        <!-- 5. Survey -->
         <a href="surveys.php" class="glass-card" style="display:flex;flex-direction:column;align-items:center;gap:0.85rem;padding:1.5rem;border-bottom:4px solid #10b981;text-decoration:none;">
             <i class="fas fa-poll" style="font-size:2.5rem;color:#10b981;"></i>
             <div style="text-align:center;">
@@ -106,16 +116,6 @@ include '../includes/citizen_sidebar.php';
                 <p style="font-size:0.82rem;color:#64748b;margin:0;">Your feedback matters to us.</p>
             </div>
             <span class="btn btn-primary" style="width:100%;text-align:center;padding:0.55rem;font-size:0.9rem;margin-top:auto;background:linear-gradient(135deg,#10b981,#059669);">View Surveys</span>
-        </a>
-
-        <!-- Request -->
-        <a href="submit_ticket.php?type=REQUEST" class="glass-card" style="display:flex;flex-direction:column;align-items:center;gap:0.85rem;padding:1.5rem;border-bottom:4px solid #f59e0b;text-decoration:none;">
-            <i class="fas fa-file-alt" style="font-size:2.5rem;color:#f59e0b;"></i>
-            <div style="text-align:center;">
-                <h3 style="color:#1e293b;font-size:1.1rem;margin-bottom:0.2rem;">Submit Request</h3>
-                <p style="font-size:0.82rem;color:#64748b;margin:0;">Need specific assistance?</p>
-            </div>
-            <span class="btn btn-primary" style="width:100%;text-align:center;padding:0.55rem;font-size:0.9rem;margin-top:auto;background:linear-gradient(135deg,#f59e0b,#d97706);">Go to Request</span>
         </a>
 
     </div>

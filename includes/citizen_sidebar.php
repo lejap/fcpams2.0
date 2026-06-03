@@ -19,17 +19,17 @@
             <a href="<?php echo BASE_URL; ?>citizen/dashboard.php" class="sidebar-link">
                 <i class="fas fa-home"></i> Home
             </a>
-            <a href="<?php echo BASE_URL; ?>citizen/submit_ticket.php?type=INQUIRY" class="sidebar-link">
-                <i class="fas fa-comment-dots"></i> Inquiries
+            <a href="<?php echo BASE_URL; ?>citizen/submit_complaint.php" class="sidebar-link">
+                <i class="fas fa-exclamation-triangle"></i> File a Complaint
             </a>
-            <a href="<?php echo BASE_URL; ?>citizen/submit_ticket.php?type=SUGGESTION" class="sidebar-link">
-                <i class="fas fa-lightbulb"></i> Suggestions
+            <a href="<?php echo BASE_URL; ?>citizen/submit_ticket.php?type=INQUIRY" class="sidebar-link">
+                <i class="fas fa-comment-dots"></i> Submit Inquiry
             </a>
             <a href="<?php echo BASE_URL; ?>citizen/submit_ticket.php?type=REQUEST" class="sidebar-link">
-                <i class="fas fa-file-alt"></i> Requests
+                <i class="fas fa-file-alt"></i> Submit Request
             </a>
-            <a href="<?php echo BASE_URL; ?>citizen/submit_complaint.php" class="sidebar-link">
-                <i class="fas fa-exclamation-triangle"></i> Complaints
+            <a href="<?php echo BASE_URL; ?>citizen/submit_ticket.php?type=SUGGESTION" class="sidebar-link">
+                <i class="fas fa-lightbulb"></i> Make Suggestion
             </a>
             <a href="<?php echo BASE_URL; ?>citizen/surveys.php" class="sidebar-link">
                 <i class="fas fa-poll"></i> Surveys

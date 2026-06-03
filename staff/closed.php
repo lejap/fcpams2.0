@@ -227,14 +227,16 @@ include '../includes/staff_sidebar.php';
         <table class="admin-table">
             <thead>
                 <tr>
-                    <th>ID</th>
+                    <th>CRN</th>
                     <th>Member</th>
                     <th>Branch</th>
                     <th>Complaint Type</th>
                     <th>Complexity</th>
                     <th>Status</th>
                     <th>Date Resolved</th>
+                    <th>Aging (Days)</th>
                     <th>Resolved By</th>
+                    <th>Resolution of Complaint</th>
                     <th>Confirmed By</th>
                     <th>Action</th>
                 </tr>
@@ -243,7 +245,7 @@ include '../includes/staff_sidebar.php';
                 <?php if ($complaints->num_rows > 0): ?>
                 <?php while ($c = $complaints->fetch_assoc()): ?>
                 <tr>
-                    <td>#<?php echo $c['id']; ?></td>
+                    <td style="font-weight:700;color:#ef4444;">CRN-<?php echo $c['id']; ?></td>
                     <td style="font-weight:600;"><?php echo htmlspecialchars($c['user_name']); ?></td>
                     <td><?php echo htmlspecialchars($c['user_branch']); ?></td>
                     <td><span style="background:#fee2e2;color:#dc2626;padding:.2rem .5rem;border-radius:.25rem;font-size:.75rem;font-weight:bold;"><?php echo htmlspecialchars(mb_substr($c['complaint_details']??'',0,20)).(strlen($c['complaint_details']??'')>20?'...':''); ?></span></td>
@@ -261,7 +263,21 @@ include '../includes/staff_sidebar.php';
                         <?php endif; ?>
                     </td>
                     <td style="font-size:0.8rem;"><?php echo $c['resolved_at'] ? date('M d, Y', strtotime($c['resolved_at'])) : '-'; ?></td>
+                    <td style="text-align:center;">
+                        <?php
+                        if ($c['resolved_at'] && $c['created_at']) {
+                            $filed = new DateTime($c['created_at']);
+                            $res   = new DateTime($c['resolved_at']);
+                            $days  = max(1, (int)$filed->diff($res)->days);
+                            $color = $days <= 3 ? '#10b981' : ($days <= 7 ? '#eab308' : '#ef4444');
+                            echo '<span style="background:'.$color.'22;color:'.$color.';padding:.15rem .5rem;border-radius:.25rem;font-size:.75rem;font-weight:700;">'.$days.'d</span>';
+                        } else {
+                            echo '<span style="color:#94a3b8;">—</span>';
+                        }
+                        ?>
+                    </td>
                     <td><?php echo $c['resolved_by_name'] ? '<span style="background:#dbeafe;color:#1e40af;padding:.15rem .5rem;border-radius:.25rem;font-size:.75rem;font-weight:600;">'.htmlspecialchars($c['resolved_by_name']).'</span>' : '-'; ?></td>
+                    <td style="font-size:.78rem;max-width:180px;color:#334155;"><?php echo !empty($c['confirm_remark']) ? nl2br(htmlspecialchars(mb_substr($c['confirm_remark'],0,80).(strlen($c['confirm_remark'])>80?'...':''))) : '<span style="color:#94a3b8;font-size:.8rem;">—</span>'; ?></td>
                     <td><?php echo $c['confirmed_by_name'] ? '<span style="background:#ede9fe;color:#5b21b6;padding:.15rem .5rem;border-radius:.25rem;font-size:.75rem;font-weight:600;">'.htmlspecialchars($c['confirmed_by_name']).'</span>' : '<span style="color:#94a3b8;font-size:.8rem;">Pending Admin</span>'; ?></td>
                     <td style="display:flex;gap:0.3rem;flex-wrap:wrap;">
                         <a href="complaints.php?view=<?php echo $c['id']; ?>" class="btn btn-outline" style="padding:.2rem .6rem;font-size:.8rem;border-radius:2rem;color:#b91c1c;border-color:#b91c1c;">View</a>
@@ -291,7 +307,7 @@ include '../includes/staff_sidebar.php';
                 </tr>
                 <?php endwhile; ?>
                 <?php else: ?>
-                <tr><td colspan="10" style="text-align:center;padding:2rem;color:#94a3b8;">No resolved or closed complaints found.</td></tr>
+                <tr><td colspan="12" style="text-align:center;padding:2rem;color:#94a3b8;">No resolved or closed complaints found.</td></tr>
                 <?php endif; ?>
             </tbody>
         </table>
