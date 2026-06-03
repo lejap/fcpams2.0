@@ -32,10 +32,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_spam'])) {
 // Handle admin confirmation
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm'])) {
     if ($current_user['role'] !== 'ADMIN') die('Forbidden');
-    $tid  = (int)$_POST['ticket_id'];
-    $name = $_SESSION['name'];
-    $stmt = $conn->prepare("UPDATE tickets SET status='CLOSED', confirmed_at=NOW(), confirmed_by_name=? WHERE id=?");
-    $stmt->bind_param("si", $name, $tid);
+    $tid            = (int)$_POST['ticket_id'];
+    $name           = $_SESSION['name'];
+    $confirm_remark = sanitize($_POST['confirm_remark'] ?? '');
+    $stmt = $conn->prepare("UPDATE tickets SET status='CLOSED', confirmed_at=NOW(), confirmed_by_name=?, confirm_remark=? WHERE id=?");
+    $stmt->bind_param("ssi", $name, $confirm_remark, $tid);
     $stmt->execute();
     header("Location: submissions.php");
     exit();
@@ -108,6 +109,12 @@ include '../includes/admin_sidebar.php';
                 <p><?php echo nl2br(htmlspecialchars($detail['admin_remark'])); ?></p>
             </div>
             <?php endif; ?>
+            <?php if (!empty($detail['confirm_remark'])): ?>
+            <div class="glass-card" style="margin-bottom:1rem;border-left:4px solid #8b5cf6;">
+                <h4 style="margin-bottom:0.75rem;color:#8b5cf6;"><i class="fas fa-clipboard-check"></i> Resolution of Complaint (Admin)</h4>
+                <p><?php echo nl2br(htmlspecialchars($detail['confirm_remark'])); ?></p>
+            </div>
+            <?php endif; ?>
             <?php if ($detail['status'] === 'OPEN'): ?>
             <div class="glass-card">
                 <h4 style="margin-bottom:1rem;">Resolve This Submission</h4>
@@ -133,10 +140,19 @@ include '../includes/admin_sidebar.php';
             <?php elseif ($detail['status'] === 'RESOLVED' && $current_user['role'] === 'ADMIN'): ?>
             <div class="glass-card" style="border-left:4px solid #8b5cf6;">
                 <h4 style="margin-bottom:1rem;color:#8b5cf6;">Confirm Resolution (Admin)</h4>
-                <p style="font-size:0.85rem;color:#64748b;margin-bottom:1rem;">As the Admin, you can confirm this resolution to officially CLOSE the submission.</p>
+                <p style="font-size:0.85rem;color:#64748b;margin-bottom:1rem;">As the Admin, you can confirm this resolution to officially CLOSE the submission. Please provide your resolution remarks below.</p>
                 <form method="POST">
                     <input type="hidden" name="ticket_id" value="<?php echo $detail['id']; ?>">
-                    <button type="submit" name="confirm" class="btn btn-primary" style="background:#8b5cf6;border:none;width:100%;justify-content:center;">Confirm & Close</button>
+                    <div class="form-group" style="margin-bottom:1rem;">
+                        <label class="form-label" style="font-weight:700;color:#8b5cf6;">Resolution of Complaint <span style="color:#ef4444;">*</span></label>
+                        <textarea name="confirm_remark" class="form-input" rows="4"
+                                  placeholder="Describe the resolution of this submission..."
+                                  required
+                                  style="border-color:#8b5cf6;resize:vertical;"></textarea>
+                    </div>
+                    <button type="submit" name="confirm" class="btn btn-primary" style="background:#8b5cf6;border:none;width:100%;justify-content:center;">
+                        <i class="fas fa-check-circle"></i> Confirm & Close
+                    </button>
                 </form>
             </div>
             <?php endif; ?>

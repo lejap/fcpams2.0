@@ -233,6 +233,6 @@ include '../includes/admin_sidebar.php';
             </tbody>
         </table>
         </div>
-    </div>
+    </div> 
 </div>
 <?php include '../includes/admin_footer.php'; ?>

@@ -84,9 +84,9 @@ include '../includes/citizen_sidebar.php';
 
                 <?php elseif ($q['type'] === 'RATING'): ?>
                     <?php
-                    // Twemoji codepoints for: 😞 😕 😐 🙂 😄
-                    $smiley_cp = ['1'=>'1f61e','2'=>'1f615','3'=>'1f610','4'=>'1f642','5'=>'1f604'];
-                    $labels    = ['1'=>'Very Bad','2'=>'Bad','3'=>'Neutral','4'=>'Good','5'=>'Excellent'];
+                    // Twemoji codepoints for: 😄 🙂 😐 😕 😞 (5 → 1, best first)
+                    $smiley_cp = ['5'=>'1f604','4'=>'1f642','3'=>'1f610','2'=>'1f615','1'=>'1f61e'];
+                    $labels    = ['5'=>'Excellent','4'=>'Good','3'=>'Neutral','2'=>'Bad','1'=>'Very Bad'];
                     $tw_base   = 'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/';
                     ?>
                     <div style="display:flex;gap:1.25rem;margin-top:0.75rem;flex-wrap:wrap;">

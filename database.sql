@@ -61,6 +61,7 @@ CREATE TABLE IF NOT EXISTS tickets (
     resolved_by_name VARCHAR(255),
     confirmed_at TIMESTAMP NULL,
     confirmed_by_name VARCHAR(255),
+    confirm_remark TEXT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (option_id) REFERENCES dropdown_options(id) ON DELETE SET NULL
 );
@@ -130,6 +131,7 @@ CREATE TABLE IF NOT EXISTS complaints (
     resolved_by_name VARCHAR(255),
     confirmed_at TIMESTAMP NULL,
     confirmed_by_name VARCHAR(255),
+    confirm_remark TEXT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
