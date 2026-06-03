@@ -2,4 +2,15 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home3/bansala1/fcpams.bansalancoop.com
-    - /bin/cp -R . $DEPLOYPATH
+    # Copy application directories (excluding .git, config, uploads)
+    - /bin/cp -R admin $DEPLOYPATH
+    - /bin/cp -R assets $DEPLOYPATH
+    - /bin/cp -R citizen $DEPLOYPATH
+    - /bin/cp -R images $DEPLOYPATH
+    - /bin/cp -R includes $DEPLOYPATH
+    - /bin/cp -R staff $DEPLOYPATH
+    # Copy root PHP files
+    - /bin/cp index.php $DEPLOYPATH
+    - /bin/cp login.php $DEPLOYPATH
+    - /bin/cp logout.php $DEPLOYPATH
+    - /bin/cp register.php $DEPLOYPATH
