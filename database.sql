@@ -80,7 +80,7 @@ CREATE TABLE IF NOT EXISTS questions (
     id INT AUTO_INCREMENT PRIMARY KEY,
     survey_id INT NOT NULL,
     text VARCHAR(500) NOT NULL,
-    type ENUM('TEXT', 'CHOICE', 'RATING') NOT NULL,
+    type ENUM('TEXT', 'CHOICE', 'RATING', 'MULTI_SELECT') NOT NULL,
     options TEXT, -- JSON string for CHOICE questions
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (survey_id) REFERENCES surveys(id) ON DELETE CASCADE
