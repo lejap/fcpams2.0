@@ -5,28 +5,41 @@ require_once '../includes/functions.php';
 auth_guard('ADMIN');
 
 $msg = '';
+$msg_type = 'success';
 if (isset($_GET['msg'])) {
-    $msgs = ['added'=>'Option added successfully.', 'updated'=>'Option updated successfully.', 'deleted'=>'Option deleted.'];
-    $msg  = $msgs[$_GET['msg']] ?? '';
+    $msgs = [
+        'added'   => 'Option added successfully.',
+        'updated' => 'Option updated successfully.',
+        'deleted' => 'Option deleted.',
+        'failed'  => 'Error: Could not save option. Check if the dropdown_options table exists in your database.',
+        'invalid' => 'Error: Please fill in both Type and Label fields.',
+    ];
+    $msg = $msgs[$_GET['msg']] ?? '';
+    $msg_type = in_array($_GET['msg'], ['failed','invalid']) ? 'error' : 'success';
 }
 
 // Handle POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
     if ($action === 'add') {
-        $type  = sanitize($_POST['type']);
-        $label = sanitize($_POST['label']);
-        if (in_array($type, ['INQUIRY','SUGGESTION','REQUEST','COMPLAINT_DETAIL','TRANSACTION_TYPE']) && $label) {
+        $type  = trim($_POST['type'] ?? '');
+        $label = trim($_POST['label'] ?? '');
+        if (in_array($type, ['INQUIRY','SUGGESTION','REQUEST','COMPLAINT_DETAIL','TRANSACTION_TYPE']) && $label !== '') {
             $stmt = $conn->prepare("INSERT INTO dropdown_options (type, label) VALUES (?, ?)");
             $stmt->bind_param("ss", $type, $label);
-            $stmt->execute();
+            if ($stmt->execute()) {
+                header("Location: dropdowns.php?msg=added");
+            } else {
+                header("Location: dropdowns.php?msg=failed");
+            }
+        } else {
+            header("Location: dropdowns.php?msg=invalid");
         }
-        header("Location: dropdowns.php?msg=added");
         exit();
     } elseif ($action === 'edit') {
         $oid = (int)$_POST['id'];
-        $label = sanitize($_POST['label']);
-        if ($label) {
+        $label = trim($_POST['label'] ?? '');
+        if ($label !== '') {
             $stmt = $conn->prepare("UPDATE dropdown_options SET label=? WHERE id=?");
             $stmt->bind_param("si", $label, $oid);
             $stmt->execute();
@@ -64,8 +77,8 @@ include '../includes/admin_sidebar.php';
     </div>
 
     <?php if ($msg): ?>
-    <div style="background:rgba(16,185,129,0.1);border:1px solid #10b981;color:#059669;padding:1rem;border-radius:0.75rem;margin-bottom:1.5rem;font-weight:600;">
-        <i class="fas fa-check-circle"></i> <?php echo htmlspecialchars($msg); ?>
+    <div style="background:<?php echo $msg_type==='error' ? 'rgba(239,68,68,0.1)' : 'rgba(16,185,129,0.1)'; ?>;border:1px solid <?php echo $msg_type==='error' ? '#ef4444' : '#10b981'; ?>;color:<?php echo $msg_type==='error' ? '#dc2626' : '#059669'; ?>;padding:1rem;border-radius:0.75rem;margin-bottom:1.5rem;font-weight:600;">
+        <i class="fas <?php echo $msg_type==='error' ? 'fa-exclamation-circle' : 'fa-check-circle'; ?>"></i> <?php echo htmlspecialchars($msg); ?>
     </div>
     <?php endif; ?>
 
