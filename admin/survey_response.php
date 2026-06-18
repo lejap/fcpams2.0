@@ -76,6 +76,17 @@ include '../includes/admin_sidebar.php';
                         <span style="color:<?php echo $s <= $r ? '#f59e0b' : '#d1d5db'; ?>;font-size:1.2rem;">★</span>
                     <?php endfor; ?>
                     <span style="margin-left:0.5rem;color:#64748b;font-size:0.85rem;">(<?php echo $r; ?>/5)</span>
+                <?php elseif ($a['q_type'] === 'MULTI_SELECT'): ?>
+                    <?php $picks = array_filter(array_map('trim', explode(',', $a['value']))); ?>
+                    <?php if ($picks): ?>
+                        <?php foreach ($picks as $pick): ?>
+                        <span style="display:inline-block;background:#ede9fe;color:#5b21b6;padding:0.2rem 0.65rem;border-radius:2rem;font-size:0.82rem;font-weight:600;margin:0.15rem 0.15rem 0.15rem 0;">
+                            <i class="fas fa-check" style="font-size:0.7rem;"></i> <?php echo htmlspecialchars($pick); ?>
+                        </span>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <span style="color:#94a3b8;font-style:italic;">No selection</span>
+                    <?php endif; ?>
                 <?php else: ?>
                     <?php echo htmlspecialchars($a['value']); ?>
                 <?php endif; ?>

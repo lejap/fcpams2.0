@@ -31,7 +31,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Save each answer
         foreach ($questions_arr as $q) {
-            $val = sanitize($_POST['q_' . $q['id']] ?? '');
+            if ($q['type'] === 'MULTI_SELECT') {
+                $selected = $_POST['q_' . $q['id']] ?? [];
+                $val = implode(', ', array_map('trim', (array)$selected));
+            } else {
+                $val = sanitize($_POST['q_' . $q['id']] ?? '');
+            }
             $astmt = $conn->prepare("INSERT INTO answers (response_id, question_id, value) VALUES (?, ?, ?)");
             $astmt->bind_param("iis", $response_id, $q['id'], $val);
             $astmt->execute();
@@ -120,6 +125,28 @@ include '../includes/citizen_sidebar.php';
                         </label>
                         <?php endforeach; ?>
                     </div>
+
+                <?php elseif ($q['type'] === 'MULTI_SELECT'): ?>
+                    <?php
+                    preg_match('/^MAX:(\d+)\|(.+)$/', $q['options'] ?? '', $ms);
+                    $ms_max  = isset($ms[1]) ? (int)$ms[1] : 2;
+                    $ms_opts = isset($ms[2]) ? array_filter(array_map('trim', explode(',', $ms[2]))) : [];
+                    ?>
+                    <p style="font-size:0.82rem;color:#6366f1;font-weight:600;margin:0.4rem 0 0.6rem;">
+                        <i class="fas fa-info-circle"></i> Select up to <strong><?php echo $ms_max; ?></strong> option(s)
+                    </p>
+                    <div style="display:flex;flex-direction:column;gap:0.5rem;margin-top:0.25rem;">
+                        <?php foreach ($ms_opts as $opt): ?>
+                        <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;padding:0.4rem 0.5rem;border-radius:0.4rem;transition:background 0.15s;" onmouseover="this.style.background='rgba(0,0,0,0.04)'" onmouseout="this.style.background='transparent'">
+                            <input type="checkbox"
+                                   name="q_<?php echo $q['id']; ?>[]"
+                                   value="<?php echo htmlspecialchars($opt); ?>"
+                                   class="mschk-<?php echo $q['id']; ?>"
+                                   onchange="enforceMax(<?php echo $q['id']; ?>, <?php echo $ms_max; ?>)">
+                            <span style="color:#1e293b;"><?php echo htmlspecialchars($opt); ?></span>
+                        </label>
+                        <?php endforeach; ?>
+                    </div>
                 <?php endif; ?>
             </div>
             <?php endforeach; ?>
@@ -146,6 +173,13 @@ function updateSmileys(qId, val) {
             el.style.filter    = (i == val) ? 'grayscale(0%) drop-shadow(0 2px 6px rgba(0,0,0,0.18))' : 'grayscale(30%)';
         }
     }
+}
+function enforceMax(qId, maxSel) {
+    var boxes   = document.querySelectorAll('.mschk-' + qId);
+    var checked = document.querySelectorAll('.mschk-' + qId + ':checked');
+    boxes.forEach(function(b) {
+        b.disabled = (!b.checked && checked.length >= maxSel);
+    });
 }
 </script>
 

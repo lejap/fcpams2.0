@@ -35,24 +35,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header("Location: surveys.php?msg=deleted");
         exit();
     } elseif ($action === 'add_question') {
-        $sid     = (int)$_POST['survey_id'];
-        $text    = sanitize($_POST['text']);
-        $type    = sanitize($_POST['type']);
+        $sid      = (int)$_POST['survey_id'];
+        $text     = sanitize($_POST['text']);
+        $type     = sanitize($_POST['type']);
         $raw_opts = $_POST['options'] ?? '';
-        // Normalise comma-separated options: trim each part, re-join cleanly
         if ($type === 'CHOICE' && $raw_opts !== '') {
-            $parts = array_filter(array_map('trim', explode(',', sanitize($raw_opts))));
+            $parts   = array_filter(array_map('trim', explode(',', trim($raw_opts))));
             $options = implode(',', $parts);
+        } elseif ($type === 'MULTI_SELECT' && $raw_opts !== '') {
+            $max_sel = max(1, (int)($_POST['max_select'] ?? 2));
+            $parts   = array_filter(array_map('trim', explode(',', trim($raw_opts))));
+            $options = 'MAX:' . $max_sel . '|' . implode(',', $parts);
         } else {
             $options = '';
         }
-        if ($sid && $text && in_array($type, ['TEXT','CHOICE','RATING'])) {
+        if ($sid && $text && in_array($type, ['TEXT','CHOICE','RATING','MULTI_SELECT'])) {
             $stmt = $conn->prepare("INSERT INTO questions (survey_id, text, type, options) VALUES (?, ?, ?, ?)");
             $stmt->bind_param("isss", $sid, $text, $type, $options);
             $stmt->execute();
-            $msg = 'Question added.';
         }
-        header("Location: surveys.php?view=$sid");
+        header("Location: surveys.php?view=$sid&msg=q_added");
         exit();
     } elseif ($action === 'delete_question') {
         $qid = (int)$_POST['id'];
@@ -61,18 +63,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header("Location: surveys.php?view=$sid&msg=q_deleted");
         exit();
     } elseif ($action === 'edit_question') {
-        $qid     = (int)$_POST['id'];
-        $sid     = (int)$_POST['survey_id'];
-        $text    = sanitize($_POST['text']);
-        $type    = sanitize($_POST['type']);
+        $qid      = (int)$_POST['id'];
+        $sid      = (int)$_POST['survey_id'];
+        $text     = sanitize($_POST['text']);
+        $type     = sanitize($_POST['type']);
         $raw_opts = $_POST['options'] ?? '';
         if ($type === 'CHOICE' && $raw_opts !== '') {
-            $parts   = array_filter(array_map('trim', explode(',', sanitize($raw_opts))));
+            $parts   = array_filter(array_map('trim', explode(',', trim($raw_opts))));
             $options = implode(',', $parts);
+        } elseif ($type === 'MULTI_SELECT' && $raw_opts !== '') {
+            $max_sel = max(1, (int)($_POST['max_select'] ?? 2));
+            $parts   = array_filter(array_map('trim', explode(',', trim($raw_opts))));
+            $options = 'MAX:' . $max_sel . '|' . implode(',', $parts);
         } else {
             $options = '';
         }
-        if ($qid && $text && in_array($type, ['TEXT','CHOICE','RATING'])) {
+        if ($qid && $text && in_array($type, ['TEXT','CHOICE','RATING','MULTI_SELECT'])) {
             $stmt = $conn->prepare("UPDATE questions SET text=?, type=?, options=? WHERE id=?");
             $stmt->bind_param("sssi", $text, $type, $options, $qid);
             $stmt->execute();
@@ -129,16 +135,21 @@ if ($view_id) {
                     </div>
                     <div class="form-group">
                         <label class="form-label">Type</label>
-                        <select name="type" class="form-select" required id="qtype" onchange="document.getElementById('opts_row').style.display=this.value==='CHOICE'?'block':'none'">
+                        <select name="type" class="form-select" required id="qtype" onchange="toggleAddFields(this.value)">
                             <option value="TEXT">Text Input</option>
-                            <option value="CHOICE">Multiple Choice</option>
-                            <option value="RATING">Rating (1-5)</option>
+                            <option value="CHOICE">Single Choice (Radio)</option>
+                            <option value="MULTI_SELECT">Multi-Select (Checkboxes)</option>
+                            <option value="RATING">Rating (Strongly Agree scale)</option>
                         </select>
                     </div>
                     <div class="form-group" id="opts_row" style="display:none;">
-                        <label class="form-label">Options <small style="color:#94a3b8;">(Required for Multiple Choice)</small></label>
+                        <label class="form-label">Options <small style="color:#94a3b8;">(comma-separated)</small></label>
                         <input type="text" name="options" class="form-input" placeholder="Excellent, Good, Fair, Poor">
-                        <p style="font-size:0.78rem;color:#94a3b8;margin-top:0.25rem;">Separate each choice with a comma. Example: <em>Choice 1, Choice 2, Choice 3</em></p>
+                        <p style="font-size:0.78rem;color:#94a3b8;margin-top:0.25rem;">Separate each choice with a comma.</p>
+                    </div>
+                    <div class="form-group" id="max_select_row" style="display:none;">
+                        <label class="form-label">Max Selections Allowed <small style="color:#94a3b8;">(how many options citizen can pick)</small></label>
+                        <input type="number" name="max_select" class="form-input" min="1" value="2" style="max-width:120px;">
                     </div>
                     <button type="submit" class="btn btn-primary" style="width:100%;">
                         <i class="fas fa-plus"></i> Add Question
@@ -160,16 +171,23 @@ if ($view_id) {
                         <div>
                             <div style="font-weight:600;color:#1e293b;"><?php echo $qi++; ?>. <?php echo htmlspecialchars($q['text']); ?></div>
                             <div style="font-size:0.78rem;color:#94a3b8;margin-top:0.2rem;">Type: <?php echo $q['type']; ?></div>
-                            <?php if ($q['type']==='CHOICE' && $q['options']): 
+                            <?php if ($q['type']==='CHOICE' && $q['options']):
                                 $opts = array_map('trim', explode(',', $q['options']));
                             ?>
                             <div style="font-size:0.78rem;color:#64748b;">Options: <?php echo htmlspecialchars(implode(' · ', $opts)); ?></div>
+                            <?php elseif ($q['type']==='MULTI_SELECT' && $q['options']):
+                                preg_match('/^MAX:(\d+)\|(.+)$/', $q['options'], $ms);
+                                $ms_max  = $ms[1] ?? '?';
+                                $ms_opts = isset($ms[2]) ? array_map('trim', explode(',', $ms[2])) : [];
+                            ?>
+                            <div style="font-size:0.78rem;color:#64748b;">Options: <?php echo htmlspecialchars(implode(' · ', $ms_opts)); ?></div>
+                            <div style="font-size:0.78rem;color:#6366f1;font-weight:600;">Max pick: <?php echo $ms_max; ?></div>
                             <?php endif; ?>
                         </div>
                         <div style="display:flex;gap:0.4rem;align-items:center;">
                             <button type="button"
                                 onclick="openEditModal(<?php echo $q['id']; ?>, <?php echo htmlspecialchars(json_encode($q['text'])); ?>, '<?php echo $q['type']; ?>', <?php echo htmlspecialchars(json_encode($q['options'] ?? '')); ?>)"
-                                style="background:transparent;color:#0e83b5;border:none;cursor:pointer;font-size:0.85rem;padding:0.1rem 0.3rem;" title="Edit">
+                                style="background:transparent;color:#0e83b5;border:none;cursor:pointer;font-size:0.85rem;padding:0.1rem 0.3rem;" title="Edit" id="editbtn_<?php echo $q['id']; ?>">
                                 <i class="fas fa-pencil-alt"></i>
                             </button>
                             <form method="POST" onsubmit="return confirm('Delete this question?');">
@@ -250,13 +268,18 @@ if ($view_id) {
                 <label class="form-label">Type</label>
                 <select name="type" id="edit_q_type" class="form-select" required onchange="toggleEditOpts()">
                     <option value="TEXT">Text Input</option>
-                    <option value="CHOICE">Multiple Choice</option>
-                    <option value="RATING">Rating (1-5)</option>
+                    <option value="CHOICE">Single Choice (Radio)</option>
+                    <option value="MULTI_SELECT">Multi-Select (Checkboxes)</option>
+                    <option value="RATING">Rating (Strongly Agree scale)</option>
                 </select>
             </div>
             <div class="form-group" id="edit_opts_row" style="display:none;margin-bottom:1rem;">
                 <label class="form-label">Options <small style="color:#94a3b8;">(comma-separated)</small></label>
                 <input type="text" name="options" id="edit_q_options" class="form-input" placeholder="Excellent, Good, Fair, Poor">
+            </div>
+            <div class="form-group" id="edit_max_select_row" style="display:none;margin-bottom:1rem;">
+                <label class="form-label">Max Selections Allowed</label>
+                <input type="number" name="max_select" id="edit_q_max_select" class="form-input" min="1" value="2" style="max-width:120px;">
             </div>
             <div style="display:flex;gap:0.75rem;justify-content:flex-end;margin-top:1.5rem;">
                 <button type="button" onclick="closeEditModal()" style="padding:0.5rem 1.2rem;border:1px solid #e2e8f0;border-radius:0.5rem;background:#f8fafc;color:#64748b;cursor:pointer;font-weight:600;">Cancel</button>
@@ -267,11 +290,21 @@ if ($view_id) {
 </div>
 
 <script>
+function toggleAddFields(val) {
+    document.getElementById('opts_row').style.display = (val==='CHOICE'||val==='MULTI_SELECT') ? 'block' : 'none';
+    document.getElementById('max_select_row').style.display = (val==='MULTI_SELECT') ? 'block' : 'none';
+}
 function openEditModal(id, text, type, options) {
-    document.getElementById('edit_q_id').value    = id;
-    document.getElementById('edit_q_text').value  = text;
-    document.getElementById('edit_q_type').value  = type;
-    document.getElementById('edit_q_options').value = options;
+    var maxSel = 2, cleanOpts = options;
+    if (type === 'MULTI_SELECT') {
+        var m = options.match(/^MAX:(\d+)\|(.*)$/);
+        if (m) { maxSel = parseInt(m[1]); cleanOpts = m[2]; }
+    }
+    document.getElementById('edit_q_id').value         = id;
+    document.getElementById('edit_q_text').value       = text;
+    document.getElementById('edit_q_type').value       = type;
+    document.getElementById('edit_q_options').value    = cleanOpts;
+    document.getElementById('edit_q_max_select').value = maxSel;
     toggleEditOpts();
     var modal = document.getElementById('editQuestionModal');
     modal.style.display = 'flex';
@@ -283,9 +316,9 @@ function closeEditModal() {
 }
 function toggleEditOpts() {
     var type = document.getElementById('edit_q_type').value;
-    document.getElementById('edit_opts_row').style.display = (type === 'CHOICE') ? 'block' : 'none';
+    document.getElementById('edit_opts_row').style.display = (type==='CHOICE'||type==='MULTI_SELECT') ? 'block' : 'none';
+    document.getElementById('edit_max_select_row').style.display = (type==='MULTI_SELECT') ? 'block' : 'none';
 }
-// Close on backdrop click
 document.getElementById('editQuestionModal').addEventListener('click', function(e) {
     if (e.target === this) closeEditModal();
 });
