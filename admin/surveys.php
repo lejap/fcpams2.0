@@ -6,7 +6,7 @@ auth_guard('ADMIN');
 
 $msg = '';
 if (isset($_GET['msg'])) {
-    $msgs = ['created'=>'Survey created successfully.','toggled'=>'Survey status updated.','deleted'=>'Survey deleted.','q_added'=>'Question added.','q_deleted'=>'Question deleted.','q_updated'=>'Question updated.'];
+    $msgs = ['created'=>'Survey created successfully.','toggled'=>'Survey status updated.','deleted'=>'Survey deleted.','q_added'=>'Question added.','q_deleted'=>'Question deleted.','q_updated'=>'Question updated.','q_error'=>'Error: Could not save question. Check if the questions table type column includes MULTI_SELECT (ALTER TABLE needed).'];
     $msg  = $msgs[$_GET['msg']] ?? '';
 }
 
@@ -52,9 +52,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($sid && $text && in_array($type, ['TEXT','CHOICE','RATING','MULTI_SELECT'])) {
             $stmt = $conn->prepare("INSERT INTO questions (survey_id, text, type, options) VALUES (?, ?, ?, ?)");
             $stmt->bind_param("isss", $sid, $text, $type, $options);
-            $stmt->execute();
+            if ($stmt->execute()) {
+                header("Location: surveys.php?view=$sid&msg=q_added");
+            } else {
+                header("Location: surveys.php?view=$sid&msg=q_error");
+            }
+        } else {
+            header("Location: surveys.php?view=$sid&msg=q_error");
         }
-        header("Location: surveys.php?view=$sid&msg=q_added");
         exit();
     } elseif ($action === 'delete_question') {
         $qid = (int)$_POST['id'];
@@ -81,9 +86,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($qid && $text && in_array($type, ['TEXT','CHOICE','RATING','MULTI_SELECT'])) {
             $stmt = $conn->prepare("UPDATE questions SET text=?, type=?, options=? WHERE id=?");
             $stmt->bind_param("sssi", $text, $type, $options, $qid);
-            $stmt->execute();
+            if ($stmt->execute()) {
+                header("Location: surveys.php?view=$sid&msg=q_updated");
+            } else {
+                header("Location: surveys.php?view=$sid&msg=q_error");
+            }
+        } else {
+            header("Location: surveys.php?view=$sid&msg=q_error");
         }
-        header("Location: surveys.php?view=$sid&msg=q_updated");
         exit();
     }
 }
@@ -116,8 +126,8 @@ if ($view_id) {
     </div>
 
     <?php if ($msg): ?>
-    <div style="background:rgba(16,185,129,0.1);border:1px solid #10b981;color:#059669;padding:0.9rem 1rem;border-radius:0.75rem;margin-bottom:1.5rem;font-weight:600;">
-        <i class="fas fa-check-circle"></i> <?php echo htmlspecialchars($msg); ?>
+    <div style="background:<?php echo str_contains($msg,'Error') ? 'rgba(239,68,68,0.1)' : 'rgba(16,185,129,0.1)'; ?>;border:1px solid <?php echo str_contains($msg,'Error') ? '#ef4444' : '#10b981'; ?>;color:<?php echo str_contains($msg,'Error') ? '#dc2626' : '#059669'; ?>;padding:0.9rem 1rem;border-radius:0.75rem;margin-bottom:1.5rem;font-weight:600;">
+        <i class="fas <?php echo str_contains($msg,'Error') ? 'fa-exclamation-circle' : 'fa-check-circle'; ?>"></i> <?php echo htmlspecialchars($msg); ?>
     </div>
     <?php endif; ?>
 
