@@ -6,7 +6,7 @@ auth_guard('ADMIN');
 
 $msg = '';
 if (isset($_GET['msg'])) {
-    $msgs = ['created'=>'Survey created successfully.','toggled'=>'Survey status updated.','deleted'=>'Survey deleted.','q_added'=>'Question added.','q_deleted'=>'Question deleted.'];
+    $msgs = ['created'=>'Survey created successfully.','toggled'=>'Survey status updated.','deleted'=>'Survey deleted.','q_added'=>'Question added.','q_deleted'=>'Question deleted.','q_updated'=>'Question updated.'];
     $msg  = $msgs[$_GET['msg']] ?? '';
 }
 
@@ -58,7 +58,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $qid = (int)$_POST['id'];
         $sid = (int)$_POST['survey_id'];
         $conn->query("DELETE FROM questions WHERE id=$qid");
-        header("Location: surveys.php?view=$sid");
+        header("Location: surveys.php?view=$sid&msg=q_deleted");
+        exit();
+    } elseif ($action === 'edit_question') {
+        $qid     = (int)$_POST['id'];
+        $sid     = (int)$_POST['survey_id'];
+        $text    = sanitize($_POST['text']);
+        $type    = sanitize($_POST['type']);
+        $raw_opts = $_POST['options'] ?? '';
+        if ($type === 'CHOICE' && $raw_opts !== '') {
+            $parts   = array_filter(array_map('trim', explode(',', sanitize($raw_opts))));
+            $options = implode(',', $parts);
+        } else {
+            $options = '';
+        }
+        if ($qid && $text && in_array($type, ['TEXT','CHOICE','RATING'])) {
+            $stmt = $conn->prepare("UPDATE questions SET text=?, type=?, options=? WHERE id=?");
+            $stmt->bind_param("sssi", $text, $type, $options, $qid);
+            $stmt->execute();
+        }
+        header("Location: surveys.php?view=$sid&msg=q_updated");
         exit();
     }
 }
@@ -147,14 +166,21 @@ if ($view_id) {
                             <div style="font-size:0.78rem;color:#64748b;">Options: <?php echo htmlspecialchars(implode(' · ', $opts)); ?></div>
                             <?php endif; ?>
                         </div>
-                        <form method="POST" onsubmit="return confirm('Delete this question?');">
-                            <input type="hidden" name="action" value="delete_question">
-                            <input type="hidden" name="id" value="<?php echo $q['id']; ?>">
-                            <input type="hidden" name="survey_id" value="<?php echo $view_id; ?>">
-                            <button type="submit" style="background:transparent;color:#ef4444;border:none;cursor:pointer;font-size:0.85rem;padding:0.1rem 0.3rem;" title="Delete">
-                                <i class="fas fa-times"></i>
+                        <div style="display:flex;gap:0.4rem;align-items:center;">
+                            <button type="button"
+                                onclick="openEditModal(<?php echo $q['id']; ?>, <?php echo htmlspecialchars(json_encode($q['text'])); ?>, '<?php echo $q['type']; ?>', <?php echo htmlspecialchars(json_encode($q['options'] ?? '')); ?>)"
+                                style="background:transparent;color:#0e83b5;border:none;cursor:pointer;font-size:0.85rem;padding:0.1rem 0.3rem;" title="Edit">
+                                <i class="fas fa-pencil-alt"></i>
                             </button>
-                        </form>
+                            <form method="POST" onsubmit="return confirm('Delete this question?');">
+                                <input type="hidden" name="action" value="delete_question">
+                                <input type="hidden" name="id" value="<?php echo $q['id']; ?>">
+                                <input type="hidden" name="survey_id" value="<?php echo $view_id; ?>">
+                                <button type="submit" style="background:transparent;color:#ef4444;border:none;cursor:pointer;font-size:0.85rem;padding:0.1rem 0.3rem;" title="Delete">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </form>
+                        </div>
                     </li>
                     <?php endwhile; ?>
                 </ul>
@@ -205,6 +231,66 @@ if ($view_id) {
             </div>
         </div>
     </div>
+<!-- Edit Question Modal -->
+<div id="editQuestionModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);align-items:center;justify-content:center;">
+    <div style="background:#fff;border-radius:1rem;padding:2rem;width:100%;max-width:500px;margin:1rem;box-shadow:0 20px 60px rgba(0,0,0,0.2);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+            <h3 style="margin:0;color:#1e293b;font-size:1.1rem;"><i class="fas fa-pencil-alt" style="color:#0e83b5;margin-right:0.5rem;"></i>Edit Question</h3>
+            <button onclick="closeEditModal()" style="background:transparent;border:none;font-size:1.3rem;cursor:pointer;color:#94a3b8;line-height:1;">&#x2715;</button>
+        </div>
+        <form method="POST" id="editQuestionForm">
+            <input type="hidden" name="action" value="edit_question">
+            <input type="hidden" name="id" id="edit_q_id">
+            <input type="hidden" name="survey_id" value="<?php echo $view_id; ?>">
+            <div class="form-group" style="margin-bottom:1rem;">
+                <label class="form-label">Question Text</label>
+                <input type="text" name="text" id="edit_q_text" class="form-input" required>
+            </div>
+            <div class="form-group" style="margin-bottom:1rem;">
+                <label class="form-label">Type</label>
+                <select name="type" id="edit_q_type" class="form-select" required onchange="toggleEditOpts()">
+                    <option value="TEXT">Text Input</option>
+                    <option value="CHOICE">Multiple Choice</option>
+                    <option value="RATING">Rating (1-5)</option>
+                </select>
+            </div>
+            <div class="form-group" id="edit_opts_row" style="display:none;margin-bottom:1rem;">
+                <label class="form-label">Options <small style="color:#94a3b8;">(comma-separated)</small></label>
+                <input type="text" name="options" id="edit_q_options" class="form-input" placeholder="Excellent, Good, Fair, Poor">
+            </div>
+            <div style="display:flex;gap:0.75rem;justify-content:flex-end;margin-top:1.5rem;">
+                <button type="button" onclick="closeEditModal()" style="padding:0.5rem 1.2rem;border:1px solid #e2e8f0;border-radius:0.5rem;background:#f8fafc;color:#64748b;cursor:pointer;font-weight:600;">Cancel</button>
+                <button type="submit" class="btn btn-primary" style="padding:0.5rem 1.4rem;"><i class="fas fa-save"></i> Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openEditModal(id, text, type, options) {
+    document.getElementById('edit_q_id').value    = id;
+    document.getElementById('edit_q_text').value  = text;
+    document.getElementById('edit_q_type').value  = type;
+    document.getElementById('edit_q_options').value = options;
+    toggleEditOpts();
+    var modal = document.getElementById('editQuestionModal');
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+function closeEditModal() {
+    document.getElementById('editQuestionModal').style.display = 'none';
+    document.body.style.overflow = '';
+}
+function toggleEditOpts() {
+    var type = document.getElementById('edit_q_type').value;
+    document.getElementById('edit_opts_row').style.display = (type === 'CHOICE') ? 'block' : 'none';
+}
+// Close on backdrop click
+document.getElementById('editQuestionModal').addEventListener('click', function(e) {
+    if (e.target === this) closeEditModal();
+});
+</script>
+
 <?php include '../includes/admin_footer.php'; ?>
 <?php
     exit();
