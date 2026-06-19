@@ -34,7 +34,7 @@ if (!function_exists('auth_guard')) {
 if (!function_exists('sanitize')) {
     function sanitize($data) {
         global $conn;
-        return mysqli_real_escape_string($conn, htmlspecialchars(strip_tags(trim($data))));
+        return mysqli_real_escape_string($conn, strip_tags(trim($data)));
     }
 }
 

@@ -179,14 +179,15 @@ if ($view_id) {
                     <?php $qi = 1; while ($q = $questions->fetch_assoc()): ?>
                     <li style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:0.5rem;padding:0.75rem 1rem;margin-bottom:0.75rem;display:flex;justify-content:space-between;align-items:flex-start;gap:0.5rem;">
                         <div>
-                            <div style="font-weight:600;color:#1e293b;"><?php echo $qi++; ?>. <?php echo htmlspecialchars($q['text']); ?></div>
+                            <div style="font-weight:600;color:#1e293b;"><?php echo $qi++; ?>. <?php echo htmlspecialchars(html_entity_decode($q['text'], ENT_QUOTES | ENT_HTML5)); ?></div>
                             <div style="font-size:0.78rem;color:#94a3b8;margin-top:0.2rem;">Type: <?php echo $q['type']; ?></div>
                             <?php if ($q['type']==='CHOICE' && $q['options']):
-                                $opts = array_map('trim', explode(',', $q['options']));
+                                $opts = array_map('trim', explode(',', html_entity_decode($q['options'], ENT_QUOTES | ENT_HTML5)));
                             ?>
                             <div style="font-size:0.78rem;color:#64748b;">Options: <?php echo htmlspecialchars(implode(' · ', $opts)); ?></div>
                             <?php elseif ($q['type']==='MULTI_SELECT' && $q['options']):
-                                preg_match('/^MAX:(\d+)\|(.+)$/', $q['options'], $ms);
+                                $decoded_opts = html_entity_decode($q['options'], ENT_QUOTES | ENT_HTML5);
+                                preg_match('/^MAX:(\d+)\|(.+)$/', $decoded_opts, $ms);
                                 $ms_max  = $ms[1] ?? '?';
                                 $ms_opts = isset($ms[2]) ? array_map('trim', explode(',', $ms[2])) : [];
                             ?>
@@ -196,7 +197,7 @@ if ($view_id) {
                         </div>
                         <div style="display:flex;gap:0.4rem;align-items:center;">
                             <button type="button"
-                                onclick="openEditModal(<?php echo $q['id']; ?>, <?php echo htmlspecialchars(json_encode($q['text'])); ?>, '<?php echo $q['type']; ?>', <?php echo htmlspecialchars(json_encode($q['options'] ?? '')); ?>)"
+                                onclick="openEditModal(<?php echo $q['id']; ?>, <?php echo htmlspecialchars(json_encode(html_entity_decode($q['text'], ENT_QUOTES | ENT_HTML5))); ?>, '<?php echo $q['type']; ?>', <?php echo htmlspecialchars(json_encode(html_entity_decode($q['options'] ?? '', ENT_QUOTES | ENT_HTML5))); ?>)"
                                 style="background:transparent;color:#0e83b5;border:none;cursor:pointer;font-size:0.85rem;padding:0.1rem 0.3rem;" title="Edit" id="editbtn_<?php echo $q['id']; ?>">
                                 <i class="fas fa-pencil-alt"></i>
                             </button>

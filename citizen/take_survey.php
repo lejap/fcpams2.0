@@ -80,7 +80,7 @@ include '../includes/citizen_sidebar.php';
             <?php foreach ($questions_arr as $i => $q): ?>
             <div class="form-group" style="background:rgba(0,0,0,0.02);border:1px solid rgba(0,0,0,0.06);border-radius:0.75rem;padding:1.25rem;margin-bottom:1rem;">
                 <label class="form-label" style="font-weight:700;color:#1e293b;margin-bottom:0.5rem;display:block;">
-                    <?php echo ($i+1); ?>. <?php echo htmlspecialchars($q['text']); ?>
+                    <?php echo ($i+1); ?>. <?php echo htmlspecialchars(html_entity_decode($q['text'], ENT_QUOTES | ENT_HTML5)); ?>
                     <span style="color:#ef4444;">*</span>
                 </label>
 
@@ -116,7 +116,7 @@ include '../includes/citizen_sidebar.php';
                     </div>
 
                 <?php elseif ($q['type'] === 'CHOICE'): ?>
-                    <?php $opts = array_filter(array_map('trim', explode(',', $q['options'] ?? ''))); ?>
+                    <?php $opts = array_filter(array_map('trim', explode(',', html_entity_decode($q['options'] ?? '', ENT_QUOTES | ENT_HTML5)))); ?>
                     <div style="display:flex;flex-direction:column;gap:0.5rem;margin-top:0.5rem;">
                         <?php foreach ($opts as $opt): ?>
                         <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;padding:0.4rem 0.5rem;border-radius:0.4rem;transition:background 0.15s;" onmouseover="this.style.background='rgba(0,0,0,0.04)'" onmouseout="this.style.background='transparent'">
@@ -128,7 +128,7 @@ include '../includes/citizen_sidebar.php';
 
                 <?php elseif ($q['type'] === 'MULTI_SELECT'): ?>
                     <?php
-                    preg_match('/^MAX:(\d+)\|(.+)$/', $q['options'] ?? '', $ms);
+                    preg_match('/^MAX:(\d+)\|(.+)$/', html_entity_decode($q['options'] ?? '', ENT_QUOTES | ENT_HTML5), $ms);
                     $ms_max  = isset($ms[1]) ? (int)$ms[1] : 2;
                     $ms_opts = isset($ms[2]) ? array_filter(array_map('trim', explode(',', $ms[2]))) : [];
                     ?>
