@@ -71,8 +71,8 @@ include '../includes/staff_sidebar.php';
                 'Branch'      => $detail['user_branch'],
                 'Type'        => $detail['type'],
             ];
-            if ($detail['type'] === 'REQUEST' && !empty($detail['option_label'])) {
-                $info_items['Request Type'] = $detail['option_label'];
+            if (!empty($detail['option_label'])) {
+                $info_items[ucfirst(strtolower($detail['type'])) . ' Type'] = $detail['option_label'];
             }
             $info_items = array_merge($info_items, [
                 'Status'      => $detail['status'],
@@ -196,7 +196,7 @@ include '../includes/staff_sidebar.php';
                         <td>
                             <?php $tc=$sub['type']==='INQUIRY'?'#ef4444':($sub['type']==='REQUEST'?'#8b5cf6':'#eab308'); ?>
                             <span class="badge" style="background:<?php echo $tc;?>"><?php echo $sub['type']; ?></span>
-                            <?php if ($sub['type'] === 'REQUEST' && !empty($sub['option_label'])): ?>
+                            <?php if (!empty($sub['option_label'])): ?>
                                 <div style="font-size:0.72rem;color:#64748b;margin-top:0.25rem;font-weight:600;"><?php echo htmlspecialchars($sub['option_label']); ?></div>
                             <?php endif; ?>
                         </td>
