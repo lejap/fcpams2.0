@@ -44,7 +44,7 @@ $cmp_where = "WHERE status = 'OPEN'";
 if ($date_from) $cmp_where .= " AND DATE(created_at) >= '$date_from'";
 if ($date_to)   $cmp_where .= " AND DATE(created_at) <= '$date_to'";
 
-$submissions = $conn->query("SELECT * FROM tickets $sub_where ORDER BY created_at ASC");
+$submissions = $conn->query("SELECT *, (SELECT label FROM dropdown_options WHERE id = tickets.option_id) as option_label FROM tickets $sub_where ORDER BY created_at ASC");
 $complaints  = $conn->query("SELECT * FROM complaints $cmp_where ORDER BY created_at ASC");
 $branches    = $conn->query("SELECT * FROM branches ORDER BY name");
 
@@ -156,6 +156,9 @@ include '../includes/admin_sidebar.php';
                         <td>
                             <?php $tc = $sub['type']==='INQUIRY'?'#ef4444':($sub['type']==='REQUEST'?'#8b5cf6':'#eab308'); ?>
                             <span class="badge" style="background:<?php echo $tc; ?>;"><?php echo $sub['type']; ?></span>
+                            <?php if ($sub['type'] === 'REQUEST' && !empty($sub['option_label'])): ?>
+                                <div style="font-size:0.72rem;color:#64748b;margin-top:0.25rem;font-weight:600;"><?php echo htmlspecialchars($sub['option_label']); ?></div>
+                            <?php endif; ?>
                         </td>
                         <td style="font-size:0.8rem;"><?php echo date('M d, Y H:i', strtotime($sub['created_at'])); ?></td>
                         <td style="display:flex;gap:0.3rem;">

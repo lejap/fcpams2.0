@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['resolve'])) {
 // Fetch detail view
 $detail = null;
 if ($view_id > 0) {
-    $detail = $conn->query("SELECT * FROM tickets WHERE id=$view_id AND status != 'SPAM'")->fetch_assoc();
+    $detail = $conn->query("SELECT *, (SELECT label FROM dropdown_options WHERE id = tickets.option_id) as option_label FROM tickets WHERE id=$view_id AND status != 'SPAM'")->fetch_assoc();
     if (!$detail) { header("Location: submissions.php"); exit(); }
 }
 
@@ -37,7 +37,7 @@ if ($branch_filter) $where .= " AND user_branch='$branch_filter'";
 if ($date_from)     $where .= " AND DATE(created_at) >= '$date_from'";
 if ($date_to)       $where .= " AND DATE(created_at) <= '$date_to'";
 
-$submissions = $conn->query("SELECT * FROM tickets $where ORDER BY created_at DESC");
+$submissions = $conn->query("SELECT *, (SELECT label FROM dropdown_options WHERE id = tickets.option_id) as option_label FROM tickets $where ORDER BY created_at DESC");
 $branches    = $conn->query("SELECT * FROM branches ORDER BY name");
 
 $page_title = "Submissions";
@@ -62,18 +62,25 @@ include '../includes/staff_sidebar.php';
     <div style="display:grid;grid-template-columns:1fr 1.5fr;gap:1.5rem;">
         <div class="glass-card">
             <h4 style="margin-bottom:1rem;color:#3b82f6;">Submission Info</h4>
-            <?php foreach ([
+            <?php
+            $info_items = [
                 'Ref No'      => $detail['ref_no'],
                 'Name'        => $detail['user_name'],
                 'Phone'       => $detail['user_phone'],
                 'Email'       => $detail['user_email'],
                 'Branch'      => $detail['user_branch'],
                 'Type'        => $detail['type'],
+            ];
+            if ($detail['type'] === 'REQUEST' && !empty($detail['option_label'])) {
+                $info_items['Request Type'] = $detail['option_label'];
+            }
+            $info_items = array_merge($info_items, [
                 'Status'      => $detail['status'],
                 'Filed'       => date('M d, Y H:i', strtotime($detail['created_at'])),
                 'Resolved'    => $detail['resolved_at'] ? date('M d, Y H:i', strtotime($detail['resolved_at'])) : '-',
                 'Resolved By' => $detail['resolved_by_name'] ?? '-',
-            ] as $label => $value): ?>
+            ]);
+            foreach ($info_items as $label => $value): ?>
             <div style="margin-bottom:0.75rem;">
                 <div style="font-size:0.72rem;color:#94a3b8;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;"><?php echo $label; ?></div>
                 <div style="font-weight:500;color:#1e293b;"><?php echo htmlspecialchars($value); ?></div>
@@ -186,7 +193,13 @@ include '../includes/staff_sidebar.php';
                             <div style="font-size:0.7rem;color:#64748b;"><?php echo htmlspecialchars($sub['user_phone']); ?></div>
                         </td>
                         <td><span style="background:#94a3b8;color:white;padding:0.1rem 0.4rem;border-radius:0.2rem;font-size:0.7rem;"><?php echo htmlspecialchars($sub['user_branch']); ?></span></td>
-                        <td><?php $tc=$sub['type']==='INQUIRY'?'#ef4444':($sub['type']==='REQUEST'?'#8b5cf6':'#eab308'); ?><span class="badge" style="background:<?php echo $tc;?>"><?php echo $sub['type']; ?></span></td>
+                        <td>
+                            <?php $tc=$sub['type']==='INQUIRY'?'#ef4444':($sub['type']==='REQUEST'?'#8b5cf6':'#eab308'); ?>
+                            <span class="badge" style="background:<?php echo $tc;?>"><?php echo $sub['type']; ?></span>
+                            <?php if ($sub['type'] === 'REQUEST' && !empty($sub['option_label'])): ?>
+                                <div style="font-size:0.72rem;color:#64748b;margin-top:0.25rem;font-weight:600;"><?php echo htmlspecialchars($sub['option_label']); ?></div>
+                            <?php endif; ?>
+                        </td>
                         <td><span class="badge" style="background:<?php echo $sub['status']==='OPEN'?'#ef4444':($sub['status']==='CLOSED'?'#8b5cf6':'#10b981'); ?>;"><?php echo $sub['status']??'OPEN'; ?></span></td>
                         <td style="font-size:0.8rem;"><?php echo date('M d, Y H:i', strtotime($sub['created_at'])); ?></td>
                         <td style="font-size:0.8rem;"><?php echo $sub['resolved_at'] ? date('M d, Y H:i', strtotime($sub['resolved_at'])) : '-'; ?></td>

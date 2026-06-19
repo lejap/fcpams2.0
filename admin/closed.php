@@ -64,7 +64,7 @@ if ($branch_filter) $sub_where .= " AND user_branch='$branch_filter'";
 if ($date_from)     $sub_where .= " AND DATE(created_at) >= '$date_from'";
 if ($date_to)       $sub_where .= " AND DATE(created_at) <= '$date_to'";
 
-$submissions       = $conn->query("SELECT * FROM tickets $sub_where ORDER BY resolved_at DESC");
+$submissions       = $conn->query("SELECT *, (SELECT label FROM dropdown_options WHERE id = tickets.option_id) as option_label FROM tickets $sub_where ORDER BY resolved_at DESC");
 $total_sub_closed  = $conn->query("SELECT COUNT(*) as c FROM tickets WHERE status='CLOSED'")->fetch_assoc()['c'];
 $total_sub_res     = $conn->query("SELECT COUNT(*) as c FROM tickets WHERE status='RESOLVED'")->fetch_assoc()['c'];
 
@@ -229,7 +229,13 @@ include '../includes/admin_sidebar.php';
                         <div style="font-size:0.7rem;color:#64748b;"><?php echo htmlspecialchars($sub['user_phone']); ?></div>
                     </td>
                     <td><span style="background:#94a3b8;color:white;padding:0.1rem 0.4rem;border-radius:0.2rem;font-size:0.7rem;"><?php echo htmlspecialchars($sub['user_branch']); ?></span></td>
-                    <td><?php $tc=$sub['type']==='INQUIRY'?'#ef4444':($sub['type']==='REQUEST'?'#8b5cf6':'#eab308'); ?><span class="badge" style="background:<?php echo $tc; ?>;"><?php echo $sub['type']; ?></span></td>
+                    <td>
+                        <?php $tc=$sub['type']==='INQUIRY'?'#ef4444':($sub['type']==='REQUEST'?'#8b5cf6':'#eab308'); ?>
+                        <span class="badge" style="background:<?php echo $tc; ?>;"><?php echo $sub['type']; ?></span>
+                        <?php if ($sub['type'] === 'REQUEST' && !empty($sub['option_label'])): ?>
+                            <div style="font-size:0.72rem;color:#64748b;margin-top:0.25rem;font-weight:600;"><?php echo htmlspecialchars($sub['option_label']); ?></div>
+                        <?php endif; ?>
+                    </td>
                     <td>
                         <?php if ($sub['status']==='CLOSED'): ?>
                             <span class="status-closed">CLOSED</span>
