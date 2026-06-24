@@ -189,7 +189,7 @@ function acceptConfidentiality() {
 <!-- ══════════════════════════════════════════════════════════════════════ -->
 
 <div class="fade-in">
-    <div style="margin-bottom:1.5rem;">
+    <div style="margin-bottom:1.5rem;padding-top:3.5rem;" class="form-top-section">
         <a href="dashboard.php" class="btn btn-outline"
             style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.35rem 0.9rem;font-size:0.85rem;margin-bottom:1rem;">
             <i class="fas fa-arrow-left"></i> Back to Dashboard

@@ -3,11 +3,12 @@ $current_page = basename($_SERVER['PHP_SELF']);
 $is_admin = isset($_SESSION['role']) && $_SESSION['role'] === 'ADMIN';
 
 // Notification counts
-$open_submissions = $conn->query("SELECT COUNT(*) as c FROM tickets WHERE status='OPEN'")->fetch_assoc()['c'];
-$open_complaints  = $conn->query("SELECT COUNT(*) as c FROM complaints WHERE status='OPEN'")->fetch_assoc()['c'];
-$closed_total     = $conn->query("SELECT COUNT(*) as c FROM tickets WHERE status IN ('RESOLVED','CLOSED')")->fetch_assoc()['c']
-                  + $conn->query("SELECT COUNT(*) as c FROM complaints WHERE status IN ('RESOLVED','CLOSED')")->fetch_assoc()['c'];
-$pending_users    = $is_admin ? $conn->query("SELECT COUNT(*) as c FROM users WHERE is_approved=0")->fetch_assoc()['c'] : 0;
+$open_submissions  = $conn->query("SELECT COUNT(*) as c FROM tickets WHERE status='OPEN'")->fetch_assoc()['c'];
+$open_complaints   = $conn->query("SELECT COUNT(*) as c FROM complaints WHERE status='OPEN'")->fetch_assoc()['c'];
+$total_appreciations = $conn->query("SELECT COUNT(*) as c FROM appreciations")->fetch_assoc()['c'];
+$closed_total      = $conn->query("SELECT COUNT(*) as c FROM tickets WHERE status IN ('RESOLVED','CLOSED')")->fetch_assoc()['c']
+                   + $conn->query("SELECT COUNT(*) as c FROM complaints WHERE status IN ('RESOLVED','CLOSED')")->fetch_assoc()['c'];
+$pending_users     = $is_admin ? $conn->query("SELECT COUNT(*) as c FROM users WHERE is_approved=0")->fetch_assoc()['c'] : 0;
 ?>
 
 <!-- Admin Sidebar -->
@@ -25,6 +26,13 @@ $pending_users    = $is_admin ? $conn->query("SELECT COUNT(*) as c FROM users WH
         <i class="fas fa-exclamation-triangle"></i> Complaints
         <?php if ($open_complaints > 0): ?>
         <span style="margin-left:auto;background:#ef4444;color:white;border-radius:9px;min-width:18px;height:18px;font-size:0.65rem;font-weight:800;display:inline-flex;align-items:center;justify-content:center;padding:0 4px;"><?php echo $open_complaints; ?></span>
+        <?php endif; ?>
+    </a>
+
+    <a href="<?php echo BASE_URL; ?>admin/appreciations.php" class="admin-nav-link <?php echo $current_page === 'appreciations.php' ? 'active' : ''; ?>" style="color:rgba(251,191,36,0.95) !important;">
+        <i class="fas fa-star"></i> Appreciations
+        <?php if ($total_appreciations > 0): ?>
+        <span style="margin-left:auto;background:#f59e0b;color:white;border-radius:9px;min-width:18px;height:18px;font-size:0.65rem;font-weight:800;display:inline-flex;align-items:center;justify-content:center;padding:0 4px;"><?php echo $total_appreciations; ?></span>
         <?php endif; ?>
     </a>
 

@@ -56,7 +56,7 @@ include '../includes/header.php';
 include '../includes/citizen_sidebar.php';
 ?>
 
-<div class="py-2 flex justify-center fade-in">
+<div class="py-2 flex justify-center fade-in form-top-section">
     <div class="glass-card" style="width: 100%; max-width: 600px;">
         <div class="mb-6 flex items-center justify-between">
             <h2>Submit <?php echo $type === 'INQUIRY' ? 'an Inquiry' : ($type === 'SUGGESTION' ? 'a Suggestion' : 'a Request'); ?></h2>

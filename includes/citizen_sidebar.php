@@ -1,8 +1,20 @@
 <div class="dashboard-layout container animate-fade-in relative z-10" style="position: relative;">
-    <button id="nav-toggle" class="btn btn-outline" style="position: absolute; top: 1rem; left: 1rem; z-index: 100; padding: 0.5rem; border-radius: 0.5rem; background: rgba(255,255,255,0.8); border: none; box-shadow: 0 2px 5px rgba(0,0,0,0.1);" onclick="toggleNav()" title="Toggle Navigation">
-        <img src="<?php echo BASE_URL; ?>images/proflogo.png" alt="Menu" style="width: 24px; height: 24px; object-fit: contain;">
+
+    <!-- Overlay backdrop (mobile only) -->
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+    <!-- Hamburger button (mobile only) -->
+    <button class="mobile-nav-toggle" id="mobile-nav-toggle" onclick="openSidebar()" title="Open Menu">
+        <i class="fas fa-bars"></i>
     </button>
+
     <aside class="sidebar glass-card" id="citizen-sidebar">
+        <!-- Close button inside sidebar (mobile) -->
+        <button onclick="closeSidebar()" id="sidebar-close-btn"
+            style="display:none;position:absolute;top:1rem;right:1rem;background:transparent;border:none;font-size:1.4rem;color:#64748b;cursor:pointer;">
+            <i class="fas fa-times"></i>
+        </button>
+
         <!-- User Avatar + Info -->
         <div class="mb-8 text-center">
             <div style="width:64px;height:64px;background:linear-gradient(135deg,var(--primary),var(--secondary));border-radius:1.25rem;margin:0 auto 1rem;display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:white;font-weight:800;box-shadow:0 8px 16px rgba(59,130,246,0.3);">
@@ -31,6 +43,9 @@
             <a href="<?php echo BASE_URL; ?>citizen/submit_ticket.php?type=SUGGESTION" class="sidebar-link">
                 <i class="fas fa-lightbulb"></i> Make Suggestion
             </a>
+            <a href="<?php echo BASE_URL; ?>citizen/submit_appreciation.php" class="sidebar-link">
+                <i class="fas fa-star"></i> Commendation
+            </a>
             <a href="<?php echo BASE_URL; ?>citizen/surveys.php" class="sidebar-link">
                 <i class="fas fa-poll"></i> Surveys
             </a>
@@ -38,7 +53,8 @@
 
         <!-- Logout -->
         <div style="margin-top:auto;padding-top:2rem;">
-            <a href="<?php echo BASE_URL; ?>logout.php" class="sidebar-link" style="color:#f43f5e;background:rgba(244,63,94,0.1);justify-content:center;display:flex;align-items:center;gap:0.5rem;text-decoration:none;border-radius:0.6rem;">
+            <a href="<?php echo BASE_URL; ?>logout.php" class="sidebar-link"
+                style="color:#f43f5e;background:rgba(244,63,94,0.1);justify-content:center;display:flex;align-items:center;gap:0.5rem;text-decoration:none;border-radius:0.6rem;">
                 <i class="fas fa-sign-out-alt"></i> Logout
             </a>
         </div>
@@ -48,12 +64,26 @@
     <main class="dashboard-content">
 
 <script>
-function toggleNav() {
-    const sidebar = document.getElementById('citizen-sidebar');
-    if (sidebar.style.display === 'none') {
-        sidebar.style.display = 'flex';
-    } else {
-        sidebar.style.display = 'none';
-    }
+function openSidebar() {
+    document.getElementById('citizen-sidebar').classList.add('open');
+    document.getElementById('sidebar-overlay').classList.add('active');
+    document.getElementById('mobile-nav-toggle').innerHTML = '<i class="fas fa-times"></i>';
+    var closeBtn = document.getElementById('sidebar-close-btn');
+    if (closeBtn && window.innerWidth < 768) closeBtn.style.display = 'block';
 }
+function closeSidebar() {
+    document.getElementById('citizen-sidebar').classList.remove('open');
+    document.getElementById('sidebar-overlay').classList.remove('active');
+    document.getElementById('mobile-nav-toggle').innerHTML = '<i class="fas fa-bars"></i>';
+    var closeBtn = document.getElementById('sidebar-close-btn');
+    if (closeBtn) closeBtn.style.display = 'none';
+}
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-close sidebar on nav link click (mobile)
+    document.querySelectorAll('#citizen-sidebar .sidebar-link').forEach(function(link) {
+        link.addEventListener('click', function() {
+            if (window.innerWidth < 768) closeSidebar();
+        });
+    });
+});
 </script>

@@ -52,6 +52,11 @@ include '../includes/citizen_sidebar.php';
         <h3 style="color:var(--success);margin-bottom:0.4rem;">Thank you!</h3>
         <p class="mb-0">Your request for document/s has been successfully submitted. A confirmation will be sent to you once it has been processed within 2–3 working days.</p>
     </div>
+    <?php elseif ($success_type === 'appreciation'): ?>
+    <div class="glass-card" style="border-left:4px solid #0891b2;margin-bottom:1.5rem;">
+        <h3 style="color:#0891b2;margin-bottom:0.4rem;"><i class="fas fa-star" style="color:#f59e0b;"></i> Thank you for your commendation!</h3>
+        <p class="mb-0">Your appreciation has been received and will be forwarded to the recognized staff member. We appreciate you taking the time to acknowledge great service.</p>
+    </div>
     <?php elseif ($survey_ok): ?>
     <div class="glass-card" style="border-left:4px solid var(--success);margin-bottom:1.5rem;">
         <h3 style="color:var(--success);margin-bottom:0.4rem;">Thank you for taking the time to complete our survey!</h3>
@@ -108,7 +113,18 @@ include '../includes/citizen_sidebar.php';
             <span class="btn btn-primary" style="width:100%;text-align:center;padding:0.55rem;font-size:0.9rem;margin-top:auto;background:linear-gradient(135deg,#6366f1,#8b5cf6);">Go to Suggestions</span>
         </a>
 
-        <!-- 5. Survey -->
+
+        <!-- 5. Commendation -->
+        <a href="submit_appreciation.php" class="glass-card" style="display:flex;flex-direction:column;align-items:center;gap:0.85rem;padding:1.5rem;border-bottom:4px solid #0891b2;text-decoration:none;">
+            <i class="fas fa-star" style="font-size:2.5rem;color:#f59e0b;"></i>
+            <div style="text-align:center;">
+                <h3 style="color:#1e293b;font-size:1.1rem;margin-bottom:0.2rem;">Commendation</h3>
+                <p style="font-size:0.82rem;color:#64748b;margin:0;">Recognize exceptional staff service.</p>
+            </div>
+            <span class="btn btn-primary" style="width:100%;text-align:center;padding:0.55rem;font-size:0.9rem;margin-top:auto;background:linear-gradient(135deg,#0891b2,#0e7490);">Commend Staff</span>
+        </a>
+
+        <!-- 6. Survey -->
         <a href="surveys.php" class="glass-card" style="display:flex;flex-direction:column;align-items:center;gap:0.85rem;padding:1.5rem;border-bottom:4px solid #10b981;text-decoration:none;">
             <i class="fas fa-poll" style="font-size:2.5rem;color:#10b981;"></i>
             <div style="text-align:center;">
