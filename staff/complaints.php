@@ -3,6 +3,7 @@ require_once '../config/db.php';
 require_once '../includes/functions.php';
 
 auth_guard('STAFF');
+validate_csrf();
 
 $view_id = isset($_GET['view']) ? (int)$_GET['view'] : 0;
 
@@ -131,6 +132,7 @@ include '../includes/staff_sidebar.php';
             <div class="glass-card">
                 <h4 style="margin-bottom:1rem;">Resolve Complaint</h4>
                 <form method="POST">
+                    <?php echo csrf_field(); ?>
                     <input type="hidden" name="complaint_id" value="<?php echo $detail['id']; ?>">
                     <div class="form-group">
                         <label class="form-label">Resolution Remark <span style="color:#ef4444;">*</span></label>
@@ -178,6 +180,7 @@ include '../includes/staff_sidebar.php';
 
                 <!-- Upload form -->
                 <form method="POST" enctype="multipart/form-data" style="margin-top:0.25rem;">
+                    <?php echo csrf_field(); ?>
                     <input type="hidden" name="complaint_id" value="<?php echo $detail['id']; ?>">
                     <label style="font-size:0.8rem;font-weight:700;color:#374151;display:block;margin-bottom:0.4rem;">
                         <i class="fas fa-upload"></i>

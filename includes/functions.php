@@ -3,6 +3,47 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+// Generate CSRF token if it doesn't exist in the session
+if (!isset($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
+/**
+ * Get CSRF Token
+ */
+if (!function_exists('csrf_token')) {
+    function csrf_token() {
+        return $_SESSION['csrf_token'] ?? '';
+    }
+}
+
+/**
+ * Output Hidden CSRF Input Field
+ */
+if (!function_exists('csrf_field')) {
+    function csrf_field() {
+        return '<input type="hidden" name="csrf_token" value="' . htmlspecialchars(csrf_token()) . '">';
+    }
+}
+
+/**
+ * Validate CSRF Token on POST Requests
+ */
+if (!function_exists('validate_csrf')) {
+    function validate_csrf() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== ($_SESSION['csrf_token'] ?? '')) {
+                http_response_code(403);
+                die("<div style='padding:2rem;font-family:Arial,sans-serif;color:#ef4444;text-align:center;'>
+                        <h2>CSRF Verification Failed</h2>
+                        <p>Your session may have expired. Please go back, refresh the page, and try again.</p>
+                        <a href='javascript:history.back()' style='color:#3b82f6;text-decoration:none;font-weight:bold;'>&larr; Go Back</a>
+                     </div>");
+            }
+        }
+    }
+}
+
 /**
  * Authentication Guard
  * Redirects to login if user is not authenticated or lacks required role.

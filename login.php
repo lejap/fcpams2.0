@@ -21,6 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($user = $result->fetch_assoc()) {
         if (password_verify($password, $user['password_hash'])) {
+            session_regenerate_id(true); // Prevent Session Fixation
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['name'] = $user['name'];
             $_SESSION['role'] = $user['role'];

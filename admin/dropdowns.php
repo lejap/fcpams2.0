@@ -3,6 +3,7 @@ require_once '../config/db.php';
 require_once '../includes/functions.php';
 
 auth_guard('ADMIN');
+validate_csrf();
 
 $msg = '';
 $msg_type = 'success';
@@ -86,6 +87,7 @@ include '../includes/admin_sidebar.php';
     <div class="glass-card">
         <h3 style="margin-bottom:1rem;color:#1e293b;">Add New Option</h3>
         <form method="POST" style="display:flex;gap:0.75rem;align-items:flex-end;flex-wrap:wrap;">
+            <?php echo csrf_field(); ?>
             <input type="hidden" name="action" value="add">
             <div style="min-width:160px;">
                 <label style="display:block;font-size:0.78rem;font-weight:600;color:#64748b;margin-bottom:0.3rem;text-transform:uppercase;">Type</label>
@@ -130,6 +132,7 @@ include '../includes/admin_sidebar.php';
                             <i class="fas fa-edit"></i>
                         </button>
                         <form method="POST" style="display:inline;" onsubmit="return confirm('Delete this option?');">
+                            <?php echo csrf_field(); ?>
                             <input type="hidden" name="action" value="delete">
                             <input type="hidden" name="id" value="<?php echo $o['id']; ?>">
                             <button type="submit" style="background:transparent;color:#ef4444;border:none;cursor:pointer;font-size:0.85rem;padding:0.25rem;transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'" title="Delete">
@@ -163,6 +166,7 @@ include '../includes/admin_sidebar.php';
                             <i class="fas fa-edit"></i>
                         </button>
                         <form method="POST" style="display:inline;" onsubmit="return confirm('Delete this option?');">
+                            <?php echo csrf_field(); ?>
                             <input type="hidden" name="action" value="delete">
                             <input type="hidden" name="id" value="<?php echo $o['id']; ?>">
                             <button type="submit" style="background:transparent;color:#ef4444;border:none;cursor:pointer;font-size:0.85rem;padding:0.25rem;transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'" title="Delete">
@@ -196,6 +200,7 @@ include '../includes/admin_sidebar.php';
                             <i class="fas fa-edit"></i>
                         </button>
                         <form method="POST" style="display:inline;" onsubmit="return confirm('Delete this option?');">
+                            <?php echo csrf_field(); ?>
                             <input type="hidden" name="action" value="delete">
                             <input type="hidden" name="id" value="<?php echo $o['id']; ?>">
                             <button type="submit" style="background:transparent;color:#ef4444;border:none;cursor:pointer;font-size:0.85rem;padding:0.25rem;transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'" title="Delete">
@@ -229,6 +234,7 @@ include '../includes/admin_sidebar.php';
                             <i class="fas fa-edit"></i>
                         </button>
                         <form method="POST" style="display:inline;" onsubmit="return confirm('Delete this option?');">
+                            <?php echo csrf_field(); ?>
                             <input type="hidden" name="action" value="delete">
                             <input type="hidden" name="id" value="<?php echo $o['id']; ?>">
                             <button type="submit" style="background:transparent;color:#ef4444;border:none;cursor:pointer;font-size:0.85rem;padding:0.25rem;transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'" title="Delete">
@@ -262,6 +268,7 @@ include '../includes/admin_sidebar.php';
                             <i class="fas fa-edit"></i>
                         </button>
                         <form method="POST" style="display:inline;" onsubmit="return confirm('Delete this option?');">
+                            <?php echo csrf_field(); ?>
                             <input type="hidden" name="action" value="delete">
                             <input type="hidden" name="id" value="<?php echo $o['id']; ?>">
                             <button type="submit" style="background:transparent;color:#ef4444;border:none;cursor:pointer;font-size:0.85rem;padding:0.25rem;transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'" title="Delete">
@@ -285,6 +292,7 @@ function editOption(id, label) {
         const form = document.createElement('form');
         form.method = 'POST';
         form.innerHTML = `
+            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(csrf_token()); ?>">
             <input type="hidden" name="action" value="edit">
             <input type="hidden" name="id" value="${id}">
             <input type="hidden" name="label" value="${newLabel}">

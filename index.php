@@ -4,6 +4,7 @@ require_once 'includes/functions.php';
 
 // Handle guest login submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['citizen_login'])) {
+    session_regenerate_id(true); // Prevent Session Fixation
     $_SESSION['user_id'] = 'GUEST_' . time();
     $_SESSION['name'] = sanitize($_POST['fullName']);
     $_SESSION['phone'] = sanitize($_POST['phone']);

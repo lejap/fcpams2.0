@@ -3,6 +3,7 @@ require_once '../config/db.php';
 require_once '../includes/functions.php';
 
 auth_guard('ADMIN');
+validate_csrf();
 
 $current_user = $conn->query("SELECT * FROM users WHERE id={$_SESSION['user_id']}")->fetch_assoc();
 $view_id = isset($_GET['view']) ? (int)$_GET['view'] : 0;
@@ -167,6 +168,7 @@ include '../includes/admin_sidebar.php';
             <div class="glass-card">
                 <h4 style="margin-bottom:1rem;">Resolve Complaint</h4>
                 <form method="POST">
+                    <?php echo csrf_field(); ?>
                     <input type="hidden" name="complaint_id" value="<?php echo $detail['id']; ?>">
                     <div class="form-group">
                         <label class="form-label">Resolution Remark</label>
@@ -175,6 +177,7 @@ include '../includes/admin_sidebar.php';
                     <button type="submit" name="resolve" class="btn btn-primary" style="width:100%;justify-content:center; margin-bottom: 0.5rem;">Mark as Resolved</button>
                 </form>
                 <form method="POST" onsubmit="return confirm('Are you sure you want to mark this complaint as SPAM? It will be removed from the main list.');">
+                    <?php echo csrf_field(); ?>
                     <input type="hidden" name="complaint_id" value="<?php echo $detail['id']; ?>">
                     <button type="submit" name="mark_spam_complaint" class="btn btn-outline" style="width: 100%; justify-content:center; color: #ef4444; border-color: #ef4444;">
                         <i class="fas fa-ban"></i> Mark as Spam
@@ -186,6 +189,7 @@ include '../includes/admin_sidebar.php';
                 <h4 style="margin-bottom:1rem;color:#8b5cf6;">Confirm Resolution (Admin)</h4>
                 <p style="font-size:.85rem;color:#64748b;margin-bottom:1rem;">As the Admin, you can confirm this resolution to officially CLOSE the complaint. Please provide your resolution remarks below.</p>
                 <form method="POST">
+                    <?php echo csrf_field(); ?>
                     <input type="hidden" name="complaint_id" value="<?php echo $detail['id']; ?>">
                     <div class="form-group" style="margin-bottom:1rem;">
                         <label class="form-label" style="font-weight:700;color:#8b5cf6;">Resolution of Complaint <span style="color:#ef4444;">*</span></label>
@@ -222,6 +226,7 @@ include '../includes/admin_sidebar.php';
                 <?php endif; ?>
 
                 <form method="POST" enctype="multipart/form-data" style="margin-top:0.25rem;">
+                    <?php echo csrf_field(); ?>
                     <input type="hidden" name="complaint_id" value="<?php echo $detail['id']; ?>">
                     <label style="font-size:0.8rem;font-weight:700;color:#374151;display:block;margin-bottom:0.4rem;">
                         <i class="fas fa-upload"></i>
@@ -299,6 +304,7 @@ include '../includes/admin_sidebar.php';
                     <td>
                         <?php if ($current_user['role'] === 'ADMIN'): ?>
                         <form method="POST" style="margin:0;">
+                            <?php echo csrf_field(); ?>
                             <input type="hidden" name="complaint_id" value="<?php echo $c['id']; ?>">
                             <select name="complexity" style="padding:0.25rem 0.5rem;font-size:0.75rem;border-radius:0.25rem;border:1px solid <?php echo $c['complexity']==='COMPLEX'?'#fca5a5':($c['complexity']==='SIMPLE'?'#86efac':'#cbd5e1'); ?>;background:<?php echo $c['complexity']==='COMPLEX'?'#fee2e2':($c['complexity']==='SIMPLE'?'#dcfce7':'#f1f5f9'); ?>;color:<?php echo $c['complexity']==='COMPLEX'?'#dc2626':($c['complexity']==='SIMPLE'?'#16a34a':'#64748b'); ?>;font-weight:bold;cursor:pointer;outline:none;" onchange="this.form.submit()">
                                 <option value="" style="background:white;color:black;" <?php echo empty($c['complexity'])?'selected':''; ?>>Unassessed</option>
@@ -331,6 +337,7 @@ include '../includes/admin_sidebar.php';
                     <td style="display:flex;gap:0.3rem;">
                         <a href="complaints.php?view=<?php echo $c['id']; ?>" class="btn btn-outline" style="padding:.25rem .5rem;font-size:.8rem;color:#b91c1c;border-color:#b91c1c;">Review</a>
                         <form method="POST" style="margin:0;" onsubmit="return confirm('Mark this complaint as SPAM?');">
+                            <?php echo csrf_field(); ?>
                             <input type="hidden" name="complaint_id" value="<?php echo $c['id']; ?>">
                             <button type="submit" name="mark_spam_complaint" class="btn btn-outline" style="padding:.25rem .5rem;font-size:.8rem;color:#ef4444;border-color:#ef4444;">Spam</button>
                         </form>

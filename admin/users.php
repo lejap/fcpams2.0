@@ -3,6 +3,7 @@ require_once '../config/db.php';
 require_once '../includes/functions.php';
 
 auth_guard('ADMIN');
+validate_csrf();
 
 $current_user = $conn->query("SELECT * FROM users WHERE id={$_SESSION['user_id']}")->fetch_assoc();
 $msg = '';
@@ -79,6 +80,7 @@ include '../includes/admin_sidebar.php';
                         <?php if ($u['id'] !== $_SESSION['user_id']): ?>
                         <form method="POST" style="display:inline-flex;gap:0.4rem;align-items:center;"
                               onsubmit="return confirmRoleChange(this)">
+                            <?php echo csrf_field(); ?>
                             <input type="hidden" name="id"     value="<?php echo $u['id']; ?>">
                             <input type="hidden" name="action" value="role">
                             <input type="hidden" name="user_name_label" value="<?php echo htmlspecialchars($u['name']); ?>">
@@ -108,6 +110,7 @@ include '../includes/admin_sidebar.php';
                         <div style="display:flex;gap:0.4rem;flex-wrap:wrap;">
                             <?php if (!$u['is_approved']): ?>
                             <form method="POST" style="display:inline;">
+                                <?php echo csrf_field(); ?>
                                 <input type="hidden" name="id" value="<?php echo $u['id']; ?>">
                                 <input type="hidden" name="action" value="approve">
                                 <button type="submit" style="background:#10b981;color:white;border:none;border-radius:0.4rem;padding:0.25rem 0.65rem;font-size:0.8rem;cursor:pointer;font-weight:600;">
@@ -117,6 +120,7 @@ include '../includes/admin_sidebar.php';
                             <?php endif; ?>
                             <?php if ($u['id'] !== $_SESSION['user_id']): ?>
                             <form method="POST" style="display:inline;" onsubmit="return confirm('Delete this user? This cannot be undone.');">
+                                <?php echo csrf_field(); ?>
                                 <input type="hidden" name="id" value="<?php echo $u['id']; ?>">
                                 <input type="hidden" name="action" value="delete">
                                 <button type="submit" style="background:transparent;color:#ef4444;border:1px solid #ef4444;border-radius:0.4rem;padding:0.25rem 0.65rem;font-size:0.8rem;cursor:pointer;font-weight:600;">

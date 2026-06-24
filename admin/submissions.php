@@ -3,6 +3,7 @@ require_once '../config/db.php';
 require_once '../includes/functions.php';
 
 auth_guard('ADMIN');
+validate_csrf();
 
 $view_id = isset($_GET['view']) ? (int)$_GET['view'] : 0;
 $current_user = $conn->query("SELECT * FROM users WHERE id = {$_SESSION['user_id']}")->fetch_assoc();
@@ -126,6 +127,7 @@ include '../includes/admin_sidebar.php';
             <div class="glass-card">
                 <h4 style="margin-bottom:1rem;">Resolve This Submission</h4>
                 <form method="POST">
+                    <?php echo csrf_field(); ?>
                     <input type="hidden" name="ticket_id" value="<?php echo $detail['id']; ?>">
                     <div class="form-group">
                         <label class="form-label">Admin Remark</label>
@@ -138,6 +140,7 @@ include '../includes/admin_sidebar.php';
                     </div>
                 </form>
                 <form method="POST" style="margin-top: 0.5rem;" onsubmit="return confirm('Are you sure you want to mark this submission as SPAM? It will be removed from the main list.');">
+                    <?php echo csrf_field(); ?>
                     <input type="hidden" name="ticket_id" value="<?php echo $detail['id']; ?>">
                     <button type="submit" name="mark_spam" class="btn btn-outline" style="width: 100%; justify-content:center; color: #ef4444; border-color: #ef4444;">
                         <i class="fas fa-ban"></i> Mark as Spam
@@ -149,6 +152,7 @@ include '../includes/admin_sidebar.php';
                 <h4 style="margin-bottom:1rem;color:#8b5cf6;">Confirm Resolution (Admin)</h4>
                 <p style="font-size:0.85rem;color:#64748b;margin-bottom:1rem;">As the Admin, you can confirm this resolution to officially CLOSE the submission. Please provide your resolution remarks below.</p>
                 <form method="POST">
+                    <?php echo csrf_field(); ?>
                     <input type="hidden" name="ticket_id" value="<?php echo $detail['id']; ?>">
                     <div class="form-group" style="margin-bottom:1rem;">
                         <label class="form-label" style="font-weight:700;color:#8b5cf6;">Resolution of Complaint <span style="color:#ef4444;">*</span></label>

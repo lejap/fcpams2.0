@@ -3,6 +3,7 @@ require_once '../config/db.php';
 require_once '../includes/functions.php';
 
 auth_guard('STAFF');
+validate_csrf();
 
 $view_id = isset($_GET['view']) ? (int)$_GET['view'] : 0;
 
@@ -103,6 +104,7 @@ include '../includes/staff_sidebar.php';
             <div class="glass-card">
                 <h4 style="margin-bottom:1rem;">Resolve This Submission</h4>
                 <form method="POST">
+                    <?php echo csrf_field(); ?>
                     <input type="hidden" name="ticket_id" value="<?php echo $detail['id']; ?>">
                     <div class="form-group">
                         <label class="form-label">Resolution Remark <span style="color:#ef4444;">*</span></label>

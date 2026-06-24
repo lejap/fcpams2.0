@@ -3,6 +3,7 @@ require_once '../config/db.php';
 require_once '../includes/functions.php';
 
 auth_guard('ADMIN');
+validate_csrf();
 
 $msg = '';
 if (isset($_GET['msg'])) {
@@ -53,6 +54,7 @@ include '../includes/admin_sidebar.php';
     <div class="glass-card" style="margin-bottom:1.5rem;">
         <h3 style="margin-bottom:1rem;color:#1e293b;">Add New Branch</h3>
         <form method="POST" style="display:flex;gap:0.75rem;align-items:flex-end;flex-wrap:wrap;">
+            <?php echo csrf_field(); ?>
             <input type="hidden" name="action" value="add">
             <div style="flex:1;min-width:200px;">
                 <label style="display:block;font-size:0.8rem;font-weight:600;color:#64748b;margin-bottom:0.3rem;text-transform:uppercase;letter-spacing:0.05em;">Branch Name</label>
@@ -90,6 +92,7 @@ include '../includes/admin_sidebar.php';
                     <td style="font-size:0.8rem;color:#64748b;"><?php echo date('M d, Y', strtotime($b['created_at'])); ?></td>
                     <td>
                         <form method="POST" style="display:inline;" onsubmit="return confirm('Delete branch \'<?php echo htmlspecialchars(addslashes($b['name'])); ?>\'? Users assigned to this branch will be unassigned.');">
+                            <?php echo csrf_field(); ?>
                             <input type="hidden" name="action" value="delete">
                             <input type="hidden" name="id" value="<?php echo $b['id']; ?>">
                             <button type="submit" style="background:transparent;color:#ef4444;border:1px solid #ef4444;border-radius:0.4rem;padding:0.25rem 0.65rem;font-size:0.8rem;cursor:pointer;font-weight:600;">
