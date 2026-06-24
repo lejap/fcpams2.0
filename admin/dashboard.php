@@ -19,12 +19,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_spam_complaint']
 }
 
 // Stat counts
-$open_tickets      = $conn->query("SELECT COUNT(*) as c FROM tickets WHERE status='OPEN'")->fetch_assoc()['c'];
-$open_complaints   = $conn->query("SELECT COUNT(*) as c FROM complaints WHERE status='OPEN'")->fetch_assoc()['c'];
-$resolved_tickets  = $conn->query("SELECT COUNT(*) as c FROM tickets WHERE status IN ('RESOLVED','CLOSED')")->fetch_assoc()['c'];
-$resolved_comp     = $conn->query("SELECT COUNT(*) as c FROM complaints WHERE status IN ('RESOLVED','CLOSED')")->fetch_assoc()['c'];
-$active_surveys    = $conn->query("SELECT COUNT(*) as c FROM surveys WHERE is_active=1")->fetch_assoc()['c'];
-$pending_users     = $conn->query("SELECT COUNT(*) as c FROM users WHERE is_approved=0")->fetch_assoc()['c'];
+$open_tickets        = $conn->query("SELECT COUNT(*) as c FROM tickets WHERE status='OPEN'")->fetch_assoc()['c'];
+$open_complaints     = $conn->query("SELECT COUNT(*) as c FROM complaints WHERE status='OPEN'")->fetch_assoc()['c'];
+$resolved_tickets    = $conn->query("SELECT COUNT(*) as c FROM tickets WHERE status IN ('RESOLVED','CLOSED')")->fetch_assoc()['c'];
+$resolved_comp       = $conn->query("SELECT COUNT(*) as c FROM complaints WHERE status IN ('RESOLVED','CLOSED')")->fetch_assoc()['c'];
+$active_surveys      = $conn->query("SELECT COUNT(*) as c FROM surveys WHERE is_active=1")->fetch_assoc()['c'];
+$pending_users       = $conn->query("SELECT COUNT(*) as c FROM users WHERE is_approved=0")->fetch_assoc()['c'];
+$total_appreciations = $conn->query("SELECT COUNT(*) as c FROM appreciations")->fetch_assoc()['c'];
+$recent_appreciations = $conn->query("SELECT * FROM appreciations ORDER BY created_at DESC LIMIT 5");
 
 // Filters
 $type_filter   = isset($_GET['type'])     ? sanitize($_GET['type'])     : '';
@@ -87,6 +89,11 @@ include '../includes/admin_sidebar.php';
             <div class="stat-card-value" style="color:#f97316;"><?php echo $pending_users; ?></div>
             <i class="fas fa-user-clock" style="position:absolute;right:1.25rem;top:1.25rem;font-size:2.2rem;opacity:0.1;color:#f97316;"></i>
         </div>
+        <a href="appreciations.php" class="stat-card" style="text-decoration:none;cursor:pointer;">
+            <div class="stat-card-title">Total Appreciations</div>
+            <div class="stat-card-value" style="color:#0891b2;"><?php echo $total_appreciations; ?></div>
+            <i class="fas fa-star" style="position:absolute;right:1.25rem;top:1.25rem;font-size:2.2rem;opacity:0.12;color:#f59e0b;"></i>
+        </a>
     </div>
 
     <!-- Filter Row -->
@@ -236,6 +243,53 @@ include '../includes/admin_sidebar.php';
             </tbody>
         </table>
         </div>
-    </div> 
+
+    <!-- Recent Appreciations Table -->
+    <div class="admin-table-wrapper" style="margin-top:1.5rem;">
+        <div class="admin-table-header" style="background:linear-gradient(90deg,#0891b2,#0e7490);">
+            <i class="fas fa-star" style="color:#fbbf24;"></i> Recent Appreciations
+            <span style="margin-left:auto;background:rgba(255,255,255,0.25);border-radius:9px;padding:0.1rem 0.55rem;font-size:0.75rem;"><?php echo $total_appreciations; ?></span>
+            <a href="appreciations.php" style="margin-left:0.75rem;font-size:0.75rem;color:rgba(255,255,255,0.85);text-decoration:underline;font-weight:600;">View All</a>
+        </div>
+        <div style="overflow-x:auto;">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Member</th>
+                    <th>Branch</th>
+                    <th>Staff Recognized</th>
+                    <th>Appreciation</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if ($recent_appreciations->num_rows > 0): ?>
+                <?php while ($ap = $recent_appreciations->fetch_assoc()): ?>
+                <tr>
+                    <td>
+                        <div style="font-weight:600;"><?php echo htmlspecialchars($ap['user_name']); ?></div>
+                        <div style="font-size:0.7rem;color:#64748b;"><?php echo htmlspecialchars($ap['user_phone']); ?></div>
+                    </td>
+                    <td><span style="background:#e0f2fe;color:#0369a1;padding:0.15rem 0.45rem;border-radius:0.25rem;font-size:0.72rem;font-weight:700;"><?php echo htmlspecialchars($ap['user_branch']); ?></span></td>
+                    <td>
+                        <span style="display:inline-flex;align-items:center;gap:0.3rem;background:#fef9c3;color:#854d0e;padding:0.2rem 0.55rem;border-radius:0.35rem;font-size:0.8rem;font-weight:700;">
+                            <i class="fas fa-star" style="font-size:0.65rem;color:#d97706;"></i>
+                            <?php echo htmlspecialchars($ap['staff_name']); ?>
+                        </span>
+                    </td>
+                    <td style="font-style:italic;color:#334155;max-width:220px;">&ldquo;<?php echo htmlspecialchars($ap['appreciation']); ?>&rdquo;</td>
+                    <td style="font-size:0.8rem;white-space:nowrap;"><?php echo date('M d, Y', strtotime($ap['created_at'])); ?></td>
+                </tr>
+                <?php endwhile; ?>
+                <?php else: ?>
+                <tr><td colspan="5" style="text-align:center;padding:2rem;color:#94a3b8;">
+                    <i class="fas fa-star" style="font-size:1.6rem;display:block;margin-bottom:0.4rem;color:#fbbf24;opacity:0.35;"></i>
+                    No appreciations yet.
+                </td></tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
+        </div>
+    </div>
 </div>
 <?php include '../includes/admin_footer.php'; ?>

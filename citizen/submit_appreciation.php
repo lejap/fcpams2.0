@@ -7,13 +7,6 @@ auth_guard('CITIZEN');
 $error   = '';
 $success = '';
 
-// Fetch staff list (ADMIN + STAFF users, approved only)
-$staff_list = [];
-$res = $conn->query("SELECT name FROM users WHERE is_approved = 1 ORDER BY name ASC");
-while ($row = $res->fetch_assoc()) {
-    $staff_list[] = $row['name'];
-}
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $staff_name      = sanitize($_POST['staff_name'] ?? '');
     $appreciation    = sanitize($_POST['appreciation'] ?? '');
@@ -94,18 +87,14 @@ include '../includes/citizen_sidebar.php';
                 <label class="form-label">
                     STAFF NAME <span style="color:#ef4444;">*</span>
                 </label>
-                <select name="staff_name" class="form-select" required>
-                    <option value="">— Select Staff Member —</option>
-                    <?php foreach ($staff_list as $sname): ?>
-                        <option value="<?php echo htmlspecialchars($sname); ?>"
-                            <?php echo (($_POST['staff_name'] ?? '') === $sname) ? 'selected' : ''; ?>>
-                            <?php echo htmlspecialchars($sname); ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-                <?php if (empty($staff_list)): ?>
-                    <p style="font-size:0.8rem;color:#94a3b8;margin-top:0.3rem;">No staff listed yet.</p>
-                <?php endif; ?>
+                <input
+                    type="text"
+                    name="staff_name"
+                    class="form-input"
+                    required
+                    placeholder="Enter the name of the staff member"
+                    value="<?php echo htmlspecialchars($_POST['staff_name'] ?? ''); ?>"
+                >
             </div>
 
             <!-- Appreciation Message -->
