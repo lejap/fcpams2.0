@@ -12,3 +12,4 @@ deployment:
     - /bin/cp login.php $DEPLOYPATH
     - /bin/cp logout.php $DEPLOYPATH
     - /bin/cp register.php $DEPLOYPATH
+    - /bin/cp migrate_is_ho.php $DEPLOYPATH
