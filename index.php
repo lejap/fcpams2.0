@@ -16,12 +16,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['citizen_login'])) {
     exit();
 }
 
-// Fetch branches for the dropdown
-$branches = [];
-$result = $conn->query("SELECT name FROM branches ORDER BY name ASC");
+// Fetch branches for the dropdown (regular branches first, then HO branches)
+$branches_regular = [];
+$branches_ho = [];
+$result = $conn->query("SELECT name, IF(is_ho IS NULL, 0, is_ho) AS is_ho FROM branches ORDER BY is_ho ASC, name ASC");
 if ($result) {
     while ($row = $result->fetch_assoc()) {
-        $branches[] = $row['name'];
+        if ($row['is_ho']) {
+            $branches_ho[] = $row['name'];
+        } else {
+            $branches_regular[] = $row['name'];
+        }
     }
 }
 
@@ -60,11 +65,22 @@ include 'includes/header.php';
                 <label class="form-label">Branch *</label>
                 <select name="branch" class="form-select" required>
                     <option value="">Select a branch</option>
-                    <?php foreach ($branches as $branch): ?>
-                        <option value="<?php echo htmlspecialchars($branch); ?>"><?php echo htmlspecialchars($branch); ?></option>
-                    <?php endforeach; ?>
+                    <?php if (!empty($branches_regular)): ?>
+                        <optgroup label="── Branches ──">
+                            <?php foreach ($branches_regular as $branch): ?>
+                                <option value="<?php echo htmlspecialchars($branch); ?>"><?php echo htmlspecialchars($branch); ?></option>
+                            <?php endforeach; ?>
+                        </optgroup>
+                    <?php endif; ?>
+                    <?php if (!empty($branches_ho)): ?>
+                        <optgroup label="── Head Office ──">
+                            <?php foreach ($branches_ho as $branch): ?>
+                                <option value="<?php echo htmlspecialchars($branch); ?>"><?php echo htmlspecialchars($branch); ?></option>
+                            <?php endforeach; ?>
+                        </optgroup>
+                    <?php endif; ?>
                 </select>
-                <?php if (empty($branches)): ?>
+                <?php if (empty($branches_regular) && empty($branches_ho)): ?>
                     <p style="font-size: 0.8rem; color: #64748b; mt-6">No branches available. Admin must add branches.</p>
                 <?php endif; ?>
             </div>
