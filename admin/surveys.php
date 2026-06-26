@@ -6,7 +6,7 @@ auth_guard('ADMIN');
 
 $msg = '';
 if (isset($_GET['msg'])) {
-    $msgs = ['created'=>'Survey created successfully.','toggled'=>'Survey status updated.','deleted'=>'Survey deleted.','q_added'=>'Question added.','q_deleted'=>'Question deleted.','q_updated'=>'Question updated.','q_error'=>'Error: Could not save question. Check if the questions table type column includes MULTI_SELECT (ALTER TABLE needed).'];
+    $msgs = ['created'=>'Survey created successfully.','toggled'=>'Survey status updated.','deleted'=>'Survey deleted.','q_added'=>'Question added.','q_deleted'=>'Question deleted.','q_updated'=>'Question updated.','q_error'=>'Error: Could not save question. Check if the questions table type column includes MULTI_SELECT (ALTER TABLE needed).','title_updated'=>'Survey updated successfully.'];
     $msg  = $msgs[$_GET['msg']] ?? '';
 }
 
@@ -95,6 +95,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header("Location: surveys.php?view=$sid&msg=q_error");
         }
         exit();
+    } elseif ($action === 'edit_survey') {
+        $sid   = (int)$_POST['id'];
+        $title = sanitize($_POST['title']);
+        $desc  = sanitize($_POST['description']);
+        if ($sid && $title) {
+            $stmt = $conn->prepare("UPDATE surveys SET title=?, description=? WHERE id=?");
+            $stmt->bind_param("ssi", $title, $desc, $sid);
+            $stmt->execute();
+        }
+        // Return to detail view if we came from there, otherwise list
+        $back = isset($_POST['from_view']) && (int)$_POST['from_view'] ? "surveys.php?view=$sid&msg=title_updated" : "surveys.php?msg=title_updated";
+        header("Location: $back");
+        exit();
     }
 }
 
@@ -116,9 +129,17 @@ if ($view_id) {
 
 <div class="fade-in">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem;">
-        <div>
-            <h1 style="font-size:1.6rem;color:#0e83b5;margin-bottom:0.2rem;"><?php echo htmlspecialchars($survey['title']); ?></h1>
-            <p style="color:#64748b;font-size:0.9rem;margin:0;"><?php echo htmlspecialchars($survey['description'] ?? ''); ?></p>
+        <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;">
+            <div>
+                <h1 style="font-size:1.6rem;color:#0e83b5;margin-bottom:0.2rem;"><?php echo htmlspecialchars($survey['title']); ?></h1>
+                <p style="color:#64748b;font-size:0.9rem;margin:0;"><?php echo htmlspecialchars($survey['description'] ?? ''); ?></p>
+            </div>
+            <button type="button"
+                onclick="openEditSurveyModal(<?php echo $survey['id']; ?>, <?php echo htmlspecialchars(json_encode($survey['title'])); ?>, <?php echo htmlspecialchars(json_encode($survey['description'] ?? '')); ?>, true)"
+                title="Edit survey title"
+                style="background:#e0f2fe;color:#0e83b5;border:none;border-radius:0.5rem;padding:0.35rem 0.7rem;cursor:pointer;font-size:0.85rem;font-weight:600;display:flex;align-items:center;gap:0.3rem;">
+                <i class="fas fa-pencil-alt"></i> Edit Title
+            </button>
         </div>
         <a href="surveys.php" class="btn btn-outline" style="padding:0.5rem 1.2rem;">
             <i class="fas fa-arrow-left"></i> Back to Surveys
@@ -424,6 +445,12 @@ include '../includes/admin_sidebar.php';
                             <a href="surveys.php?view=<?php echo $s['id']; ?>" class="btn btn-outline" style="padding:0.25rem 0.65rem;font-size:0.8rem;">
                                 <i class="fas fa-edit"></i> Manage
                             </a>
+                            <button type="button"
+                                onclick="openEditSurveyModal(<?php echo $s['id']; ?>, <?php echo htmlspecialchars(json_encode($s['title'])); ?>, <?php echo htmlspecialchars(json_encode($s['description'] ?? '')); ?>, false)"
+                                style="background:#e0f2fe;color:#0e83b5;border:1px solid #bae6fd;border-radius:0.4rem;padding:0.25rem 0.65rem;font-size:0.8rem;cursor:pointer;font-weight:600;"
+                                title="Edit survey title">
+                                <i class="fas fa-pencil-alt"></i> Edit Title
+                            </button>
                             <form method="POST" style="display:inline;">
                                 <input type="hidden" name="action" value="toggle">
                                 <input type="hidden" name="id" value="<?php echo $s['id']; ?>">
@@ -450,5 +477,53 @@ include '../includes/admin_sidebar.php';
         </div>
     </div>
 </div>
+
+<!-- Edit Survey Modal -->
+<div id="editSurveyModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);align-items:center;justify-content:center;">
+    <div style="background:#fff;border-radius:1rem;padding:2rem;width:100%;max-width:480px;margin:1rem;box-shadow:0 20px 60px rgba(0,0,0,0.2);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+            <h3 style="margin:0;color:#1e293b;font-size:1.1rem;"><i class="fas fa-pencil-alt" style="color:#0e83b5;margin-right:0.5rem;"></i>Edit Survey</h3>
+            <button onclick="closeEditSurveyModal()" style="background:transparent;border:none;font-size:1.3rem;cursor:pointer;color:#94a3b8;line-height:1;">&#x2715;</button>
+        </div>
+        <form method="POST" id="editSurveyForm">
+            <input type="hidden" name="action" value="edit_survey">
+            <input type="hidden" name="id" id="edit_sv_id">
+            <input type="hidden" name="from_view" id="edit_sv_from_view" value="0">
+            <div class="form-group" style="margin-bottom:1rem;">
+                <label class="form-label" style="font-size:0.78rem;font-weight:600;color:#64748b;text-transform:uppercase;">Survey Title <span style="color:#ef4444;">*</span></label>
+                <input type="text" name="title" id="edit_sv_title" class="form-input" required placeholder="e.g. Customer Satisfaction 2026" style="width:100%;padding:0.65rem 0.9rem;border:1px solid #e2e8f0;border-radius:0.5rem;font-size:0.95rem;">
+            </div>
+            <div class="form-group" style="margin-bottom:1.5rem;">
+                <label class="form-label" style="font-size:0.78rem;font-weight:600;color:#64748b;text-transform:uppercase;">Description <small style="color:#94a3b8;text-transform:none;">(optional)</small></label>
+                <input type="text" name="description" id="edit_sv_desc" class="form-input" placeholder="Brief description..." style="width:100%;padding:0.65rem 0.9rem;border:1px solid #e2e8f0;border-radius:0.5rem;font-size:0.95rem;">
+            </div>
+            <div style="display:flex;gap:0.75rem;justify-content:flex-end;">
+                <button type="button" onclick="closeEditSurveyModal()" style="padding:0.5rem 1.2rem;border:1px solid #e2e8f0;border-radius:0.5rem;background:#f8fafc;color:#64748b;cursor:pointer;font-weight:600;">Cancel</button>
+                <button type="submit" class="btn btn-primary" style="padding:0.5rem 1.4rem;"><i class="fas fa-save"></i> Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openEditSurveyModal(id, title, desc, fromView) {
+    document.getElementById('edit_sv_id').value        = id;
+    document.getElementById('edit_sv_title').value     = title;
+    document.getElementById('edit_sv_desc').value      = desc || '';
+    document.getElementById('edit_sv_from_view').value = fromView ? 1 : 0;
+    var modal = document.getElementById('editSurveyModal');
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    setTimeout(function(){ document.getElementById('edit_sv_title').focus(); }, 100);
+}
+function closeEditSurveyModal() {
+    document.getElementById('editSurveyModal').style.display = 'none';
+    document.body.style.overflow = '';
+}
+document.getElementById('editSurveyModal').addEventListener('click', function(e) {
+    if (e.target === this) closeEditSurveyModal();
+});
+</script>
+
 <?php include '../includes/admin_footer.php'; ?>
 
