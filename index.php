@@ -17,6 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['citizen_login'])) {
 }
 
 // Fetch branches for the dropdown (regular branches first, then HO branches)
+// Falls back gracefully if is_ho column hasn't been migrated yet on the server
 $branches_regular = [];
 $branches_ho = [];
 $result = $conn->query("SELECT name, IF(is_ho IS NULL, 0, is_ho) AS is_ho FROM branches ORDER BY is_ho ASC, name ASC");
@@ -25,6 +26,14 @@ if ($result) {
         if ($row['is_ho']) {
             $branches_ho[] = $row['name'];
         } else {
+            $branches_regular[] = $row['name'];
+        }
+    }
+} else {
+    // Fallback: is_ho column not yet added — show all branches alphabetically as regular
+    $fallback = $conn->query("SELECT name FROM branches ORDER BY name ASC");
+    if ($fallback) {
+        while ($row = $fallback->fetch_assoc()) {
             $branches_regular[] = $row['name'];
         }
     }

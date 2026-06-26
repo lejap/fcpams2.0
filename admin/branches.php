@@ -37,7 +37,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
+// Fetch branches — graceful fallback if is_ho column not yet migrated on production
 $branches = $conn->query("SELECT *, IF(is_ho IS NULL, 0, is_ho) AS is_ho FROM branches ORDER BY is_ho ASC, name ASC");
+if (!$branches) {
+    $branches = $conn->query("SELECT *, 0 AS is_ho FROM branches ORDER BY name ASC");
+}
 
 $page_title = "Manage Branches";
 include '../includes/admin_header.php';
