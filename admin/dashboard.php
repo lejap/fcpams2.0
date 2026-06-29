@@ -281,6 +281,7 @@ include '../includes/admin_sidebar.php';
                     <th>Staff Recognized</th>
                     <th>Appreciation</th>
                     <th>Date</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody>
@@ -300,10 +301,13 @@ include '../includes/admin_sidebar.php';
                     </td>
                     <td style="font-style:italic;color:#334155;max-width:220px;">&ldquo;<?php echo htmlspecialchars($ap['appreciation']); ?>&rdquo;</td>
                     <td style="font-size:0.8rem;white-space:nowrap;"><?php echo date('M d, Y', strtotime($ap['created_at'])); ?></td>
+                    <td>
+                        <a href="appreciations.php?view=<?php echo $ap['id']; ?>" class="btn btn-outline" style="padding:0.2rem 0.6rem;font-size:0.75rem;border-radius:2rem;">View</a>
+                    </td>
                 </tr>
                 <?php endwhile; ?>
                 <?php else: ?>
-                <tr><td colspan="5" style="text-align:center;padding:2rem;color:#94a3b8;">
+                <tr><td colspan="6" style="text-align:center;padding:2rem;color:#94a3b8;">
                     <i class="fas fa-star" style="font-size:1.6rem;display:block;margin-bottom:0.4rem;color:#fbbf24;opacity:0.35;"></i>
                     No appreciations yet.
                 </td></tr>
