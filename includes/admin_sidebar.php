@@ -21,6 +21,46 @@ $pending_users     = $is_admin ? $conn->query("SELECT COUNT(*) as c FROM users W
         <?php endif; ?>
     </a>
 
+    <?php
+    $on_submissions = ($current_page === 'submissions.php');
+    ?>
+    <!-- Submissions submenu -->
+    <div class="nav-group" style="margin-bottom: 0.25rem;">
+        <button onclick="toggleSubmissionsMenu()" id="submissions-toggle"
+            style="width:100%;display:flex;align-items:center;gap:0.65rem;padding:0.6rem 1.25rem;background:<?php echo $on_submissions?'rgba(255,255,255,0.12)':'transparent';?>;border:none;color:<?php echo $on_submissions?'#fff':'rgba(255,255,255,0.75)';?>;font-size:0.88rem;font-weight:600;cursor:pointer;border-radius:0.5rem;text-align:left;transition:background 0.2s,color 0.2s;outline:none;"
+            onmouseover="this.style.background='rgba(255,255,255,0.12)';this.style.color='#fff'"
+            onmouseout="if(!window._subOpen){this.style.background='<?php echo $on_submissions?'rgba(255,255,255,0.12)':'transparent';?>';this.style.color='<?php echo $on_submissions?'#fff':'rgba(255,255,255,0.75)';?>';}">
+            <i class="fas fa-inbox"></i>
+            <span style="flex:1;">Submissions</span>
+            <?php if ($open_submissions > 0): ?>
+            <span style="background:#ef4444;color:white;border-radius:9px;min-width:18px;height:18px;font-size:0.65rem;font-weight:800;display:inline-flex;align-items:center;justify-content:center;padding:0 4px;margin-right: 0.5rem;"><?php echo $open_submissions; ?></span>
+            <?php endif; ?>
+            <i class="fas fa-chevron-down" id="submissions-chevron" style="font-size:0.7rem;transition:transform 0.25s;<?php echo $on_submissions?'transform:rotate(180deg)':'';?>"></i>
+        </button>
+        <div id="submissions-submenu" style="overflow:hidden;max-height:<?php echo $on_submissions?'200px':'0';?>;transition:max-height 0.3s ease;padding-left:0.75rem;">
+            <a href="<?php echo BASE_URL; ?>admin/submissions.php"
+               class="admin-nav-link <?php echo ($current_page==='submissions.php' && !isset($_GET['type']))?'active':''; ?>"
+               style="font-size:0.82rem;padding:0.45rem 1rem;">
+                <i class="fas fa-layer-group"></i> All
+            </a>
+            <a href="<?php echo BASE_URL; ?>admin/submissions.php?type=INQUIRY"
+               class="admin-nav-link <?php echo ($current_page==='submissions.php' && isset($_GET['type']) && $_GET['type']==='INQUIRY')?'active':''; ?>"
+               style="font-size:0.82rem;padding:0.45rem 1rem;color:rgba(255,180,180,0.95) !important;">
+                <i class="fas fa-question-circle"></i> Inquiries
+            </a>
+            <a href="<?php echo BASE_URL; ?>admin/submissions.php?type=SUGGESTION"
+               class="admin-nav-link <?php echo ($current_page==='submissions.php' && isset($_GET['type']) && $_GET['type']==='SUGGESTION')?'active':''; ?>"
+               style="font-size:0.82rem;padding:0.45rem 1rem;color:rgba(251,191,36,0.95) !important;">
+                <i class="fas fa-lightbulb"></i> Suggestions
+            </a>
+            <a href="<?php echo BASE_URL; ?>admin/submissions.php?type=REQUEST"
+               class="admin-nav-link <?php echo ($current_page==='submissions.php' && isset($_GET['type']) && $_GET['type']==='REQUEST')?'active':''; ?>"
+               style="font-size:0.82rem;padding:0.45rem 1rem;color:rgba(200,180,255,0.95) !important;">
+                <i class="fas fa-hand-holding"></i> Requests
+            </a>
+        </div>
+    </div>
+
 
     <a href="<?php echo BASE_URL; ?>admin/complaints.php" class="admin-nav-link <?php echo $current_page === 'complaints.php' ? 'active' : ''; ?>" style="color:rgba(255,180,180,0.95) !important;">
         <i class="fas fa-exclamation-triangle"></i> Complaints
@@ -113,6 +153,17 @@ function toggleReportsMenu(){
     c.style.transform=window._rptOpen?'rotate(180deg)':'rotate(0deg)';
     b.style.background=window._rptOpen?'rgba(255,255,255,0.12)':'transparent';
     b.style.color=window._rptOpen?'#fff':'rgba(255,255,255,0.75)';
+}
+window._subOpen = <?php echo $on_submissions?'true':'false'; ?>;
+function toggleSubmissionsMenu(){
+    var m=document.getElementById('submissions-submenu');
+    var c=document.getElementById('submissions-chevron');
+    var b=document.getElementById('submissions-toggle');
+    window._subOpen=!window._subOpen;
+    m.style.maxHeight=window._subOpen?'200px':'0';
+    c.style.transform=window._subOpen?'rotate(180deg)':'rotate(0deg)';
+    b.style.background=window._subOpen?'rgba(255,255,255,0.12)':'transparent';
+    b.style.color=window._subOpen?'#fff':'rgba(255,255,255,0.75)';
 }
 </script>
 

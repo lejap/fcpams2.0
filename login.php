@@ -48,7 +48,7 @@ include 'includes/header.php';
         <div class="text-center mb-8">
             <h1 style="font-size: 2rem; color: #1e293b; marginBottom: 0.25rem; letterSpacing: -0.02em;">FCPAMS Admin</h1>
             <p style="font-size: 0.9rem; color: #475569; font-weight: 500;">
-                Financial Consumer Protection Assistance Management System
+                Members Financial Consumer Protection Assistance Management System
             </p>
         </div>
         

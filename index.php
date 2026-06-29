@@ -59,7 +59,7 @@ include 'includes/header.php';
         <div class="text-center mb-10">
             <h1 style="font-size: 2.2rem; color: #1e293b; margin-bottom: 0.5rem; letter-spacing: -0.03em;">Welcome to FCPAMS</h1>
             <p style="font-size: 0.95rem; color: #475569; font-weight: 500;">
-                Financial Consumer Protection Assistance Management System
+                Members Financial Consumer Protection Assistance Management System
             </p>
         </div>
         

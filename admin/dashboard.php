@@ -20,6 +20,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_spam_complaint']
 
 // Stat counts
 $open_tickets        = $conn->query("SELECT COUNT(*) as c FROM tickets WHERE status='OPEN'")->fetch_assoc()['c'];
+$open_inquiries      = $conn->query("SELECT COUNT(*) as c FROM tickets WHERE status='OPEN' AND type='INQUIRY'")->fetch_assoc()['c'];
+$open_suggestions    = $conn->query("SELECT COUNT(*) as c FROM tickets WHERE status='OPEN' AND type='SUGGESTION'")->fetch_assoc()['c'];
+$open_requests       = $conn->query("SELECT COUNT(*) as c FROM tickets WHERE status='OPEN' AND type='REQUEST'")->fetch_assoc()['c'];
 $open_complaints     = $conn->query("SELECT COUNT(*) as c FROM complaints WHERE status='OPEN'")->fetch_assoc()['c'];
 $resolved_tickets    = $conn->query("SELECT COUNT(*) as c FROM tickets WHERE status IN ('RESOLVED','CLOSED')")->fetch_assoc()['c'];
 $resolved_comp       = $conn->query("SELECT COUNT(*) as c FROM complaints WHERE status IN ('RESOLVED','CLOSED')")->fetch_assoc()['c'];
@@ -69,11 +72,21 @@ include '../includes/admin_sidebar.php';
 
     <!-- Stat Cards -->
     <div class="stat-card-row">
-        <div class="stat-card">
-            <div class="stat-card-title">Open Submissions</div>
-            <div class="stat-card-value" style="color:#ef4444;"><?php echo $open_tickets; ?></div>
-            <i class="fas fa-inbox" style="position:absolute;right:1.25rem;top:1.25rem;font-size:2.2rem;opacity:0.1;color:#ef4444;"></i>
-        </div>
+        <a href="submissions.php?type=INQUIRY" class="stat-card" style="text-decoration:none;cursor:pointer;">
+            <div class="stat-card-title">Open Inquiries</div>
+            <div class="stat-card-value" style="color:#ef4444;"><?php echo $open_inquiries; ?></div>
+            <i class="fas fa-question-circle" style="position:absolute;right:1.25rem;top:1.25rem;font-size:2.2rem;opacity:0.1;color:#ef4444;"></i>
+        </a>
+        <a href="submissions.php?type=SUGGESTION" class="stat-card" style="text-decoration:none;cursor:pointer;">
+            <div class="stat-card-title">Open Suggestions</div>
+            <div class="stat-card-value" style="color:#eab308;"><?php echo $open_suggestions; ?></div>
+            <i class="fas fa-lightbulb" style="position:absolute;right:1.25rem;top:1.25rem;font-size:2.2rem;opacity:0.1;color:#eab308;"></i>
+        </a>
+        <a href="submissions.php?type=REQUEST" class="stat-card" style="text-decoration:none;cursor:pointer;">
+            <div class="stat-card-title">Open Requests</div>
+            <div class="stat-card-value" style="color:#8b5cf6;"><?php echo $open_requests; ?></div>
+            <i class="fas fa-hand-holding" style="position:absolute;right:1.25rem;top:1.25rem;font-size:2.2rem;opacity:0.1;color:#8b5cf6;"></i>
+        </a>
         <div class="stat-card">
             <div class="stat-card-title">Open Complaints</div>
             <div class="stat-card-value" style="color:#eab308;"><?php echo $open_complaints; ?></div>
@@ -132,9 +145,17 @@ include '../includes/admin_sidebar.php';
 
     <!-- Open Submissions Table -->
     <div class="admin-table-wrapper">
-        <div class="admin-table-header" style="background:linear-gradient(90deg,#ef4444,#f97316);">
-            <i class="fas fa-inbox"></i> Open Submissions
-            <span style="margin-left:auto;background:rgba(255,255,255,0.25);border-radius:9px;padding:0.1rem 0.55rem;font-size:0.75rem;"><?php echo $open_tickets; ?></span>
+        <div class="admin-table-header" style="background:linear-gradient(90deg,#ef4444,#f97316); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; padding: 0.6rem 1.25rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fas fa-inbox"></i> Open Submissions
+                <span id="submissions-count" style="background:rgba(255,255,255,0.25);border-radius:9px;padding:0.1rem 0.55rem;font-size:0.75rem;"><?php echo $open_tickets; ?></span>
+            </div>
+            <div class="table-tabs" style="display: flex; gap: 0.25rem; flex-wrap: wrap;">
+                <button type="button" onclick="filterSubmissions('ALL', this)" class="tab-btn" style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.72rem; font-weight: 700; cursor: pointer; transition: all 0.2s; outline: none;">All</button>
+                <button type="button" onclick="filterSubmissions('INQUIRY', this)" class="tab-btn" style="background: transparent; border: none; color: rgba(255,255,255,0.7); padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.72rem; font-weight: 700; cursor: pointer; transition: all 0.2s; outline: none;">Inquiries</button>
+                <button type="button" onclick="filterSubmissions('SUGGESTION', this)" class="tab-btn" style="background: transparent; border: none; color: rgba(255,255,255,0.7); padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.72rem; font-weight: 700; cursor: pointer; transition: all 0.2s; outline: none;">Suggestions</button>
+                <button type="button" onclick="filterSubmissions('REQUEST', this)" class="tab-btn" style="background: transparent; border: none; color: rgba(255,255,255,0.7); padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.72rem; font-weight: 700; cursor: pointer; transition: all 0.2s; outline: none;">Requests</button>
+            </div>
         </div>
         <div style="overflow-x:auto;">
         <table class="admin-table">
@@ -152,7 +173,7 @@ include '../includes/admin_sidebar.php';
             <tbody>
                 <?php if ($submissions->num_rows > 0): ?>
                     <?php while ($sub = $submissions->fetch_assoc()): ?>
-                    <tr>
+                    <tr data-type="<?php echo htmlspecialchars($sub['type'] ?? ''); ?>">
                         <td style="font-weight:bold;color:#64748b;">#<?php echo $sub['id']; ?></td>
                         <td style="font-weight:600;"><?php echo htmlspecialchars(mb_substr($sub['message'] ?? '', 0, 55)) . (strlen($sub['message'] ?? '') > 55 ? '...' : ''); ?></td>
                         <td>
@@ -292,4 +313,59 @@ include '../includes/admin_sidebar.php';
         </div>
     </div>
 </div>
+
+<script>
+function filterSubmissions(type, btn) {
+    const buttons = document.querySelectorAll('.table-tabs .tab-btn');
+    buttons.forEach(b => {
+        b.style.background = 'transparent';
+        b.style.color = 'rgba(255,255,255,0.7)';
+    });
+    btn.style.background = 'rgba(255,255,255,0.2)';
+    btn.style.color = 'white';
+
+    const rows = document.querySelectorAll('.admin-table tbody tr[data-type]');
+    let visibleCount = 0;
+    
+    rows.forEach(row => {
+        const rowType = row.getAttribute('data-type');
+        if (type === 'ALL' || rowType === type) {
+            row.style.display = '';
+            visibleCount++;
+        } else {
+            row.style.display = 'none';
+        }
+    });
+
+    const countSpan = document.getElementById('submissions-count');
+    if (countSpan) {
+        countSpan.textContent = visibleCount;
+    }
+    
+    let emptyRow = document.getElementById('submissions-empty-row');
+    if (visibleCount === 0) {
+        if (!emptyRow) {
+            const tbody = document.querySelector('.admin-table tbody');
+            const headerRow = document.querySelector('.admin-table thead tr');
+            const cols = headerRow ? headerRow.children.length : 7;
+            emptyRow = document.createElement('tr');
+            emptyRow.id = 'submissions-empty-row';
+            emptyRow.innerHTML = `<td colspan="${cols}" style="text-align:center;padding:2.5rem;color:#94a3b8;">
+                <i class="fas fa-check-circle" style="font-size:1.8rem;display:block;margin-bottom:0.5rem;color:#10b981;"></i>
+                No open ${type.toLowerCase()}s — all clear!
+            </td>`;
+            tbody.appendChild(emptyRow);
+        } else {
+            emptyRow.style.display = '';
+            emptyRow.querySelector('td').innerHTML = `<i class="fas fa-check-circle" style="font-size:1.8rem;display:block;margin-bottom:0.5rem;color:#10b981;"></i>
+                No open ${type.toLowerCase()}s — all clear!`;
+        }
+    } else {
+        if (emptyRow) {
+            emptyRow.style.display = 'none';
+        }
+    }
+}
+</script>
+
 <?php include '../includes/admin_footer.php'; ?>

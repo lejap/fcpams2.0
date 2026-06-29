@@ -132,7 +132,7 @@ include '../includes/citizen_sidebar.php';
         <!-- Modal Body — scrollable -->
         <div id="modal-body" style="padding:1.5rem 1.75rem;overflow-y:auto;flex:1;line-height:1.75;color:#1e293b;font-size:.92rem;" onscroll="checkScroll()">
             <p style="text-align:justify;margin-bottom:1rem;">
-                All information obtained, processed, and documented during the handling of financial consumer complaints and requests under the Financial Consumer Protection Assistance Management System (FCPAMS) shall be treated with strict confidentiality. Bansalan Coop shall ensure that the identity, personal information, and transaction details of the financial consumer are safeguarded and used solely for the purpose of resolving the complaint or request.
+                All information obtained, processed, and documented during the handling of financial consumer complaints and requests under the Members Financial Consumer Protection Assistance Management System (FCPAMS) shall be treated with strict confidentiality. Bansalan Coop shall ensure that the identity, personal information, and transaction details of the financial consumer are safeguarded and used solely for the purpose of resolving the complaint or request.
             </p>
             <p style="text-align:justify;margin-bottom:1rem;">
                 Access to confidential information shall be limited to authorized personnel directly involved in the assessment, investigation, and resolution of the complaint. Any disclosure of information to third parties shall require the explicit consent of the financial consumer, except when disclosure is necessary to comply with legal or regulatory requirements.
