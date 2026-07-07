@@ -37,7 +37,7 @@ include '../includes/admin_sidebar.php';
     </div>
 
     <!-- Respondent Info -->
-    <div class="glass-card">
+    <div class="glass-card" style="margin-bottom:1.5rem;">
         <h3 style="margin-bottom:1rem;color:#1e293b;">Respondent Information</h3>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;">
             <div>

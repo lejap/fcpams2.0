@@ -24,4 +24,7 @@ if ($conn->connect_error) {
 
 // Set Timezone
 date_default_timezone_set('Asia/Manila'); // Adjust as per USER'S region
+
+// Sync database timezone with PHP timezone
+$conn->query("SET time_zone = '" . date('P') . "';");
 ?>

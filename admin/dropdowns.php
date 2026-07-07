@@ -84,7 +84,7 @@ include '../includes/admin_sidebar.php';
     <?php endif; ?>
 
     <!-- Add Option Card -->
-    <div class="glass-card">
+    <div class="glass-card" style="margin-bottom:1.5rem;">
         <h3 style="margin-bottom:1rem;color:#1e293b;">Add New Option</h3>
         <form method="POST" style="display:flex;gap:0.75rem;align-items:flex-end;flex-wrap:wrap;">
             <?php echo csrf_field(); ?>

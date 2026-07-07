@@ -155,7 +155,7 @@ if ($view_id) {
     <div style="display:grid;grid-template-columns:1fr 1.2fr;gap:1.5rem;">
         <!-- Left: Questions -->
         <div>
-            <div class="glass-card">
+            <div class="glass-card" style="margin-bottom:1.5rem;">
                 <h3 style="margin-bottom:1rem;color:#1e293b;">Add Question</h3>
                 <form method="POST">
                     <input type="hidden" name="action" value="add_question">
@@ -392,7 +392,7 @@ include '../includes/admin_sidebar.php';
     <?php endif; ?>
 
     <!-- Create Survey Card -->
-    <div class="glass-card">
+    <div class="glass-card" style="margin-bottom:1.5rem;">
         <h3 style="margin-bottom:1rem;color:#1e293b;">Create New Survey</h3>
         <form method="POST" style="display:flex;gap:0.75rem;align-items:flex-end;flex-wrap:wrap;">
             <input type="hidden" name="action" value="create">

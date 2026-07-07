@@ -38,33 +38,36 @@ include '../includes/admin_sidebar.php';
     </div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));gap:1.5rem;margin-bottom:2rem;">
         <div class="glass-card">
-            <h4 style="margin-bottom:1.25rem;color:#0891b2;font-size:1rem;display:flex;align-items:center;gap:0.5rem;border-bottom:1px solid #f1f5f9;padding-bottom:0.5rem;"><i class="fas fa-user"></i> Submitter Details</h4>
-            <table class="detail-table" style="width:100%; border-collapse: collapse;">
-                <tr style="border-bottom:1px solid #f1f5f9;">
-                    <td style="padding:0.75rem 0;color:#64748b;font-weight:600;font-size:0.85rem;">Member Name</td>
-                    <td style="padding:0.75rem 0;font-weight:700;color:#0f172a;text-align:right;"><?php echo htmlspecialchars($detail['user_name']); ?></td>
-                </tr>
-                <tr style="border-bottom:1px solid #f1f5f9;">
-                    <td style="padding:0.75rem 0;color:#64748b;font-weight:600;font-size:0.85rem;">Phone Number</td>
-                    <td style="padding:0.75rem 0;color:#0f172a;text-align:right;"><?php echo htmlspecialchars($detail['user_phone']); ?></td>
-                </tr>
-                <tr style="border-bottom:1px solid #f1f5f9;">
-                    <td style="padding:0.75rem 0;color:#64748b;font-weight:600;font-size:0.85rem;">Email Address</td>
-                    <td style="padding:0.75rem 0;color:#0f172a;text-align:right;"><?php echo htmlspecialchars($detail['user_email'] ?: '-'); ?></td>
-                </tr>
-                <tr style="border-bottom:1px solid #f1f5f9;">
-                    <td style="padding:0.75rem 0;color:#64748b;font-weight:600;font-size:0.85rem;">Branch</td>
-                    <td style="padding:0.75rem 0;text-align:right;">
-                        <span style="background:#e0f2fe;color:#0369a1;padding:0.15rem 0.45rem;border-radius:0.25rem;font-size:0.75rem;font-weight:700;">
-                            <?php echo htmlspecialchars($detail['user_branch']); ?>
-                        </span>
-                    </td>
-                </tr>
-                <tr>
-                    <td style="padding:0.75rem 0;color:#64748b;font-weight:600;font-size:0.85rem;">Date Submitted</td>
-                    <td style="padding:0.75rem 0;color:#0f172a;text-align:right;font-size:0.85rem;"><?php echo date('M d, Y H:i', strtotime($detail['created_at'])); ?></td>
-                </tr>
-            </table>
+            <h4 style="margin-bottom:1.25rem;color:#0891b2;font-size:1rem;display:flex;align-items:center;gap:0.5rem;border-bottom:1px solid rgba(8,145,178,0.15);padding-bottom:0.5rem;"><i class="fas fa-user"></i> Submitter Details</h4>
+            
+            <div style="margin-bottom:1rem;">
+                <div style="font-size:0.72rem;color:#94a3b8;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">Member Name</div>
+                <div style="font-weight:700;color:#1e293b;font-size:1rem;"><?php echo htmlspecialchars($detail['user_name']); ?></div>
+            </div>
+            
+            <div style="margin-bottom:1rem;">
+                <div style="font-size:0.72rem;color:#94a3b8;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">Phone Number</div>
+                <div style="font-weight:500;color:#1e293b;"><?php echo htmlspecialchars($detail['user_phone']); ?></div>
+            </div>
+            
+            <div style="margin-bottom:1rem;">
+                <div style="font-size:0.72rem;color:#94a3b8;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">Email Address</div>
+                <div style="font-weight:500;color:#1e293b;"><?php echo htmlspecialchars($detail['user_email'] ?: '-'); ?></div>
+            </div>
+            
+            <div style="margin-bottom:1rem;">
+                <div style="font-size:0.72rem;color:#94a3b8;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">Branch</div>
+                <div style="margin-top:0.25rem;">
+                    <span style="background:#e0f2fe;color:#0369a1;padding:0.2rem 0.55rem;border-radius:0.35rem;font-size:0.75rem;font-weight:700;">
+                        <?php echo htmlspecialchars($detail['user_branch']); ?>
+                    </span>
+                </div>
+            </div>
+            
+            <div>
+                <div style="font-size:0.72rem;color:#94a3b8;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">Date Submitted</div>
+                <div style="font-weight:500;color:#1e293b;font-size:0.9rem;"><?php echo date('M d, Y H:i', strtotime($detail['created_at'])); ?></div>
+            </div>
         </div>
         <div class="glass-card" style="display:flex;flex-direction:column;justify-content:space-between;">
             <div>
