@@ -110,7 +110,7 @@ $pending_users     = $is_admin ? $conn->query("SELECT COUNT(*) as c FROM users W
     </a>
 
     <?php
-    $report_pages = ['report_submissions.php','report_complaints.php','report_surveys.php'];
+    $report_pages = ['report_submissions.php','report_complaints.php'];
     $on_report = in_array($current_page, $report_pages);
     ?>
     <!-- Reports submenu -->
@@ -133,11 +133,6 @@ $pending_users     = $is_admin ? $conn->query("SELECT COUNT(*) as c FROM users W
                class="admin-nav-link <?php echo $current_page==='report_complaints.php'?'active':''; ?>"
                style="font-size:0.82rem;padding:0.45rem 1rem;color:rgba(255,180,180,0.95) !important;">
                 <i class="fas fa-exclamation-triangle"></i> Complaints
-            </a>
-            <a href="<?php echo BASE_URL; ?>admin/report_surveys.php"
-               class="admin-nav-link <?php echo $current_page==='report_surveys.php'?'active':''; ?>"
-               style="font-size:0.82rem;padding:0.45rem 1rem;">
-                <i class="fas fa-poll"></i> Surveys
             </a>
         </div>
     </div>

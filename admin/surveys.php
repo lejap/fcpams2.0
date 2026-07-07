@@ -380,9 +380,6 @@ include '../includes/admin_sidebar.php';
             <h1 style="font-size:1.75rem;color:#0e83b5;margin-bottom:0.25rem;">Manage Surveys</h1>
             <p style="color:#64748b;font-size:0.9rem;">Create and manage citizen satisfaction surveys.</p>
         </div>
-        <a href="reports.php" class="btn btn-primary" style="padding:0.6rem 1.2rem; background: linear-gradient(135deg, #10b981, #059669); border: none; box-shadow: 0 4px 12px rgba(16,185,129,0.3);">
-            <i class="fas fa-chart-pie"></i> Survey Reporting
-        </a>
     </div>
 
     <?php if ($msg): ?>
