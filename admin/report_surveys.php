@@ -355,44 +355,82 @@ include '../includes/admin_sidebar.php';
     </div>
 
     <!-- Hero -->
-    <div class="rpt-hero no-print">
+    <div class="rpt-hero no-print" style="background:linear-gradient(135deg,#1e1b4b 0%,#312e81 40%,#4c1d95 100%);border-radius:1.25rem;padding:2rem 2.25rem;margin-bottom:2rem;box-shadow:0 8px 32px rgba(139,92,246,0.25);">
         <div>
             <a href="dashboard.php"
-                style="color:#64748b;text-decoration:none;font-size:.85rem;display:flex;align-items:center;gap:.4rem;margin-bottom:.4rem;"><i
-                    class="fas fa-arrow-left"></i> Dashboard</a>
-            <h1 style="color:#8b5cf6;">Surveys Report</h1>
-            <p>Citizen engagement &amp; survey response analytics</p>
+                style="color:rgba(255,255,255,0.6);text-decoration:none;font-size:.82rem;display:inline-flex;align-items:center;gap:.4rem;margin-bottom:.75rem;transition:color .2s;"
+                onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.6)'">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+            <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+                <div style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.18);border-radius:0.9rem;width:3.2rem;height:3.2rem;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);">
+                    <i class="fas fa-poll-h" style="font-size:1.4rem;color:#c4b5fd;"></i>
+                </div>
+                <div>
+                    <div style="display:flex;align-items:center;gap:0.6rem;">
+                        <h1 style="color:#fff;margin:0;font-size:1.75rem;font-weight:800;letter-spacing:-0.02em;">Surveys Report</h1>
+                        <span style="background:linear-gradient(135deg,#a855f7,#7c3aed);color:#fff;font-size:0.65rem;font-weight:800;padding:0.2rem 0.6rem;border-radius:1rem;letter-spacing:0.06em;text-transform:uppercase;box-shadow:0 2px 8px rgba(168,85,247,0.5);">Analytics</span>
+                    </div>
+                    <p style="color:rgba(255,255,255,0.65);margin:0.2rem 0 0;font-size:0.9rem;">Citizen engagement &amp; survey response insights</p>
+                </div>
+            </div>
         </div>
-        <button onclick="window.print()" class="btn btn-primary"
-            style="padding:.7rem 1.4rem;background:#8b5cf6;border-color:#8b5cf6;">
-            <i class="fas fa-print"></i> Print / PDF
+        <button onclick="window.print()" class="btn no-print"
+            style="padding:.75rem 1.6rem;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;border-radius:0.75rem;font-weight:700;font-size:0.88rem;cursor:pointer;display:flex;align-items:center;gap:.55rem;backdrop-filter:blur(6px);transition:all .2s;white-space:nowrap;"
+            onmouseover="this.style.background='rgba(255,255,255,0.25)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'">
+            <i class="fas fa-print"></i> Print / Export PDF
         </button>
     </div>
 
     <!-- KPIs -->
     <div class="kpi-row">
-        <div class="kpi">
-            <div class="kpi-lbl">Total Surveys</div>
+        <div class="kpi" style="border-left:4px solid #8b5cf6;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.5rem;">
+                <div class="kpi-lbl">Total Surveys</div>
+                <div style="background:rgba(139,92,246,0.1);border-radius:0.5rem;width:2rem;height:2rem;display:flex;align-items:center;justify-content:center;">
+                    <i class="fas fa-clipboard-list" style="color:#8b5cf6;font-size:.85rem;"></i>
+                </div>
+            </div>
             <div class="kpi-val" style="color:#8b5cf6;"><?php echo $total_surveys; ?></div>
         </div>
-        <div class="kpi">
-            <div class="kpi-lbl">Active</div>
+        <div class="kpi" style="border-left:4px solid #10b981;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.5rem;">
+                <div class="kpi-lbl">Active Surveys</div>
+                <div style="background:rgba(16,185,129,0.1);border-radius:0.5rem;width:2rem;height:2rem;display:flex;align-items:center;justify-content:center;">
+                    <i class="fas fa-toggle-on" style="color:#10b981;font-size:.85rem;"></i>
+                </div>
+            </div>
             <div class="kpi-val" style="color:#10b981;"><?php echo $active_surveys; ?></div>
         </div>
-        <div class="kpi">
-            <div class="kpi-lbl">Total Responses</div>
+        <div class="kpi" style="border-left:4px solid #3b82f6;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.5rem;">
+                <div class="kpi-lbl">Total Responses</div>
+                <div style="background:rgba(59,130,246,0.1);border-radius:0.5rem;width:2rem;height:2rem;display:flex;align-items:center;justify-content:center;">
+                    <i class="fas fa-users" style="color:#3b82f6;font-size:.85rem;"></i>
+                </div>
+            </div>
             <div class="kpi-val" style="color:#3b82f6;"><?php echo $total_responses; ?></div>
         </div>
-        <div class="kpi">
-            <div class="kpi-lbl">Avg / Survey</div>
+        <div class="kpi" style="border-left:4px solid #0d9488;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.5rem;">
+                <div class="kpi-lbl">Avg / Survey</div>
+                <div style="background:rgba(13,148,136,0.1);border-radius:0.5rem;width:2rem;height:2rem;display:flex;align-items:center;justify-content:center;">
+                    <i class="fas fa-chart-line" style="color:#0d9488;font-size:.85rem;"></i>
+                </div>
+            </div>
             <div class="kpi-val" style="color:#0d9488;"><?php echo $avg_per_survey; ?></div>
         </div>
     </div>
 
     <!-- Chart -->
     <div class="chart-pair">
-        <div class="chart-box">
-            <h4>Response Volume by Survey (Top 6)</h4>
+        <div class="chart-box" style="border-top:3px solid #8b5cf6;">
+            <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:1rem;">
+                <div style="background:linear-gradient(135deg,#7c3aed,#a855f7);border-radius:0.5rem;width:2rem;height:2rem;display:flex;align-items:center;justify-content:center;">
+                    <i class="fas fa-chart-bar" style="color:#fff;font-size:.8rem;"></i>
+                </div>
+                <h4 style="margin:0;">Response Volume by Survey <span style="color:#94a3b8;font-weight:400;font-size:.8rem;">(Top 6)</span></h4>
+            </div>
             <div class="chart-wrap"><canvas id="surveysChart"></canvas></div>
         </div>
     </div>
