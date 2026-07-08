@@ -292,9 +292,9 @@ $generated = date('F d, Y \a\t h:i A');
     </div>
 </form>
 
-<!-- Section 1: Methodology -->
+<!-- Methodology & CSAT Interpretation -->
 <div class="report-section">
-    <div class="section-hd"><i class="fas fa-flask" style="color:var(--blue);"></i> 1.0 Methodology &amp; CSAT Interpretation</div>
+    <div class="section-hd"><i class="fas fa-flask" style="color:var(--blue);"></i> Methodology &amp; CSAT Interpretation</div>
     <div class="section-body">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
             <div>
@@ -330,105 +330,6 @@ $generated = date('F d, Y \a\t h:i A');
         </div>
     </div>
 </div>
-<!-- Section 2: Key Findings -->
-<div class="report-section">
-    <div class="section-hd"><i class="fas fa-search" style="color:var(--amber);"></i> 2.0 Key Findings &amp; Analysis</div>
-    <div class="section-body">
-        <?php if (empty($question_stats)): ?>
-        <div style="text-align:center;padding:2rem;color:var(--text4);">
-            <i class="fas fa-filter" style="font-size:2rem;margin-bottom:.75rem;display:block;"></i>
-            <div style="font-weight:700;margin-bottom:.5rem;">Select a Survey to View Question-Level Analysis</div>
-            <div style="font-size:.85rem;">Use the filter above to select a specific survey and see CSAT scores per question.</div>
-        </div>
-        <?php else: ?>
-        <?php
-        $rating_qs = array_filter($question_stats, fn($s)=>$s['question']['type']==='RATING');
-        $other_qs  = array_filter($question_stats, fn($s)=>$s['question']['type']!=='RATING');
-        $qi = 1;
-        ?>
-        <?php if ($rating_qs): ?>
-        <div style="margin-bottom:1.5rem;">
-            <div style="font-size:.8rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--text4);margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem;"><i class="fas fa-star" style="color:var(--amber);"></i> Rating Questions (CSAT Analysis)</div>
-            <?php foreach ($rating_qs as $s):
-                $t = csatTier($s['csat']);
-                $q = $s['question'];
-                $dist = $s['dist'];
-                $totalR = $s['total'];
-            ?>
-            <div class="q-card">
-                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-wrap:wrap;">
-                    <div class="q-title">Q<?php echo $qi++; ?>. <?php echo htmlspecialchars($q['text']); ?></div>
-                    <div style="display:flex;align-items:center;gap:.5rem;flex-shrink:0;">
-                        <?php if ($s['csat'] !== null): ?>
-                        <span style="font-size:1.4rem;font-weight:900;color:<?php echo $t['color']; ?>;"><?php echo $s['csat']; ?>%</span>
-                        <?php endif; ?>
-                        <span class="tier-pill" style="background:<?php echo $t['bg']; ?>;color:<?php echo $t['color']; ?>;"><?php echo $t['label']; ?></span>
-                    </div>
-                </div>
-                <?php if ($totalR > 0): ?>
-                <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:.4rem;margin-bottom:.75rem;">
-                    <?php
-                    $labels = [1=>'Strongly Disagree',2=>'Disagree',3=>'Neutral',4=>'Agree',5=>'Strongly Agree'];
-                    $colors = [1=>'#ef4444',2=>'#f97316',3=>'#f59e0b',4=>'#3b82f6',5=>'#10b981'];
-                    foreach ($dist as $k=>$v):
-                        $pct = $totalR>0 ? round($v/$totalR*100) : 0;
-                    ?>
-                    <div style="text-align:center;">
-                        <div style="font-size:.65rem;color:var(--text4);margin-bottom:.2rem;"><?php echo $labels[$k]; ?></div>
-                        <div style="background:var(--border);border-radius:2rem;height:6px;overflow:hidden;margin-bottom:.2rem;">
-                            <div style="height:100%;background:<?php echo $colors[$k]; ?>;border-radius:2rem;width:<?php echo $pct; ?>%;transition:width .6s;"></div>
-                        </div>
-                        <div style="font-size:.72rem;font-weight:700;color:var(--text2);"><?php echo $v; ?> <span style="color:var(--text4);">(<?php echo $pct; ?>%)</span></div>
-                    </div>
-                    <?php endforeach; ?>
-                </div>
-                <div style="font-size:.78rem;color:var(--text3);"><i class="fas fa-users" style="color:var(--accent);"></i> <?php echo $totalR; ?> total rated &nbsp;&middot;&nbsp; <?php echo $s['agree']; ?> satisfied (4-5) &nbsp;&middot;&nbsp; <?php echo $totalR - $s['agree']; ?> below threshold</div>
-                <?php else: ?>
-                <div style="font-size:.82rem;color:var(--text4);">No responses yet for this question.</div>
-                <?php endif; ?>
-            </div>
-            <?php endforeach; ?>
-        </div>
-        <?php endif; ?>
-
-        <?php if ($other_qs): ?>
-        <div>
-            <div style="font-size:.8rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--text4);margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem;"><i class="fas fa-list" style="color:var(--blue);"></i> Choice &amp; Text Questions</div>
-            <?php foreach ($other_qs as $s):
-                $q = $s['question'];
-            ?>
-            <div class="q-card">
-                <div class="q-title">Q<?php echo $qi++; ?>. <?php echo htmlspecialchars($q['text']); ?>
-                    <span style="font-size:.7rem;font-weight:600;color:var(--text4);margin-left:.5rem;">(<?php echo $q['type']; ?>)</span>
-                </div>
-                <?php if (!empty($s['dist'])): ?>
-                <?php $maxVal = max($s['dist']); foreach ($s['dist'] as $opt=>$cnt):
-                    $pct = $maxVal>0 ? round($cnt/$maxVal*100) : 0;
-                    $absPct = $response_count > 0 ? round($cnt/$response_count*100) : round($cnt/max(array_sum($s['dist']),1)*100);
-                ?>
-                <div class="q-bar-wrap">
-                    <div class="q-bar-label"><span><?php echo htmlspecialchars($opt); ?></span><span><?php echo $cnt; ?> (<?php echo $absPct; ?>%)</span></div>
-                    <div class="q-bar-track"><div class="q-bar" style="width:<?php echo $pct; ?>%;background:linear-gradient(90deg,var(--accent),var(--blue));"></div></div>
-                </div>
-                <?php endforeach; ?>
-                <?php elseif (!empty($s['texts'])): ?>
-                <div style="display:flex;flex-direction:column;gap:.4rem;max-height:120px;overflow-y:auto;">
-                    <?php foreach (array_slice($s['texts'],0,5) as $txt): ?>
-                    <div style="padding:.4rem .7rem;background:var(--surface);border:1px solid var(--border);border-radius:.4rem;font-size:.8rem;color:var(--text2);"><?php echo htmlspecialchars($txt); ?></div>
-                    <?php endforeach; ?>
-                    <?php if (count($s['texts'])>5): ?><div style="font-size:.75rem;color:var(--text4);">+<?php echo count($s['texts'])-5; ?> more responses...</div><?php endif; ?>
-                </div>
-                <?php else: ?>
-                <div style="font-size:.82rem;color:var(--text4);">No responses yet.</div>
-                <?php endif; ?>
-            </div>
-            <?php endforeach; ?>
-        </div>
-        <?php endif; ?>
-        <?php endif; ?>
-    </div>
-</div>
-
 
 <!-- Charts -->
 <div class="chart-pair">
