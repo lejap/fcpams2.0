@@ -292,58 +292,9 @@ $generated = date('F d, Y \a\t h:i A');
     </div>
 </form>
 
-<!-- Section 1: Executive Summary -->
+<!-- Section 1: Methodology -->
 <div class="report-section">
-    <div class="section-hd"><i class="fas fa-file-alt" style="color:var(--accent);"></i> 1.0 Executive Summary</div>
-    <div class="section-body">
-        <?php if ($survey_data): ?>
-        <div style="margin-bottom:1rem;padding:.75rem 1rem;background:var(--surface2);border-radius:var(--radius-sm);border-left:4px solid var(--accent);">
-            <div style="font-weight:800;font-size:1rem;color:var(--text);margin-bottom:.25rem;"><?php echo htmlspecialchars($survey_data['title']); ?></div>
-            <?php if ($survey_data['description']): ?><div style="font-size:.85rem;color:var(--text3);"><?php echo htmlspecialchars($survey_data['description']); ?></div><?php endif; ?>
-        </div>
-        <?php endif; ?>
-        <p style="font-size:.88rem;color:var(--text2);margin-bottom:1rem;">
-            This report presents the findings of the <?php echo date('Y'); ?> FCPAMS Membership Satisfaction Survey, assessing citizen satisfaction across key areas of cooperative services. The Customer Satisfaction (CSAT) score model is used to provide a quantitative measure of performance.
-        </p>
-        <div class="exec-grid">
-            <div class="exec-item">
-                <div class="exec-label">Generated</div>
-                <div class="exec-value" style="font-size:.9rem;"><?php echo $generated; ?></div>
-            </div>
-            <div class="exec-item">
-                <div class="exec-label">Prepared by</div>
-                <div class="exec-value" style="font-size:.9rem;"><?php echo htmlspecialchars($_SESSION['name']); ?></div>
-            </div>
-            <div class="exec-item">
-                <div class="exec-label">Overall CSAT Score</div>
-                <div class="exec-value" style="color:<?php echo $tier['color']; ?>;"><?php echo $csat_overall !== null ? $csat_overall.'%' : 'No rating data yet'; ?></div>
-            </div>
-            <div class="exec-item">
-                <div class="exec-label">Performance Tier</div>
-                <div class="exec-value"><span class="tier-pill" style="background:<?php echo $tier['bg']; ?>;color:<?php echo $tier['color']; ?>;"><?php echo $tier['label']; ?></span></div>
-            </div>
-            <?php if ($f_survey): ?>
-            <div class="exec-item">
-                <div class="exec-label">Responses (Filtered)</div>
-                <div class="exec-value"><?php echo $response_count; ?></div>
-            </div>
-            <?php else: ?>
-            <div class="exec-item">
-                <div class="exec-label">Total Responses</div>
-                <div class="exec-value"><?php echo $total_responses; ?></div>
-            </div>
-            <?php endif; ?>
-            <div class="exec-item">
-                <div class="exec-label">Active Surveys</div>
-                <div class="exec-value"><?php echo $active_surveys; ?> of <?php echo $total_surveys; ?></div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Section 2: Methodology -->
-<div class="report-section">
-    <div class="section-hd"><i class="fas fa-flask" style="color:var(--blue);"></i> 2.0 Methodology &amp; CSAT Interpretation</div>
+    <div class="section-hd"><i class="fas fa-flask" style="color:var(--blue);"></i> 1.0 Methodology &amp; CSAT Interpretation</div>
     <div class="section-body">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
             <div>
@@ -353,7 +304,7 @@ $generated = date('F d, Y \a\t h:i A');
                     <div style="border-top:2px solid var(--text);padding-top:.4rem;font-size:.88rem;font-weight:600;color:var(--text2);">Agree (4) + Strongly Agree (5) responses</div>
                     <div style="height:2px;background:var(--text);margin:.3rem auto;width:80%;"></div>
                     <div style="font-size:.88rem;font-weight:600;color:var(--text2);">Total Number of Responses</div>
-                    <div style="margin-top:.4rem;font-weight:800;color:var(--accent);">Ã— 100</div>
+                    <div style="margin-top:.4rem;font-weight:800;color:var(--accent);">&times; 100</div>
                 </div>
             </div>
             <div>
@@ -379,9 +330,9 @@ $generated = date('F d, Y \a\t h:i A');
         </div>
     </div>
 </div>
-<!-- Section 3: Key Findings -->
+<!-- Section 2: Key Findings -->
 <div class="report-section">
-    <div class="section-hd"><i class="fas fa-search" style="color:var(--amber);"></i> 3.0 Key Findings &amp; Analysis</div>
+    <div class="section-hd"><i class="fas fa-search" style="color:var(--amber);"></i> 2.0 Key Findings &amp; Analysis</div>
     <div class="section-body">
         <?php if (empty($question_stats)): ?>
         <div style="text-align:center;padding:2rem;color:var(--text4);">
