@@ -197,8 +197,8 @@ $generated = date('F d, Y \a\t h:i A');
 
 <!-- Print Header -->
 <div class="print-hd">
-    <h1>FCPAMS â€” Membership Satisfaction Survey Report: <?php echo date('Y'); ?></h1>
-    <p>Generated: <?php echo $generated; ?> &nbsp;Â·&nbsp; Prepared by: <?php echo htmlspecialchars($_SESSION['name']); ?></p>
+    <h1>FCPAMS - Membership Satisfaction Survey Report: <?php echo date('Y'); ?></h1>
+    <p>Generated: <?php echo $generated; ?> &nbsp;&middot;&nbsp; Prepared by: <?php echo htmlspecialchars($_SESSION['name']); ?></p>
     <?php if ($survey_data): ?><p style="margin-top:.3rem;font-size:.75rem;">Survey: <strong><?php echo htmlspecialchars($survey_data['title']); ?></strong><?php if($f_branch) echo " &nbsp;| Branch: <strong>$f_branch</strong>"; ?></p><?php endif; ?>
 </div>
 
@@ -215,7 +215,7 @@ $generated = date('F d, Y \a\t h:i A');
                     <h1 style="color:#fff;margin:0;font-size:1.75rem;font-weight:800;letter-spacing:-0.02em;">Surveys Report</h1>
                     <span style="background:linear-gradient(135deg,#3b82f6,#0e83b5);color:#fff;font-size:.65rem;font-weight:800;padding:.2rem .6rem;border-radius:1rem;letter-spacing:.06em;text-transform:uppercase;">CSAT Analytics</span>
                 </div>
-                <p style="color:rgba(255,255,255,.65);margin:.2rem 0 0;font-size:.9rem;">Citizen engagement &amp; satisfaction survey insights â€” <?php echo date('Y'); ?></p>
+                <p style="color:rgba(255,255,255,.65);margin:.2rem 0 0;font-size:.9rem;">Citizen engagement &amp; satisfaction survey insights - <?php echo date('Y'); ?></p>
             </div>
         </div>
     </div>
@@ -360,16 +360,16 @@ $generated = date('F d, Y \a\t h:i A');
                 <div style="font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--text4);margin-bottom:.6rem;">CSAT Score Tiers</div>
                 <div style="display:flex;flex-direction:column;gap:.5rem;">
                     <div style="display:flex;align-items:center;gap:.75rem;padding:.6rem .85rem;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.25);border-radius:var(--radius-sm);border-left:4px solid #10b981;">
-                        <div style="font-weight:800;color:#10b981;min-width:5rem;">85% â€“ 100%</div>
-                        <div style="font-size:.82rem;color:var(--text2);"><strong style="color:var(--text);">Excellent</strong> â€” Exceeding expectations; high member satisfaction.</div>
+                        <div style="font-weight:800;color:#10b981;min-width:5rem;">85% - 100%</div>
+                        <div style="font-size:.82rem;color:var(--text2);"><strong style="color:var(--text);">Excellent</strong> - Exceeding expectations; high member satisfaction.</div>
                     </div>
                     <div style="display:flex;align-items:center;gap:.75rem;padding:.6rem .85rem;background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.25);border-radius:var(--radius-sm);border-left:4px solid #3b82f6;">
-                        <div style="font-weight:800;color:#3b82f6;min-width:5rem;">70% â€“ 84%</div>
-                        <div style="font-size:.82rem;color:var(--text2);"><strong style="color:var(--text);">Good</strong> â€” Room for improvement; satisfaction is acceptable.</div>
+                        <div style="font-weight:800;color:#3b82f6;min-width:5rem;">70% - 84%</div>
+                        <div style="font-size:.82rem;color:var(--text2);"><strong style="color:var(--text);">Good</strong> - Room for improvement; satisfaction is acceptable.</div>
                     </div>
                     <div style="display:flex;align-items:center;gap:.75rem;padding:.6rem .85rem;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);border-radius:var(--radius-sm);border-left:4px solid #ef4444;">
                         <div style="font-weight:800;color:#ef4444;min-width:5rem;">Below 70%</div>
-                        <div style="font-size:.82rem;color:var(--text2);"><strong style="color:var(--text);">Needs Improvement</strong> â€” Immediate corrective action needed.</div>
+                        <div style="font-size:.82rem;color:var(--text2);"><strong style="color:var(--text);">Needs Improvement</strong> - Immediate corrective action needed.</div>
                     </div>
                 </div>
             </div>
@@ -431,7 +431,7 @@ $generated = date('F d, Y \a\t h:i A');
                     </div>
                     <?php endforeach; ?>
                 </div>
-                <div style="font-size:.78rem;color:var(--text3);"><i class="fas fa-users" style="color:var(--accent);"></i> <?php echo $totalR; ?> total rated &nbsp;Â·&nbsp; <?php echo $s['agree']; ?> satisfied (4â€“5) &nbsp;Â·&nbsp; <?php echo $totalR - $s['agree']; ?> below threshold</div>
+                <div style="font-size:.78rem;color:var(--text3);"><i class="fas fa-users" style="color:var(--accent);"></i> <?php echo $totalR; ?> total rated &nbsp;&middot;&nbsp; <?php echo $s['agree']; ?> satisfied (4-5) &nbsp;&middot;&nbsp; <?php echo $totalR - $s['agree']; ?> below threshold</div>
                 <?php else: ?>
                 <div style="font-size:.82rem;color:var(--text4);">No responses yet for this question.</div>
                 <?php endif; ?>
@@ -478,60 +478,6 @@ $generated = date('F d, Y \a\t h:i A');
     </div>
 </div>
 
-<!-- Section 4: Recommendations -->
-<div class="report-section">
-    <div class="section-hd"><i class="fas fa-lightbulb" style="color:var(--amber);"></i> 4.0 Recommendations</div>
-    <div class="section-body">
-        <?php
-        $recs = [];
-        if ($csat_overall !== null) {
-            if ($csat_overall < 70) {
-                $recs[] = ['title'=>'Immediate Service Review','text'=>'Overall CSAT is below 70%. Conduct an immediate review of service delivery processes and identify bottleneck areas for urgent corrective action.'];
-                $recs[] = ['title'=>'Member Feedback Campaign','text'=>'Launch a targeted feedback campaign to understand specific pain points and gather actionable suggestions from dissatisfied members.'];
-            } elseif ($csat_overall < 85) {
-                $recs[] = ['title'=>'Enhance Service Accessibility','text'=>'Improve digital service options, streamline member processes, and extend operating hours where feasible to increase member convenience.'];
-                $recs[] = ['title'=>'Improve Member Engagement','text'=>'Create dedicated feedback channels (online forums, town halls, suggestion boxes) and acknowledge changes made based on member input.'];
-            } else {
-                $recs[] = ['title'=>'Sustain High Performance','text'=>'Maintain current service excellence by regular staff training and continuous process improvement to keep CSAT above the 85% threshold.'];
-                $recs[] = ['title'=>'Leverage Positive Advocacy','text'=>'Encourage satisfied members to participate in referral programs and share their positive experience to increase membership.'];
-            }
-            // Check for low-scoring questions
-            $low_qs = array_filter($question_stats, fn($s)=>$s['csat']!==null && $s['csat']<70);
-            if (!empty($low_qs)) {
-                $recs[] = ['title'=>'Address Low-Scoring Areas','text'=>''.count($low_qs).' question(s) scored below 70% CSAT. Review these specific areas with management and implement targeted improvement programs.'];
-            }
-        }
-        $recs[] = ['title'=>'Address Leadership Perception','text'=>'Implement a transparent communication strategy including regular Q&amp;A sessions and a "Meet the Leadership" series to improve governance visibility.'];
-        $recs[] = ['title'=>'Regular Survey Cadence','text'=>'Conduct satisfaction surveys quarterly to track trends over time and measure the impact of improvement initiatives.'];
-        ?>
-        <div>
-            <?php foreach ($recs as $i=>$rec): ?>
-            <div class="rec-item">
-                <div class="rec-num"><?php echo $i+1; ?></div>
-                <div class="rec-text"><strong><?php echo $rec['title']; ?></strong><?php echo $rec['text']; ?></div>
-            </div>
-            <?php endforeach; ?>
-        </div>
-    </div>
-</div>
-
-<!-- Section 5: Conclusion -->
-<div class="report-section">
-    <div class="section-hd"><i class="fas fa-check-circle" style="color:var(--green);"></i> 5.0 Conclusion</div>
-    <div class="section-body">
-        <p style="font-size:.88rem;color:var(--text2);margin-bottom:.75rem;">
-            The FCPAMS Membership Satisfaction Survey provides a vital window into the member experience. 
-            <?php if ($csat_overall !== null): ?>
-            The current overall CSAT score of <strong style="color:<?php echo $tier['color']; ?>;"><?php echo $csat_overall; ?>%</strong> indicates a <strong><?php echo strtolower($tier['label']); ?></strong> level of satisfaction among respondents.
-            <?php else: ?>
-            Insufficient rating data is available to compute a CSAT score at this time.
-            <?php endif; ?>
-        </p>
-        <p style="font-size:.88rem;color:var(--text2);margin:0;">
-            Prioritizing service accessibility, member engagement, and leadership transparency will be key drivers of long-term cooperative success. It is recommended that this report be shared with department heads and reviewed during the next board or management meeting.
-        </p>
-    </div>
-</div>
 
 <!-- Charts -->
 <div class="chart-pair">
@@ -553,7 +499,7 @@ $generated = date('F d, Y \a\t h:i A');
 
 <!-- Survey Summary Table -->
 <div class="tbl-wrap">
-    <div class="tbl-hd"><span><i class="fas fa-clipboard-list"></i> All Surveys â€” Summary</span></div>
+    <div class="tbl-hd"><span><i class="fas fa-clipboard-list"></i> All Surveys - Summary</span></div>
     <table class="rtbl">
         <thead><tr><th>#</th><th>Survey Title</th><th>Description</th><th>Status</th><th>Responses</th><th>Created</th></tr></thead>
         <tbody>
@@ -574,7 +520,7 @@ $generated = date('F d, Y \a\t h:i A');
 <!-- Response Log -->
 <div class="tbl-wrap">
     <div class="tbl-hd">
-        <span><i class="fas fa-users"></i> Response Log â€” <?php echo $filtered_count; ?> record<?php echo $filtered_count!=1?'s':''; ?></span>
+        <span><i class="fas fa-users"></i> Response Log - <?php echo $filtered_count; ?> record<?php echo $filtered_count!=1?'s':''; ?></span>
         <?php if ($f_survey||$f_branch||$f_from||$f_to): ?><span style="font-size:.75rem;color:var(--accent);font-weight:600;background:var(--surface2);padding:.2rem .6rem;border-radius:.4rem;">Filtered</span><?php endif; ?>
     </div>
     <div style="overflow-x:auto;">
