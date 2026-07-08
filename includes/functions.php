@@ -112,4 +112,20 @@ if (!function_exists('get_status_class')) {
         }
     }
 }
+
+/**
+ * Format Remark for Display
+ * Converts literal \r\n escape sequences AND real newlines to <br> tags.
+ * Use this everywhere admin_remark / confirm_remark is displayed.
+ */
+if (!function_exists('format_remark')) {
+    function format_remark($text) {
+        if (empty($text)) return '';
+        // Replace literal backslash-r-backslash-n (4 chars) with a real newline
+        $text = str_replace(['\\r\\n', '\\r', '\\n'], "\n", $text);
+        // Normalize Windows-style real CRLF to LF
+        $text = str_replace("\r\n", "\n", $text);
+        return nl2br(htmlspecialchars($text, ENT_QUOTES, 'UTF-8'));
+    }
+}
 ?>

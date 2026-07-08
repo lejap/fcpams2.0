@@ -114,13 +114,13 @@ include '../includes/admin_sidebar.php';
             <?php if ($detail['admin_remark']): ?>
             <div class="glass-card" style="margin-bottom:1rem;border-left:4px solid #10b981;">
                 <h4 style="margin-bottom:0.75rem;color:#10b981;">Admin Remark</h4>
-                <p><?php echo nl2br(htmlspecialchars($detail['admin_remark'])); ?></p>
+                <p><?php echo format_remark($detail['admin_remark']); ?></p>
             </div>
             <?php endif; ?>
             <?php if (!empty($detail['confirm_remark'])): ?>
             <div class="glass-card" style="margin-bottom:1rem;border-left:4px solid #8b5cf6;">
                 <h4 style="margin-bottom:0.75rem;color:#8b5cf6;"><i class="fas fa-clipboard-check"></i> Resolution of Complaint (Admin)</h4>
-                <p><?php echo nl2br(htmlspecialchars($detail['confirm_remark'])); ?></p>
+                <p><?php echo format_remark($detail['confirm_remark']); ?></p>
             </div>
             <?php endif; ?>
             <?php if ($detail['status'] === 'OPEN'): ?>

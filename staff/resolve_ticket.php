@@ -157,7 +157,7 @@ include '../includes/staff_sidebar.php';
             
             <div>
                 <div class="detail-label" style="margin-bottom:0.5rem;">Staff/Admin Remark</div>
-                <p style="color:#1e293b;line-height:1.6;font-size:0.9rem;white-space:pre-wrap;background:#f8fafc;padding:1rem;border-radius:0.5rem;border:1px solid #e2e8f0;"><?php echo htmlspecialchars($ticket['admin_remark'] ?? 'No remark provided.'); ?></p>
+                <p style="color:#1e293b;line-height:1.6;font-size:0.9rem;background:#f8fafc;padding:1rem;border-radius:0.5rem;border:1px solid #e2e8f0;"><?php echo format_remark($ticket['admin_remark'] ?? 'No remark provided.'); ?></p>
             </div>
             <?php endif; ?>
         </div>

@@ -96,7 +96,7 @@ include '../includes/staff_sidebar.php';
             <?php if ($detail['admin_remark']): ?>
             <div class="glass-card" style="margin-bottom:1rem;border-left:4px solid #10b981;">
                 <h4 style="margin-bottom:0.75rem;color:#10b981;">Resolution Remark</h4>
-                <p><?php echo nl2br(htmlspecialchars($detail['admin_remark'])); ?></p>
+                <p><?php echo format_remark($detail['admin_remark']); ?></p>
             </div>
             <?php endif; ?>
 
