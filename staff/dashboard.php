@@ -4,11 +4,54 @@ require_once '../includes/functions.php';
 
 auth_guard('STAFF');
 
-// Stat counts — OPEN only
+// Get current staff's branch info
+$staff_branch_id = $_SESSION['branch_id'] ?? null;
+$staff_is_ho     = $_SESSION['is_ho'] ?? 0;
+$staff_role      = $_SESSION['role'] ?? 'STAFF';
+
+// ---------------------------------------------------------------
+// Build branch-aware WHERE clauses
+// ---------------------------------------------------------------
+// Submissions: Staff see all submissions (no branch restriction on tickets)
+// Complaints:  Must be assessed (complexity IS NOT NULL).
+//              If staff is HO → see ALL assessed complaints.
+//              Otherwise → see only complaints where user_branch matches
+//              the staff's branch name.
+// ---------------------------------------------------------------
+
+// Resolve staff branch name for matching against complaint user_branch
+$staff_branch_name = '';
+if ($staff_branch_id) {
+    $br_res = $conn->query("SELECT name FROM branches WHERE id=$staff_branch_id");
+    if ($br_res && $row = $br_res->fetch_assoc()) {
+        $staff_branch_name = $row['name'];
+    }
+}
+
+// Stat counts
 $open_tickets    = $conn->query("SELECT COUNT(*) as c FROM tickets WHERE status='OPEN'")->fetch_assoc()['c'];
-$open_complaints = $conn->query("SELECT COUNT(*) as c FROM complaints WHERE status='OPEN' AND complexity IS NOT NULL")->fetch_assoc()['c'];
-$closed_total    = $conn->query("SELECT COUNT(*) as c FROM tickets WHERE status IN ('RESOLVED','CLOSED')")->fetch_assoc()['c']
-                 + $conn->query("SELECT COUNT(*) as c FROM complaints WHERE status IN ('RESOLVED','CLOSED') AND complexity IS NOT NULL")->fetch_assoc()['c'];
+
+// Open complaints — branch-filtered
+if ($staff_role === 'ADMIN' || $staff_is_ho) {
+    // HO staff / Admin see all assessed open complaints
+    $open_complaints = $conn->query("SELECT COUNT(*) as c FROM complaints WHERE status='OPEN' AND complexity IS NOT NULL")->fetch_assoc()['c'];
+} else {
+    // Branch staff see only their branch's assessed open complaints
+    $stmt = $conn->prepare("SELECT COUNT(*) as c FROM complaints WHERE status='OPEN' AND complexity IS NOT NULL AND user_branch = ?");
+    $stmt->bind_param("s", $staff_branch_name);
+    $stmt->execute();
+    $open_complaints = $stmt->get_result()->fetch_assoc()['c'];
+}
+
+$closed_total = $conn->query("SELECT COUNT(*) as c FROM tickets WHERE status IN ('RESOLVED','CLOSED')")->fetch_assoc()['c'];
+if ($staff_role === 'ADMIN' || $staff_is_ho) {
+    $closed_total += $conn->query("SELECT COUNT(*) as c FROM complaints WHERE status IN ('RESOLVED','CLOSED') AND complexity IS NOT NULL")->fetch_assoc()['c'];
+} else {
+    $stmt = $conn->prepare("SELECT COUNT(*) as c FROM complaints WHERE status IN ('RESOLVED','CLOSED') AND complexity IS NOT NULL AND user_branch = ?");
+    $stmt->bind_param("s", $staff_branch_name);
+    $stmt->execute();
+    $closed_total += $stmt->get_result()->fetch_assoc()['c'];
+}
 
 // Filters
 $type_filter   = isset($_GET['type'])     ? sanitize($_GET['type'])     : '';
@@ -23,8 +66,12 @@ if ($branch_filter) $sub_where .= " AND user_branch = '$branch_filter'";
 if ($date_from)     $sub_where .= " AND DATE(created_at) >= '$date_from'";
 if ($date_to)       $sub_where .= " AND DATE(created_at) <= '$date_to'";
 
-// OPEN complaints only (assessed by admin)
+// OPEN complaints only (assessed by admin) — branch filtered
 $cmp_where = "WHERE status = 'OPEN' AND complexity IS NOT NULL";
+if (!($staff_role === 'ADMIN' || $staff_is_ho)) {
+    $safe_branch = $conn->real_escape_string($staff_branch_name);
+    $cmp_where .= " AND user_branch = '$safe_branch'";
+}
 if ($date_from) $cmp_where .= " AND DATE(created_at) >= '$date_from'";
 if ($date_to)   $cmp_where .= " AND DATE(created_at) <= '$date_to'";
 
@@ -42,6 +89,19 @@ include '../includes/staff_sidebar.php';
         <div>
             <h1 style="font-size:1.75rem;color:#0e83b5;margin-bottom:0.25rem;">Staff Dashboard</h1>
             <p style="color:#64748b;font-size:0.88rem;">Welcome back, <strong><?php echo htmlspecialchars($_SESSION['name']); ?></strong>. Items below require your attention.</p>
+            <?php if ($staff_branch_name): ?>
+            <div style="margin-top:0.35rem;">
+                <?php if ($staff_is_ho): ?>
+                <span style="background:rgba(124,58,237,0.1);color:#7c3aed;border:1px solid rgba(124,58,237,0.3);border-radius:1rem;padding:0.2rem 0.65rem;font-size:0.78rem;font-weight:700;">
+                    <i class="fas fa-building"></i> <?php echo htmlspecialchars($staff_branch_name); ?> (Head Office)
+                </span>
+                <?php else: ?>
+                <span style="background:rgba(14,131,181,0.1);color:#0e83b5;border:1px solid rgba(14,131,181,0.25);border-radius:1rem;padding:0.2rem 0.65rem;font-size:0.78rem;font-weight:700;">
+                    <i class="fas fa-code-branch"></i> <?php echo htmlspecialchars($staff_branch_name); ?>
+                </span>
+                <?php endif; ?>
+            </div>
+            <?php endif; ?>
         </div>
         <a href="closed.php" style="display:inline-flex;align-items:center;gap:0.5rem;padding:0.5rem 1.25rem;border-radius:0.75rem;background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.25);color:#7c3aed;font-weight:600;font-size:0.88rem;text-decoration:none;">
             <i class="fas fa-archive"></i> View Closed Records
@@ -160,6 +220,11 @@ include '../includes/staff_sidebar.php';
     <div class="admin-table-wrapper" style="margin-top:1.5rem;">
         <div class="admin-table-header" style="background:linear-gradient(90deg,#dc2626,#b91c1c);">
             <i class="fas fa-exclamation-triangle"></i> Open Complaints
+            <?php if (!$staff_is_ho && $staff_role !== 'ADMIN' && $staff_branch_name): ?>
+            <span style="margin-left:0.5rem;background:rgba(255,255,255,0.2);border-radius:1rem;padding:0.1rem 0.6rem;font-size:0.7rem;font-weight:600;">
+                <i class="fas fa-filter"></i> <?php echo htmlspecialchars($staff_branch_name); ?> only
+            </span>
+            <?php endif; ?>
             <span style="margin-left:auto;background:rgba(255,255,255,0.25);border-radius:9px;padding:0.1rem 0.55rem;font-size:0.75rem;"><?php echo $open_complaints; ?></span>
         </div>
         <div style="overflow-x:auto;">

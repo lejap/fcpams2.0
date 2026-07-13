@@ -5,6 +5,20 @@ require_once '../includes/functions.php';
 auth_guard('STAFF');
 validate_csrf();
 
+// Get current staff's branch info
+$staff_branch_id = $_SESSION['branch_id'] ?? null;
+$staff_is_ho     = $_SESSION['is_ho'] ?? 0;
+$staff_role      = $_SESSION['role'] ?? 'STAFF';
+
+// Resolve staff branch name for matching
+$staff_branch_name = '';
+if ($staff_branch_id) {
+    $br_res = $conn->query("SELECT name FROM branches WHERE id=$staff_branch_id");
+    if ($br_res && $row = $br_res->fetch_assoc()) {
+        $staff_branch_name = $row['name'];
+    }
+}
+
 $view_id = isset($_GET['view']) ? (int)$_GET['view'] : 0;
 
 // Handle resolve action by staff
@@ -41,20 +55,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_signed'])) {
     exit();
 }
 
+// ---------------------------------------------------------------
+// Branch-based visibility logic
+// Complaints must be assessed (complexity IS NOT NULL)
+// HO staff see ALL, branch staff see only their branch's complaints
+// ---------------------------------------------------------------
+$branch_condition = "";
+if (!($staff_role === 'ADMIN' || $staff_is_ho)) {
+    $safe_branch = $conn->real_escape_string($staff_branch_name);
+    $branch_condition = " AND user_branch = '$safe_branch'";
+}
+
 // Date filter
 $date_from = isset($_GET['dateFrom']) ? sanitize($_GET['dateFrom']) : '';
 $date_to   = isset($_GET['dateTo'])   ? sanitize($_GET['dateTo'])   : '';
-$where     = "WHERE status != 'SPAM' AND complexity IS NOT NULL";
+$where     = "WHERE status != 'SPAM' AND complexity IS NOT NULL" . $branch_condition;
 if ($date_from) $where .= " AND DATE(created_at) >= '$date_from'";
 if ($date_to)   $where .= " AND DATE(created_at) <= '$date_to'";
 
-$total_complaints = $conn->query("SELECT COUNT(*) as c FROM complaints WHERE status != 'SPAM' AND complexity IS NOT NULL")->fetch_assoc()['c'];
-$open_complaints  = $conn->query("SELECT COUNT(*) as c FROM complaints WHERE status='OPEN' AND complexity IS NOT NULL")->fetch_assoc()['c'];
+$total_complaints = $conn->query("SELECT COUNT(*) as c FROM complaints WHERE status != 'SPAM' AND complexity IS NOT NULL" . $branch_condition)->fetch_assoc()['c'];
+$open_complaints  = $conn->query("SELECT COUNT(*) as c FROM complaints WHERE status='OPEN' AND complexity IS NOT NULL" . $branch_condition)->fetch_assoc()['c'];
 $complaints       = $conn->query("SELECT * FROM complaints $where ORDER BY created_at DESC");
 
 $detail = null;
 if ($view_id > 0) {
-    $detail = $conn->query("SELECT * FROM complaints WHERE id=$view_id AND status != 'SPAM' AND complexity IS NOT NULL")->fetch_assoc();
+    // For detail view, also enforce branch access
+    $detail_where = "WHERE id=$view_id AND status != 'SPAM' AND complexity IS NOT NULL" . $branch_condition;
+    $detail = $conn->query("SELECT * FROM complaints $detail_where")->fetch_assoc();
     if (!$detail) { header("Location: complaints.php"); exit(); }
 }
 
@@ -205,8 +232,17 @@ include '../includes/staff_sidebar.php';
 <?php else: ?>
 <!-- List View -->
 <div class="fade-in">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:0.5rem;">
         <h1 style="font-size:1.75rem;color:#ef4444;">Complaints</h1>
+        <?php if (!$staff_is_ho && $staff_role !== 'ADMIN' && $staff_branch_name): ?>
+        <span style="background:rgba(14,131,181,0.1);color:#0e83b5;border:1px solid rgba(14,131,181,0.25);border-radius:1rem;padding:0.3rem 0.8rem;font-size:0.8rem;font-weight:700;">
+            <i class="fas fa-filter"></i> Showing: <?php echo htmlspecialchars($staff_branch_name); ?> complaints only
+        </span>
+        <?php elseif ($staff_is_ho || $staff_role === 'ADMIN'): ?>
+        <span style="background:rgba(124,58,237,0.1);color:#7c3aed;border:1px solid rgba(124,58,237,0.3);border-radius:1rem;padding:0.3rem 0.8rem;font-size:0.8rem;font-weight:700;">
+            <i class="fas fa-building"></i> Showing: All branch complaints (HO)
+        </span>
+        <?php endif; ?>
     </div>
 
     <div class="stat-card-row">

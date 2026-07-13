@@ -1,11 +1,34 @@
 <?php
 $current_page = basename($_SERVER['PHP_SELF']);
 
+// Get current staff's branch info for filtering
+$_staff_branch_id = $_SESSION['branch_id'] ?? null;
+$_staff_is_ho     = $_SESSION['is_ho'] ?? 0;
+$_staff_role      = $_SESSION['role'] ?? 'STAFF';
+
+// Resolve branch name
+$_staff_branch_name = '';
+if ($_staff_branch_id) {
+    $_br = $conn->query("SELECT name FROM branches WHERE id=$_staff_branch_id");
+    if ($_br && $_r = $_br->fetch_assoc()) {
+        $_staff_branch_name = $_r['name'];
+    }
+}
+
 // Notification counts
 $open_submissions = $conn->query("SELECT COUNT(*) as c FROM tickets WHERE status='OPEN'")->fetch_assoc()['c'];
-$open_complaints  = $conn->query("SELECT COUNT(*) as c FROM complaints WHERE status='OPEN' AND complexity IS NOT NULL")->fetch_assoc()['c'];
-$closed_total     = $conn->query("SELECT COUNT(*) as c FROM tickets WHERE status IN ('RESOLVED','CLOSED')")->fetch_assoc()['c']
-                  + $conn->query("SELECT COUNT(*) as c FROM complaints WHERE status IN ('RESOLVED','CLOSED') AND complexity IS NOT NULL")->fetch_assoc()['c'];
+
+// Complaints: branch-filtered
+if ($_staff_role === 'ADMIN' || $_staff_is_ho) {
+    $open_complaints = $conn->query("SELECT COUNT(*) as c FROM complaints WHERE status='OPEN' AND complexity IS NOT NULL")->fetch_assoc()['c'];
+    $closed_total    = $conn->query("SELECT COUNT(*) as c FROM tickets WHERE status IN ('RESOLVED','CLOSED')")->fetch_assoc()['c']
+                     + $conn->query("SELECT COUNT(*) as c FROM complaints WHERE status IN ('RESOLVED','CLOSED') AND complexity IS NOT NULL")->fetch_assoc()['c'];
+} else {
+    $_safe_branch = $conn->real_escape_string($_staff_branch_name);
+    $open_complaints = $conn->query("SELECT COUNT(*) as c FROM complaints WHERE status='OPEN' AND complexity IS NOT NULL AND user_branch = '$_safe_branch'")->fetch_assoc()['c'];
+    $closed_total    = $conn->query("SELECT COUNT(*) as c FROM tickets WHERE status IN ('RESOLVED','CLOSED')")->fetch_assoc()['c']
+                     + $conn->query("SELECT COUNT(*) as c FROM complaints WHERE status IN ('RESOLVED','CLOSED') AND complexity IS NOT NULL AND user_branch = '$_safe_branch'")->fetch_assoc()['c'];
+}
 ?>
 
 <!-- Staff Sidebar -->

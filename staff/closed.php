@@ -4,6 +4,27 @@ require_once '../includes/functions.php';
 
 auth_guard('STAFF');
 
+// Get current staff's branch info for filtering
+$staff_branch_id = $_SESSION['branch_id'] ?? null;
+$staff_is_ho     = $_SESSION['is_ho'] ?? 0;
+$staff_role      = $_SESSION['role'] ?? 'STAFF';
+
+// Resolve branch name
+$staff_branch_name = '';
+if ($staff_branch_id) {
+    $br_res = $conn->query("SELECT name FROM branches WHERE id=$staff_branch_id");
+    if ($br_res && $row = $br_res->fetch_assoc()) {
+        $staff_branch_name = $row['name'];
+    }
+}
+
+// Branch condition for complaints
+$cmp_branch_cond = "";
+if (!($staff_role === 'ADMIN' || $staff_is_ho)) {
+    $safe_branch = $conn->real_escape_string($staff_branch_name);
+    $cmp_branch_cond = " AND user_branch = '$safe_branch'";
+}
+
 // Handle signed document upload
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_signed'])) {
     $cid = (int)$_POST['complaint_id'];
@@ -45,14 +66,14 @@ $submissions      = $conn->query("SELECT *, (SELECT label FROM dropdown_options 
 $total_sub_res    = $conn->query("SELECT COUNT(*) as c FROM tickets WHERE status='RESOLVED'")->fetch_assoc()['c'];
 $total_sub_closed = $conn->query("SELECT COUNT(*) as c FROM tickets WHERE status='CLOSED'")->fetch_assoc()['c'];
 
-// --- Complaints (RESOLVED + CLOSED, assessed only) ---
-$cmp_where = "WHERE status IN ('RESOLVED','CLOSED') AND complexity IS NOT NULL";
+// --- Complaints (RESOLVED + CLOSED, assessed only) — branch filtered ---
+$cmp_where = "WHERE status IN ('RESOLVED','CLOSED') AND complexity IS NOT NULL" . $cmp_branch_cond;
 if ($date_from) $cmp_where .= " AND DATE(created_at) >= '$date_from'";
 if ($date_to)   $cmp_where .= " AND DATE(created_at) <= '$date_to'";
 
 $complaints       = $conn->query("SELECT * FROM complaints $cmp_where ORDER BY resolved_at DESC");
-$total_cmp_res    = $conn->query("SELECT COUNT(*) as c FROM complaints WHERE status='RESOLVED' AND complexity IS NOT NULL")->fetch_assoc()['c'];
-$total_cmp_closed = $conn->query("SELECT COUNT(*) as c FROM complaints WHERE status='CLOSED' AND complexity IS NOT NULL")->fetch_assoc()['c'];
+$total_cmp_res    = $conn->query("SELECT COUNT(*) as c FROM complaints WHERE status='RESOLVED' AND complexity IS NOT NULL" . $cmp_branch_cond)->fetch_assoc()['c'];
+$total_cmp_closed = $conn->query("SELECT COUNT(*) as c FROM complaints WHERE status='CLOSED' AND complexity IS NOT NULL" . $cmp_branch_cond)->fetch_assoc()['c'];
 
 $branches = $conn->query("SELECT * FROM branches ORDER BY name");
 

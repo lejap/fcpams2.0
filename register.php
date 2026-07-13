@@ -2,6 +2,9 @@
 require_once 'config/db.php';
 require_once 'includes/functions.php';
 
+// Fetch branches for the dropdown
+$branches = $conn->query("SELECT id, name FROM branches ORDER BY name ASC");
+
 $error = '';
 $success = '';
 
@@ -10,6 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = sanitize($_POST['email']);
     $password = $_POST['password'];
     $confirm_password = $_POST['confirm_password'];
+    $branch_id = isset($_POST['branch_id']) && $_POST['branch_id'] !== '' ? (int)$_POST['branch_id'] : null;
 
     if (empty($name) || empty($email) || empty($password) || empty($confirm_password)) {
         $error = "All fields are required!";
@@ -27,8 +31,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $final_role = $is_first ? 'ADMIN' : 'STAFF';
         $is_approved = $is_first ? 1 : 0;
         
-        $stmt = $conn->prepare("INSERT INTO users (name, email, password_hash, role, is_approved) VALUES (?, ?, ?, ?, ?)");
-        $stmt->bind_param("ssssi", $name, $email, $password_hash, $final_role, $is_approved);
+        // First user (admin) doesn't need a branch; staff must have one
+        $final_branch = $is_first ? null : $branch_id;
+        $stmt = $conn->prepare("INSERT INTO users (name, email, password_hash, role, is_approved, branch_id) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("ssssii", $name, $email, $password_hash, $final_role, $is_approved, $final_branch);
         
         if ($stmt->execute()) {
             $stmt->close();
@@ -91,6 +97,18 @@ include 'includes/header.php';
                 <span onclick="togglePassword('reg-confirm', this)" style="position: absolute; right: 15px; top: 35px; cursor: pointer; color: #64748b;">
                     <i class="fas fa-eye"></i>
                 </span>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Assigned Branch *</label>
+                <select name="branch_id" class="form-input" required>
+                    <option value="">-- Select Branch --</option>
+                    <?php
+                    // Re-fetch branches since result set may have been consumed
+                    $br = $conn->query("SELECT id, name FROM branches ORDER BY name ASC");
+                    while ($b = $br->fetch_assoc()): ?>
+                    <option value="<?php echo $b['id']; ?>"><?php echo htmlspecialchars($b['name']); ?></option>
+                    <?php endwhile; ?>
+                </select>
             </div>
             <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 1rem;">
                 Register
