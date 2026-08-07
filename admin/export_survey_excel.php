@@ -151,7 +151,10 @@ function buildRow(int $rowNum, array $cells): string {
         $val  = $cell[1] ?? '';
         $ref  = colLetter($ci) . $rowNum;
 
-        if ($type === 'n' && is_numeric($val)) {
+        if ($val === '' || $val === null) {
+            $sIdx = ($type === 'h') ? ' s="1"' : '';
+            $xml .= "<c r=\"$ref\"$sIdx/>";
+        } elseif ($type === 'n' && is_numeric($val)) {
             $xml .= "<c r=\"$ref\"><v>" . (float)$val . "</v></c>";
         } else {
             $sIdx = ($type === 'h') ? ' s="1"' : '';
@@ -339,7 +342,6 @@ $zip->addFromString('[Content_Types].xml', '<?xml version="1.0" encoding="UTF-8"
 <Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
   <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
   <Default Extension="xml"  ContentType="application/xml"/>
-  <Override PartName="/docProps/core.xml"            ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>
   <Override PartName="/xl/workbook.xml"               ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
   <Override PartName="/xl/worksheets/sheet1.xml"      ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
   <Override PartName="/xl/worksheets/sheet2.xml"      ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
@@ -351,18 +353,7 @@ $zip->addFromString('[Content_Types].xml', '<?xml version="1.0" encoding="UTF-8"
 $zip->addFromString('_rels/.rels', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
   <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
-  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/>
 </Relationships>');
-
-// docProps/core.xml
-$zip->addFromString('docProps/core.xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/coreproperties"
-                   xmlns:dc="http://purl.org/dc/elements/1.1/"
-                   xmlns:dcterms="http://purl.org/dc/terms/"
-                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <dc:creator>Lejap</dc:creator>
-  <cp:lastModifiedBy>Lejap</cp:lastModifiedBy>
-</cp:coreProperties>');
 
 // xl/_rels/workbook.xml.rels
 $zip->addFromString('xl/_rels/workbook.xml.rels', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
