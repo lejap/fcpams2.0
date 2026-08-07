@@ -542,30 +542,30 @@ $generated = date('F d, Y \a\t h:i A');
             </tbody>
         </table>
     </div>
-</div>
+</div><!-- end fade-in -->
 
 <!-- ═══════════════════════════════════════════════════════════════════════════
-     EXPORT / PREVIEW OPTIONS MODAL
+     EXPORT / PREVIEW OPTIONS MODAL (Positioned at root body level)
 ═══════════════════════════════════════════════════════════════════════════ -->
-<div id="exportSurveyModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(15,23,42,0.6);backdrop-filter:blur(6px);align-items:center;justify-content:center;">
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:1.25rem;padding:2rem;width:100%;max-width:500px;margin:1rem;box-shadow:var(--shadow-lg);">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;border-bottom:1px solid var(--border);padding-bottom:.85rem;">
-            <div style="display:flex;align-items:center;gap:.6rem;">
-                <div style="background:rgba(16,185,129,.12);border-radius:.6rem;width:2.4rem;height:2.4rem;display:flex;align-items:center;justify-content:center;">
-                    <i class="fas fa-file-excel" style="color:#10b981;font-size:1.2rem;"></i>
+<div id="exportSurveyModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;width:100vw;height:100vh;z-index:99999;background:rgba(15,23,42,0.75);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:1rem;">
+    <div style="background:var(--surface,#ffffff);color:var(--text,#0f172a);border:1px solid var(--border,#cbd5e1);border-radius:1.25rem;padding:2rem;width:100%;max-width:520px;box-shadow:0 25px 60px rgba(0,0,0,0.35);position:relative;z-index:100000;max-height:90vh;overflow-y:auto;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;border-bottom:1px solid var(--border,#e2e8f0);padding-bottom:.85rem;">
+            <div style="display:flex;align-items:center;gap:.6.rem;">
+                <div style="background:rgba(16,185,129,.15);border-radius:.6rem;width:2.5rem;height:2.5rem;display:flex;align-items:center;justify-content:center;margin-right:.6rem;">
+                    <i class="fas fa-file-excel" style="color:#10b981;font-size:1.3rem;"></i>
                 </div>
                 <div>
-                    <h3 style="margin:0;color:var(--text);font-size:1.1rem;font-weight:800;">Export Survey Analysis</h3>
-                    <p style="margin:.1rem 0 0;font-size:.78rem;color:var(--text3);">Select a survey to view statistical analysis or export to Excel.</p>
+                    <h3 style="margin:0;color:var(--text,#0f172a);font-size:1.15rem;font-weight:800;">Export Survey Analysis</h3>
+                    <p style="margin:.1rem 0 0;font-size:.78rem;color:var(--text3,#64748b);">Configure filters and choose whether to preview data or export to Excel.</p>
                 </div>
             </div>
-            <button onclick="closeExportModal()" style="background:transparent;border:none;font-size:1.4rem;cursor:pointer;color:var(--text4);line-height:1;">&#x2715;</button>
+            <button type="button" onclick="closeExportModal()" style="background:transparent;border:none;font-size:1.5rem;cursor:pointer;color:var(--text4,#94a3b8);line-height:1;padding:.2rem .4rem;">&#x2715;</button>
         </div>
 
         <form id="exportModalForm" method="GET" action="export_survey_excel.php">
             <div style="margin-bottom:1rem;">
-                <label style="display:block;font-size:.75rem;font-weight:700;text-transform:uppercase;color:var(--text4);letter-spacing:.04em;margin-bottom:.3rem;">Select Survey <span style="color:#ef4444;">*</span></label>
-                <select id="modal_survey_select" name="survey" required style="width:100%;padding:.6rem .85rem;border:1px solid var(--border);border-radius:.6rem;font-size:.9rem;background:var(--surface2);color:var(--text);">
+                <label style="display:block;font-size:.75rem;font-weight:700;text-transform:uppercase;color:var(--text4,#64748b);letter-spacing:.04em;margin-bottom:.3rem;">1. Select Survey <span style="color:#ef4444;">*</span></label>
+                <select id="modal_survey_select" name="survey" required style="width:100%;padding:.65rem .85rem;border:1px solid var(--border,#cbd5e1);border-radius:.6rem;font-size:.9rem;background:var(--surface2,#f1f5f9);color:var(--text,#0f172a);">
                     <option value="">-- Choose a Survey --</option>
                     <?php $surveys_all->data_seek(0); while ($sv=$surveys_all->fetch_assoc()): ?>
                     <option value="<?php echo $sv['id']; ?>" <?php echo $f_survey==$sv['id']?'selected':''; ?>><?php echo htmlspecialchars($sv['title']); ?></option>
@@ -576,18 +576,18 @@ $generated = date('F d, Y \a\t h:i A');
             <!-- Date Range & Branch Filters -->
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1rem;">
                 <div>
-                    <label style="display:block;font-size:.7rem;font-weight:700;text-transform:uppercase;color:var(--text4);letter-spacing:.04em;margin-bottom:.25rem;"><i class="far fa-calendar-alt"></i> Date From</label>
-                    <input type="date" id="modal_from_date" name="from" value="<?php echo htmlspecialchars($f_from); ?>" style="width:100%;padding:.45rem .7rem;border:1px solid var(--border);border-radius:.5rem;font-size:.85rem;background:var(--surface2);color:var(--text);">
+                    <label style="display:block;font-size:.7rem;font-weight:700;text-transform:uppercase;color:var(--text4,#64748b);letter-spacing:.04em;margin-bottom:.25rem;"><i class="far fa-calendar-alt"></i> Date From</label>
+                    <input type="date" id="modal_from_date" name="from" value="<?php echo htmlspecialchars($f_from); ?>" style="width:100%;padding:.5rem .7rem;border:1px solid var(--border,#cbd5e1);border-radius:.5rem;font-size:.85rem;background:var(--surface2,#f1f5f9);color:var(--text,#0f172a);">
                 </div>
                 <div>
-                    <label style="display:block;font-size:.7rem;font-weight:700;text-transform:uppercase;color:var(--text4);letter-spacing:.04em;margin-bottom:.25rem;"><i class="far fa-calendar-alt"></i> Date To</label>
-                    <input type="date" id="modal_to_date" name="to" value="<?php echo htmlspecialchars($f_to); ?>" style="width:100%;padding:.45rem .7rem;border:1px solid var(--border);border-radius:.5rem;font-size:.85rem;background:var(--surface2);color:var(--text);">
+                    <label style="display:block;font-size:.7rem;font-weight:700;text-transform:uppercase;color:var(--text4,#64748b);letter-spacing:.04em;margin-bottom:.25rem;"><i class="far fa-calendar-alt"></i> Date To</label>
+                    <input type="date" id="modal_to_date" name="to" value="<?php echo htmlspecialchars($f_to); ?>" style="width:100%;padding:.5rem .7rem;border:1px solid var(--border,#cbd5e1);border-radius:.5rem;font-size:.85rem;background:var(--surface2,#f1f5f9);color:var(--text,#0f172a);">
                 </div>
             </div>
 
             <div style="margin-bottom:1.25rem;">
-                <label style="display:block;font-size:.7rem;font-weight:700;text-transform:uppercase;color:var(--text4);letter-spacing:.04em;margin-bottom:.25rem;"><i class="fas fa-building"></i> Branch (Optional)</label>
-                <select id="modal_branch_select" name="branch" style="width:100%;padding:.5rem .85rem;border:1px solid var(--border);border-radius:.6rem;font-size:.85rem;background:var(--surface2);color:var(--text);">
+                <label style="display:block;font-size:.7rem;font-weight:700;text-transform:uppercase;color:var(--text4,#64748b);letter-spacing:.04em;margin-bottom:.25rem;"><i class="fas fa-building"></i> Branch Filter (Optional)</label>
+                <select id="modal_branch_select" name="branch" style="width:100%;padding:.55rem .85rem;border:1px solid var(--border,#cbd5e1);border-radius:.6rem;font-size:.85rem;background:var(--surface2,#f1f5f9);color:var(--text,#0f172a);">
                     <option value="">All Branches</option>
                     <?php $branches->data_seek(0); while ($b=$branches->fetch_assoc()): ?>
                     <option value="<?php echo htmlspecialchars($b['name']); ?>" <?php echo $f_branch===$b['name']?'selected':''; ?>><?php echo htmlspecialchars($b['name']); ?></option>
@@ -595,22 +595,21 @@ $generated = date('F d, Y \a\t h:i A');
                 </select>
             </div>
 
-            <div style="background:var(--surface2);border:1px solid var(--border);border-radius:.75rem;padding:.8rem 1rem;margin-bottom:1.25rem;font-size:.8rem;color:var(--text2);">
-                <div style="font-weight:700;color:var(--text);margin-bottom:.3rem;display:flex;align-items:center;gap:.4rem;">
-                    <i class="fas fa-info-circle" style="color:var(--accent);"></i> Export File Details:
+            <div style="background:var(--surface2,#f8fafc);border:1px solid var(--border,#e2e8f0);border-radius:.75rem;padding:.85rem 1rem;margin-bottom:1.5rem;font-size:.8rem;color:var(--text2,#334155);">
+                <div style="font-weight:700;color:var(--text,#0f172a);margin-bottom:.3rem;display:flex;align-items:center;gap:.4rem;">
+                    <i class="fas fa-info-circle" style="color:var(--accent,#0e83b5);"></i> Export Options Summary:
                 </div>
-                <ul style="margin:.3rem 0 0 1.2rem;padding:0;color:var(--text3);line-height:1.5;">
-                    <li><strong>Filename:</strong> <code>Survey Report Analysis (<?php echo date('M d, Y'); ?>).xlsx</code></li>
-                    <li><strong>Format:</strong> Microsoft Excel (.xlsx) with 3 sheets</li>
-                    <li><strong>Includes:</strong> CSAT %, Rating Distributions, Choices, Open-ended Text &amp; Response Logs</li>
+                <ul style="margin:.3rem 0 0 1.2rem;padding:0;color:var(--text3,#64748b);line-height:1.5;">
+                    <li><strong>File Name:</strong> <code>Survey Report Analysis (<?php echo date('M d, Y'); ?>).xlsx</code></li>
+                    <li><strong>Worksheets:</strong> Statistical Summary, Raw Responses &amp; Breakdown</li>
                 </ul>
             </div>
 
             <div style="display:flex;gap:.75rem;flex-wrap:wrap;justify-content:flex-end;">
-                <button type="button" onclick="viewAnalysisFromModal()" class="btn btn-outline" style="padding:.6rem 1.1rem;font-size:.85rem;font-weight:600;display:flex;align-items:center;gap:.4rem;">
-                    <i class="fas fa-eye"></i> Preview Filtered Data First
+                <button type="button" onclick="viewAnalysisFromModal()" class="btn btn-outline" style="padding:.65rem 1.2rem;font-size:.85rem;font-weight:600;display:flex;align-items:center;gap:.4rem;">
+                    <i class="fas fa-eye"></i> Preview Data First
                 </button>
-                <button type="submit" class="btn" style="padding:.6rem 1.3rem;font-size:.85rem;font-weight:700;background:linear-gradient(135deg,#10b981,#059669);color:#fff;border-radius:.5rem;border:none;cursor:pointer;display:flex;align-items:center;gap:.4rem;">
+                <button type="submit" class="btn" style="padding:.65rem 1.4rem;font-size:.85rem;font-weight:700;background:linear-gradient(135deg,#10b981,#059669);color:#fff;border-radius:.5rem;border:none;cursor:pointer;display:flex;align-items:center;gap:.4rem;box-shadow:0 4px 14px rgba(16,185,129,0.35);">
                     <i class="fas fa-download"></i> Export Excel File
                 </button>
             </div>
