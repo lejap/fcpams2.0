@@ -219,9 +219,23 @@ $generated = date('F d, Y \a\t h:i A');
             </div>
         </div>
     </div>
-    <button onclick="window.print()" class="btn no-print" style="padding:.75rem 1.6rem;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:.75rem;font-weight:700;font-size:.88rem;cursor:pointer;display:flex;align-items:center;gap:.55rem;backdrop-filter:blur(6px);transition:all .2s;white-space:nowrap;" onmouseover="this.style.background='rgba(255,255,255,.25)'" onmouseout="this.style.background='rgba(255,255,255,.15)'">
-        <i class="fas fa-print"></i> Print / Export PDF
-    </button>
+    <div style="display:flex;gap:.75rem;align-items:center;flex-wrap:wrap;" class="no-print">
+        <?php if ($f_survey): ?>
+        <a href="export_survey_excel.php?survey=<?php echo $f_survey; ?><?php echo $f_branch ? '&branch='.urlencode($f_branch) : ''; ?><?php echo $f_from ? '&from='.urlencode($f_from) : ''; ?><?php echo $f_to ? '&to='.urlencode($f_to) : ''; ?>"
+           style="padding:.75rem 1.6rem;background:rgba(16,185,129,.85);border:1px solid rgba(16,185,129,.5);color:#fff;border-radius:.75rem;font-weight:700;font-size:.88rem;cursor:pointer;display:flex;align-items:center;gap:.55rem;backdrop-filter:blur(6px);transition:all .2s;white-space:nowrap;text-decoration:none;"
+           onmouseover="this.style.background='rgba(16,185,129,1)'" onmouseout="this.style.background='rgba(16,185,129,.85)'">
+            <i class="fas fa-file-excel"></i> Export to Excel
+        </a>
+        <?php else: ?>
+        <span title="Select a specific survey first to enable Excel export"
+              style="padding:.75rem 1.6rem;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.4);border-radius:.75rem;font-weight:700;font-size:.88rem;display:flex;align-items:center;gap:.55rem;white-space:nowrap;cursor:not-allowed;">
+            <i class="fas fa-file-excel"></i> Export to Excel
+        </span>
+        <?php endif; ?>
+        <button onclick="window.print()" style="padding:.75rem 1.6rem;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:.75rem;font-weight:700;font-size:.88rem;cursor:pointer;display:flex;align-items:center;gap:.55rem;backdrop-filter:blur(6px);transition:all .2s;white-space:nowrap;" onmouseover="this.style.background='rgba(255,255,255,.25)'" onmouseout="this.style.background='rgba(255,255,255,.15)'">
+            <i class="fas fa-print"></i> Print / PDF
+        </button>
+    </div>
 </div>
 
 <!-- KPIs -->
@@ -368,6 +382,132 @@ $generated = date('F d, Y \a\t h:i A');
         </tbody>
     </table>
 </div>
+
+<?php if ($f_survey && !empty($question_stats)): ?>
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     PER-QUESTION STATISTICAL ANALYSIS (Google Forms-style)
+═══════════════════════════════════════════════════════════════════════════ -->
+<div class="report-section" style="border-top:4px solid var(--purple);">
+    <div class="section-hd" style="justify-content:space-between;">
+        <span><i class="fas fa-chart-pie" style="color:var(--purple);"></i>&nbsp; Question-by-Question Analysis
+            <?php if ($survey_data): ?>
+            <span style="font-size:.72rem;font-weight:400;color:var(--text3);margin-left:.5rem;">— <?php echo htmlspecialchars($survey_data['title']); ?> &nbsp;·&nbsp; <?php echo $response_count; ?> response<?php echo $response_count!=1?'s':''; ?></span>
+            <?php endif; ?>
+        </span>
+        <span style="font-size:.72rem;font-weight:600;color:var(--purple);background:rgba(139,92,246,.1);padding:.25rem .6rem;border-radius:1rem;">
+            Overall CSAT: <?php echo $csat_overall !== null ? $csat_overall.'%' : 'N/A'; ?>
+        </span>
+    </div>
+    <div class="section-body">
+        <?php foreach ($question_stats as $qi => $qs):
+            $q   = $qs['question'];
+            $typ = $q['type'];
+        ?>
+        <div class="q-card" style="margin-bottom:1.25rem;">
+            <!-- Question header -->
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.85rem;flex-wrap:wrap;gap:.5rem;">
+                <div class="q-title">
+                    <span style="color:var(--text4);font-size:.75rem;font-weight:700;margin-right:.4rem;">Q<?php echo $qi+1; ?>.</span>
+                    <?php echo htmlspecialchars($q['text']); ?>
+                </div>
+                <div style="display:flex;gap:.4rem;align-items:center;flex-wrap:wrap;">
+                    <span class="badge" style="background:rgba(139,92,246,.12);color:var(--purple);font-size:.68rem;"><?php echo $typ; ?></span>
+                    <?php if ($typ === 'RATING' && $qs['csat'] !== null):
+                        $qt = csatTier($qs['csat']); ?>
+                    <span class="tier-pill" style="background:<?php echo $qt['bg']; ?>;color:<?php echo $qt['color']; ?>;"><?php echo $qs['csat']; ?>% CSAT &mdash; <?php echo $qt['label']; ?></span>
+                    <?php endif; ?>
+                    <span class="badge" style="background:rgba(14,131,181,.1);color:var(--accent);"><?php echo $qs['total']; ?> response<?php echo $qs['total']!=1?'s':''; ?></span>
+                </div>
+            </div>
+
+            <?php if ($typ === 'RATING'): ?>
+            <!-- Rating distribution bars -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+                <div>
+                    <?php
+                    $labels = [1=>'Strongly Disagree',2=>'Disagree',3=>'Neutral',4=>'Agree',5=>'Strongly Agree'];
+                    $colors = [1=>'#ef4444',2=>'#f97316',3=>'#eab308',4=>'#3b82f6',5=>'#10b981'];
+                    foreach (array_reverse($qs['dist'], true) as $star => $cnt):
+                        $pct = $qs['total'] > 0 ? round($cnt / $qs['total'] * 100, 1) : 0;
+                    ?>
+                    <div class="q-bar-wrap">
+                        <div class="q-bar-label">
+                            <span><?php echo $star; ?> ★ <?php echo $labels[$star]; ?></span>
+                            <span style="font-weight:700;color:var(--text);"><?php echo $cnt; ?> <span style="color:var(--text4);font-weight:400;">(<?php echo $pct; ?>%)</span></span>
+                        </div>
+                        <div class="q-bar-track">
+                            <div class="q-bar" style="width:<?php echo $pct; ?>%;background:<?php echo $colors[$star]; ?>;"></div>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:.6rem;">
+                    <div class="exec-item">
+                        <div class="exec-label">Average Rating</div>
+                        <?php
+                        $sum=0; $tot=0;
+                        foreach($qs['dist'] as $s=>$c){$sum+=$s*$c;$tot+=$c;}
+                        $avg = $tot>0?round($sum/$tot,2):0;
+                        $acolor = $avg>=4?'var(--green)':($avg>=3?'var(--amber)':'var(--red)');
+                        ?>
+                        <div class="exec-value" style="color:<?php echo $acolor; ?>;font-size:1.4rem;"><?php echo $avg; ?> <span style="font-size:.85rem;color:var(--text4);">/ 5.0</span></div>
+                    </div>
+                    <div class="exec-item">
+                        <div class="exec-label">Satisfied (4-5 ★)</div>
+                        <div class="exec-value" style="color:var(--green);"><?php echo $qs['agree']; ?> <span style="font-size:.8rem;color:var(--text4);">respondents</span></div>
+                    </div>
+                    <div class="exec-item">
+                        <div class="exec-label">CSAT Score</div>
+                        <?php $ct=csatTier($qs['csat']); ?>
+                        <div class="exec-value" style="color:<?php echo $ct['color']; ?>;"><?php echo $qs['csat'] !== null ? $qs['csat'].'%' : 'N/A'; ?></div>
+                    </div>
+                </div>
+            </div>
+
+            <?php elseif (in_array($typ, ['CHOICE', 'MULTI_SELECT'])): ?>
+            <!-- Choice distribution bars -->
+            <?php if (empty($qs['dist'])): ?>
+                <p style="color:var(--text4);font-size:.85rem;">No responses yet.</p>
+            <?php else:
+                $maxVal = max($qs['dist']);
+                $palette = ['#0e83b5','#8b5cf6','#10b981','#f59e0b','#ef4444','#ec4899','#06b6d4','#84cc16'];
+                $ci = 0;
+                foreach ($qs['dist'] as $opt => $cnt):
+                    $pct = $qs['total'] > 0 ? round($cnt / $qs['total'] * 100, 1) : 0;
+                    $col = $palette[$ci % count($palette)];
+                    $ci++;
+            ?>
+                <div class="q-bar-wrap">
+                    <div class="q-bar-label">
+                        <span style="font-weight:500;"><?php echo htmlspecialchars($opt); ?></span>
+                        <span style="font-weight:700;color:var(--text);"><?php echo $cnt; ?> <span style="color:var(--text4);font-weight:400;">(<?php echo $pct; ?>%)</span></span>
+                    </div>
+                    <div class="q-bar-track">
+                        <div class="q-bar" style="width:<?php echo $pct; ?>%;background:<?php echo $col; ?>;"></div>
+                    </div>
+                </div>
+            <?php endforeach; endif; ?>
+
+            <?php else: ?>
+            <!-- Text / open-ended responses -->
+            <?php if (empty($qs['texts'])): ?>
+                <p style="color:var(--text4);font-size:.85rem;">No text responses yet.</p>
+            <?php else: ?>
+                <div style="max-height:220px;overflow-y:auto;display:flex;flex-direction:column;gap:.5rem;padding-right:.25rem;">
+                    <?php foreach ($qs['texts'] as $ti => $txt): ?>
+                    <div style="background:var(--surface);border:1px solid var(--border);border-radius:.5rem;padding:.6rem .85rem;font-size:.85rem;color:var(--text2);display:flex;gap:.6rem;align-items:flex-start;">
+                        <span style="color:var(--text4);font-size:.72rem;flex-shrink:0;margin-top:.1rem;"><?php echo $ti+1; ?>.</span>
+                        <span><?php echo nl2br(htmlspecialchars($txt)); ?></span>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+            <?php endif; ?>
+        </div>
+        <?php endforeach; ?>
+    </div>
+</div>
+<?php endif; ?>
 
 <!-- Response Log -->
 <div class="tbl-wrap">
