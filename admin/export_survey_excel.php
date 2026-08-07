@@ -409,8 +409,23 @@ $zip->addFromString('xl/worksheets/sheet3.xml', buildBreakdownSheet($question_st
 $zip->close();
 
 // ── Send file to browser ──────────────────────────────────────────────────────
-$safeTitle = preg_replace('/[^A-Za-z0-9_\-]/', '_', $survey['title']);
-$filename  = 'Survey Report Analysis (' . date('M d, Y') . ').xlsx';
+$surveyTitleClean = trim(preg_replace('/[^\w\s\-]/', '', $survey['title']));
+if (empty($surveyTitleClean)) {
+    $surveyTitleClean = 'Survey Report Analysis';
+}
+
+$dateRangeStr = '';
+if (!empty($f_from) && !empty($f_to)) {
+    $dateRangeStr = date('M d, Y', strtotime($f_from)) . ' to ' . date('M d, Y', strtotime($f_to));
+} elseif (!empty($f_from)) {
+    $dateRangeStr = 'From ' . date('M d, Y', strtotime($f_from));
+} elseif (!empty($f_to)) {
+    $dateRangeStr = 'Until ' . date('M d, Y', strtotime($f_to));
+} else {
+    $dateRangeStr = date('M d, Y');
+}
+
+$filename = $surveyTitleClean . ' (' . $dateRangeStr . ').xlsx';
 
 header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 header('Content-Disposition: attachment; filename="' . $filename . '"');

@@ -600,7 +600,7 @@ $generated = date('F d, Y \a\t h:i A');
                     <i class="fas fa-info-circle" style="color:var(--accent,#0e83b5);"></i> Export Options Summary:
                 </div>
                 <ul style="margin:.3rem 0 0 1.2rem;padding:0;color:var(--text3,#64748b);line-height:1.5;">
-                    <li><strong>File Name:</strong> <code>Survey Report Analysis (<?php echo date('M d, Y'); ?>).xlsx</code></li>
+                    <li><strong>File Format:</strong> <code>[Survey Name] ([Picked Date Range]).xlsx</code></li>
                     <li><strong>Worksheets:</strong> Statistical Summary, Raw Responses &amp; Breakdown</li>
                 </ul>
             </div>
