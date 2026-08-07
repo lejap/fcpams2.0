@@ -161,7 +161,7 @@ function buildRow(int $rowNum, array $cells): string {
 }
 
 // ── Sheet 1: Summary / Statistics ────────────────────────────────────────────
-function buildSummarySheet(array $survey, array $question_stats, int $response_count, $overall_csat): string {
+function buildSummarySheet(array $survey, array $question_stats, int $response_count, $overall_csat, string $f_branch = '', string $f_from = '', string $f_to = ''): string {
     $rows = '';
     $r = 1;
 
@@ -169,6 +169,13 @@ function buildSummarySheet(array $survey, array $question_stats, int $response_c
     $rows .= buildRow($r++, [['s', 'FCPAMS — Survey Statistical Report']]);
     $rows .= buildRow($r++, [['s', 'Survey: ' . $survey['title']]]);
     $rows .= buildRow($r++, [['s', 'Generated: ' . date('F d, Y \a\t h:i A')]]);
+    if ($f_from || $f_to) {
+        $dateStr = ($f_from ? $f_from : 'Start') . ' to ' . ($f_to ? $f_to : 'Present');
+        $rows .= buildRow($r++, [['s', 'Date Filter Range: ' . $dateStr]]);
+    }
+    if ($f_branch) {
+        $rows .= buildRow($r++, [['s', 'Branch Filter: ' . $f_branch]]);
+    }
     $rows .= buildRow($r++, [['s', 'Total Responses: ' . $response_count]]);
     $csat_lbl = $overall_csat !== null ? $overall_csat . '%' : 'N/A';
     $rows .= buildRow($r++, [['s', 'Overall CSAT Score: ' . $csat_lbl]]);
@@ -382,7 +389,7 @@ $zip->addFromString('xl/styles.xml', '<?xml version="1.0" encoding="UTF-8" stand
 </styleSheet>');
 
 // Sheets
-$zip->addFromString('xl/worksheets/sheet1.xml', buildSummarySheet($survey, $question_stats, $response_count, $overall_csat));
+$zip->addFromString('xl/worksheets/sheet1.xml', buildSummarySheet($survey, $question_stats, $response_count, $overall_csat, $f_branch, $f_from, $f_to));
 $zip->addFromString('xl/worksheets/sheet2.xml', buildRawSheet($questions, $raw_rows));
 $zip->addFromString('xl/worksheets/sheet3.xml', buildBreakdownSheet($question_stats));
 

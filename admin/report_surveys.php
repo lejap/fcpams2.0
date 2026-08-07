@@ -571,9 +571,9 @@ $generated = date('F d, Y \a\t h:i A');
         </div>
 
         <form id="exportModalForm" method="GET" action="export_survey_excel.php">
-            <div style="margin-bottom:1.25rem;">
-                <label style="display:block;font-size:.75rem;font-weight:700;text-transform:uppercase;color:var(--text4);letter-spacing:.04em;margin-bottom:.4rem;">Select Survey <span style="color:#ef4444;">*</span></label>
-                <select id="modal_survey_select" name="survey" required style="width:100%;padding:.65rem .85rem;border:1px solid var(--border);border-radius:.6rem;font-size:.9rem;background:var(--surface2);color:var(--text);">
+            <div style="margin-bottom:1rem;">
+                <label style="display:block;font-size:.75rem;font-weight:700;text-transform:uppercase;color:var(--text4);letter-spacing:.04em;margin-bottom:.3rem;">Select Survey <span style="color:#ef4444;">*</span></label>
+                <select id="modal_survey_select" name="survey" required style="width:100%;padding:.6rem .85rem;border:1px solid var(--border);border-radius:.6rem;font-size:.9rem;background:var(--surface2);color:var(--text);">
                     <option value="">-- Choose a Survey --</option>
                     <?php $surveys_all->data_seek(0); while ($sv=$surveys_all->fetch_assoc()): ?>
                     <option value="<?php echo $sv['id']; ?>" <?php echo $f_survey==$sv['id']?'selected':''; ?>><?php echo htmlspecialchars($sv['title']); ?></option>
@@ -581,20 +581,42 @@ $generated = date('F d, Y \a\t h:i A');
                 </select>
             </div>
 
-            <div style="background:var(--surface2);border:1px solid var(--border);border-radius:.75rem;padding:.9rem 1rem;margin-bottom:1.5rem;font-size:.8rem;color:var(--text2);">
+            <!-- Date Range & Branch Filters -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1rem;">
+                <div>
+                    <label style="display:block;font-size:.7rem;font-weight:700;text-transform:uppercase;color:var(--text4);letter-spacing:.04em;margin-bottom:.25rem;"><i class="far fa-calendar-alt"></i> Date From</label>
+                    <input type="date" id="modal_from_date" name="from" value="<?php echo htmlspecialchars($f_from); ?>" style="width:100%;padding:.45rem .7rem;border:1px solid var(--border);border-radius:.5rem;font-size:.85rem;background:var(--surface2);color:var(--text);">
+                </div>
+                <div>
+                    <label style="display:block;font-size:.7rem;font-weight:700;text-transform:uppercase;color:var(--text4);letter-spacing:.04em;margin-bottom:.25rem;"><i class="far fa-calendar-alt"></i> Date To</label>
+                    <input type="date" id="modal_to_date" name="to" value="<?php echo htmlspecialchars($f_to); ?>" style="width:100%;padding:.45rem .7rem;border:1px solid var(--border);border-radius:.5rem;font-size:.85rem;background:var(--surface2);color:var(--text);">
+                </div>
+            </div>
+
+            <div style="margin-bottom:1.25rem;">
+                <label style="display:block;font-size:.7rem;font-weight:700;text-transform:uppercase;color:var(--text4);letter-spacing:.04em;margin-bottom:.25rem;"><i class="fas fa-building"></i> Branch (Optional)</label>
+                <select id="modal_branch_select" name="branch" style="width:100%;padding:.5rem .85rem;border:1px solid var(--border);border-radius:.6rem;font-size:.85rem;background:var(--surface2);color:var(--text);">
+                    <option value="">All Branches</option>
+                    <?php $branches->data_seek(0); while ($b=$branches->fetch_assoc()): ?>
+                    <option value="<?php echo htmlspecialchars($b['name']); ?>" <?php echo $f_branch===$b['name']?'selected':''; ?>><?php echo htmlspecialchars($b['name']); ?></option>
+                    <?php endwhile; ?>
+                </select>
+            </div>
+
+            <div style="background:var(--surface2);border:1px solid var(--border);border-radius:.75rem;padding:.8rem 1rem;margin-bottom:1.25rem;font-size:.8rem;color:var(--text2);">
                 <div style="font-weight:700;color:var(--text);margin-bottom:.3rem;display:flex;align-items:center;gap:.4rem;">
                     <i class="fas fa-info-circle" style="color:var(--accent);"></i> Export File Details:
                 </div>
                 <ul style="margin:.3rem 0 0 1.2rem;padding:0;color:var(--text3);line-height:1.5;">
                     <li><strong>Filename:</strong> <code>Survey Report Analysis (<?php echo date('M d, Y'); ?>).xlsx</code></li>
                     <li><strong>Format:</strong> Microsoft Excel (.xlsx) with 3 sheets</li>
-                    <li><strong>Includes:</strong> CSAT %, Rating Distributions, Choices, Open-ended Text Answers &amp; Raw Responses log</li>
+                    <li><strong>Includes:</strong> CSAT %, Rating Distributions, Choices, Open-ended Text &amp; Response Logs</li>
                 </ul>
             </div>
 
             <div style="display:flex;gap:.75rem;flex-wrap:wrap;justify-content:flex-end;">
                 <button type="button" onclick="viewAnalysisFromModal()" class="btn btn-outline" style="padding:.6rem 1.1rem;font-size:.85rem;font-weight:600;display:flex;align-items:center;gap:.4rem;">
-                    <i class="fas fa-eye"></i> Preview Data First
+                    <i class="fas fa-eye"></i> Preview Filtered Data First
                 </button>
                 <button type="submit" class="btn" style="padding:.6rem 1.3rem;font-size:.85rem;font-weight:700;background:linear-gradient(135deg,#10b981,#059669);color:#fff;border-radius:.5rem;border:none;cursor:pointer;display:flex;align-items:center;gap:.4rem;">
                     <i class="fas fa-download"></i> Export Excel File
@@ -615,12 +637,19 @@ function closeExportModal() {
     document.body.style.overflow = '';
 }
 function viewAnalysisFromModal() {
-    const sel = document.getElementById('modal_survey_select').value;
+    const sel    = document.getElementById('modal_survey_select').value;
+    const fromDt = document.getElementById('modal_from_date').value;
+    const toDt   = document.getElementById('modal_to_date').value;
+    const branch = document.getElementById('modal_branch_select').value;
     if (!sel) {
         alert('Please select a survey first to view its data.');
         return;
     }
-    window.location.href = 'report_surveys.php?survey=' + sel + '#survey-analysis-section';
+    let url = 'report_surveys.php?survey=' + sel;
+    if (fromDt) url += '&from=' + encodeURIComponent(fromDt);
+    if (toDt)   url += '&to=' + encodeURIComponent(toDt);
+    if (branch) url += '&branch=' + encodeURIComponent(branch);
+    window.location.href = url;
 }
 document.getElementById('exportSurveyModal')?.addEventListener('click', function(e) {
     if (e.target === this) closeExportModal();
