@@ -606,8 +606,8 @@ $generated = date('F d, Y \a\t h:i A');
             </div>
 
             <div style="display:flex;gap:.75rem;flex-wrap:wrap;justify-content:flex-end;">
-                <button type="button" onclick="viewAnalysisFromModal()" class="btn btn-outline" style="padding:.65rem 1.2rem;font-size:.85rem;font-weight:600;display:flex;align-items:center;gap:.4rem;">
-                    <i class="fas fa-eye"></i> Preview Data First
+                <button type="button" onclick="closeExportModal()" class="btn btn-outline" style="padding:.65rem 1.2rem;font-size:.85rem;font-weight:600;">
+                    Cancel
                 </button>
                 <button type="submit" class="btn" style="padding:.65rem 1.4rem;font-size:.85rem;font-weight:700;background:linear-gradient(135deg,#10b981,#059669);color:#fff;border-radius:.5rem;border:none;cursor:pointer;display:flex;align-items:center;gap:.4rem;box-shadow:0 4px 14px rgba(16,185,129,0.35);">
                     <i class="fas fa-download"></i> Export Excel File
@@ -638,21 +638,6 @@ function openExportModal(surveyId, branch, dateFrom, dateTo) {
 function closeExportModal() {
     document.getElementById('exportSurveyModal').style.display = 'none';
     document.body.style.overflow = '';
-}
-function viewAnalysisFromModal() {
-    const sel    = document.getElementById('modal_survey_select').value;
-    const fromDt = document.getElementById('modal_from_date').value;
-    const toDt   = document.getElementById('modal_to_date').value;
-    const branch = document.getElementById('modal_branch_select').value;
-    if (!sel) {
-        alert('Please select a survey first to view its data.');
-        return;
-    }
-    let url = 'report_surveys.php?survey=' + sel;
-    if (fromDt) url += '&from=' + encodeURIComponent(fromDt);
-    if (toDt)   url += '&to=' + encodeURIComponent(toDt);
-    if (branch) url += '&branch=' + encodeURIComponent(branch);
-    window.location.href = url;
 }
 document.getElementById('exportSurveyModal')?.addEventListener('click', function(e) {
     if (e.target === this) closeExportModal();
