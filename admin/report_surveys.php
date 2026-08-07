@@ -222,15 +222,15 @@ $generated = date('F d, Y \a\t h:i A');
     <div style="display:flex;gap:.75rem;align-items:center;flex-wrap:wrap;" class="no-print">
         <?php if ($f_survey): ?>
         <a href="export_survey_excel.php?survey=<?php echo $f_survey; ?><?php echo $f_branch ? '&branch='.urlencode($f_branch) : ''; ?><?php echo $f_from ? '&from='.urlencode($f_from) : ''; ?><?php echo $f_to ? '&to='.urlencode($f_to) : ''; ?>"
-           style="padding:.75rem 1.6rem;background:rgba(16,185,129,.85);border:1px solid rgba(16,185,129,.5);color:#fff;border-radius:.75rem;font-weight:700;font-size:.88rem;cursor:pointer;display:flex;align-items:center;gap:.55rem;backdrop-filter:blur(6px);transition:all .2s;white-space:nowrap;text-decoration:none;"
-           onmouseover="this.style.background='rgba(16,185,129,1)'" onmouseout="this.style.background='rgba(16,185,129,.85)'">
+           style="padding:.75rem 1.6rem;background:linear-gradient(135deg,#10b981,#059669);border:1px solid rgba(16,185,129,.5);color:#fff;border-radius:.75rem;font-weight:700;font-size:.88rem;cursor:pointer;display:flex;align-items:center;gap:.55rem;backdrop-filter:blur(6px);transition:all .2s;white-space:nowrap;text-decoration:none;box-shadow:0 4px 14px rgba(16,185,129,0.35);"
+           onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='none'">
             <i class="fas fa-file-excel"></i> Export to Excel
         </a>
         <?php else: ?>
-        <span title="Select a specific survey first to enable Excel export"
-              style="padding:.75rem 1.6rem;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.4);border-radius:.75rem;font-weight:700;font-size:.88rem;display:flex;align-items:center;gap:.55rem;white-space:nowrap;cursor:not-allowed;">
+        <button onclick="openExportModal()"
+                style="padding:.75rem 1.6rem;background:linear-gradient(135deg,#10b981,#059669);border:1px solid rgba(16,185,129,.5);color:#fff;border-radius:.75rem;font-weight:700;font-size:.88rem;cursor:pointer;display:flex;align-items:center;gap:.55rem;backdrop-filter:blur(6px);transition:all .2s;white-space:nowrap;box-shadow:0 4px 14px rgba(16,185,129,0.35);">
             <i class="fas fa-file-excel"></i> Export to Excel
-        </span>
+        </button>
         <?php endif; ?>
         <button onclick="window.print()" style="padding:.75rem 1.6rem;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:.75rem;font-weight:700;font-size:.88rem;cursor:pointer;display:flex;align-items:center;gap:.55rem;backdrop-filter:blur(6px);transition:all .2s;white-space:nowrap;" onmouseover="this.style.background='rgba(255,255,255,.25)'" onmouseout="this.style.background='rgba(255,255,255,.15)'">
             <i class="fas fa-print"></i> Print / PDF
@@ -365,9 +365,9 @@ $generated = date('F d, Y \a\t h:i A');
 
 <!-- Survey Summary Table -->
 <div class="tbl-wrap">
-    <div class="tbl-hd"><span><i class="fas fa-clipboard-list"></i> All Surveys - Summary</span></div>
+    <div class="tbl-hd"><span><i class="fas fa-clipboard-list"></i> All Surveys - Summary &amp; Analytics</span></div>
     <table class="rtbl">
-        <thead><tr><th>#</th><th>Survey Title</th><th>Description</th><th>Status</th><th>Responses</th><th>Created</th></tr></thead>
+        <thead><tr><th>#</th><th>Survey Title</th><th>Description</th><th>Status</th><th>Responses</th><th>Created</th><th class="no-print" style="text-align:right;">Actions</th></tr></thead>
         <tbody>
         <?php while ($s=$surveys_detail->fetch_assoc()): ?>
         <tr>
@@ -377,6 +377,14 @@ $generated = date('F d, Y \a\t h:i A');
             <td><?php if($s['is_active']): ?><span class="badge" style="background:#dcfce7;color:#16a34a;">Active</span><?php else: ?><span class="badge" style="background:var(--surface2);color:var(--text4);">Inactive</span><?php endif; ?></td>
             <td style="font-weight:800;font-size:1.05rem;color:var(--accent);"><?php echo $s['responses']; ?></td>
             <td style="font-size:.8rem;color:var(--text3);"><?php echo date('M d, Y',strtotime($s['created_at'])); ?></td>
+            <td class="no-print" style="text-align:right;white-space:nowrap;">
+                <a href="report_surveys.php?survey=<?php echo $s['id']; ?>" class="btn btn-outline" style="padding:.25rem .65rem;font-size:.75rem;margin-right:.3rem;" title="View Data & Statistical Analysis">
+                    <i class="fas fa-chart-pie"></i> View Data
+                </a>
+                <a href="export_survey_excel.php?survey=<?php echo $s['id']; ?>" class="btn" style="padding:.25rem .65rem;font-size:.75rem;background:#10b981;color:#fff;border-radius:.4rem;text-decoration:none;font-weight:600;" title="Export Survey Report Analysis (Date).xlsx">
+                    <i class="fas fa-file-excel"></i> Export Excel
+                </a>
+            </td>
         </tr>
         <?php endwhile; ?>
         </tbody>
@@ -387,16 +395,22 @@ $generated = date('F d, Y \a\t h:i A');
 <!-- ═══════════════════════════════════════════════════════════════════════════
      PER-QUESTION STATISTICAL ANALYSIS (Google Forms-style)
 ═══════════════════════════════════════════════════════════════════════════ -->
-<div class="report-section" style="border-top:4px solid var(--purple);">
-    <div class="section-hd" style="justify-content:space-between;">
+<div class="report-section" id="survey-analysis-section" style="border-top:4px solid var(--purple);">
+    <div class="section-hd" style="justify-content:space-between;flex-wrap:wrap;gap:.5rem;">
         <span><i class="fas fa-chart-pie" style="color:var(--purple);"></i>&nbsp; Question-by-Question Analysis
             <?php if ($survey_data): ?>
             <span style="font-size:.72rem;font-weight:400;color:var(--text3);margin-left:.5rem;">— <?php echo htmlspecialchars($survey_data['title']); ?> &nbsp;·&nbsp; <?php echo $response_count; ?> response<?php echo $response_count!=1?'s':''; ?></span>
             <?php endif; ?>
         </span>
-        <span style="font-size:.72rem;font-weight:600;color:var(--purple);background:rgba(139,92,246,.1);padding:.25rem .6rem;border-radius:1rem;">
-            Overall CSAT: <?php echo $csat_overall !== null ? $csat_overall.'%' : 'N/A'; ?>
-        </span>
+        <div style="display:flex;align-items:center;gap:.6rem;" class="no-print">
+            <span style="font-size:.72rem;font-weight:600;color:var(--purple);background:rgba(139,92,246,.1);padding:.25rem .6rem;border-radius:1rem;">
+                Overall CSAT: <?php echo $csat_overall !== null ? $csat_overall.'%' : 'N/A'; ?>
+            </span>
+            <a href="export_survey_excel.php?survey=<?php echo $f_survey; ?><?php echo $f_branch ? '&branch='.urlencode($f_branch) : ''; ?><?php echo $f_from ? '&from='.urlencode($f_from) : ''; ?><?php echo $f_to ? '&to='.urlencode($f_to) : ''; ?>"
+               class="btn" style="background:#10b981;color:#fff;padding:.35rem .9rem;font-size:.78rem;font-weight:700;border-radius:.5rem;text-decoration:none;display:inline-flex;align-items:center;gap:.4rem;">
+                <i class="fas fa-file-excel"></i> Export Analysis to Excel
+            </a>
+        </div>
     </div>
     <div class="section-body">
         <?php foreach ($question_stats as $qi => $qs):
@@ -538,10 +552,80 @@ $generated = date('F d, Y \a\t h:i A');
     </div>
 </div>
 
-</div><!-- end fade-in -->
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     EXPORT / PREVIEW OPTIONS MODAL
+═══════════════════════════════════════════════════════════════════════════ -->
+<div id="exportSurveyModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(15,23,42,0.6);backdrop-filter:blur(6px);align-items:center;justify-content:center;">
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:1.25rem;padding:2rem;width:100%;max-width:500px;margin:1rem;box-shadow:var(--shadow-lg);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;border-bottom:1px solid var(--border);padding-bottom:.85rem;">
+            <div style="display:flex;align-items:center;gap:.6rem;">
+                <div style="background:rgba(16,185,129,.12);border-radius:.6rem;width:2.4rem;height:2.4rem;display:flex;align-items:center;justify-content:center;">
+                    <i class="fas fa-file-excel" style="color:#10b981;font-size:1.2rem;"></i>
+                </div>
+                <div>
+                    <h3 style="margin:0;color:var(--text);font-size:1.1rem;font-weight:800;">Export Survey Analysis</h3>
+                    <p style="margin:.1rem 0 0;font-size:.78rem;color:var(--text3);">Select a survey to view statistical analysis or export to Excel.</p>
+                </div>
+            </div>
+            <button onclick="closeExportModal()" style="background:transparent;border:none;font-size:1.4rem;cursor:pointer;color:var(--text4);line-height:1;">&#x2715;</button>
+        </div>
+
+        <form id="exportModalForm" method="GET" action="export_survey_excel.php">
+            <div style="margin-bottom:1.25rem;">
+                <label style="display:block;font-size:.75rem;font-weight:700;text-transform:uppercase;color:var(--text4);letter-spacing:.04em;margin-bottom:.4rem;">Select Survey <span style="color:#ef4444;">*</span></label>
+                <select id="modal_survey_select" name="survey" required style="width:100%;padding:.65rem .85rem;border:1px solid var(--border);border-radius:.6rem;font-size:.9rem;background:var(--surface2);color:var(--text);">
+                    <option value="">-- Choose a Survey --</option>
+                    <?php $surveys_all->data_seek(0); while ($sv=$surveys_all->fetch_assoc()): ?>
+                    <option value="<?php echo $sv['id']; ?>" <?php echo $f_survey==$sv['id']?'selected':''; ?>><?php echo htmlspecialchars($sv['title']); ?></option>
+                    <?php endwhile; ?>
+                </select>
+            </div>
+
+            <div style="background:var(--surface2);border:1px solid var(--border);border-radius:.75rem;padding:.9rem 1rem;margin-bottom:1.5rem;font-size:.8rem;color:var(--text2);">
+                <div style="font-weight:700;color:var(--text);margin-bottom:.3rem;display:flex;align-items:center;gap:.4rem;">
+                    <i class="fas fa-info-circle" style="color:var(--accent);"></i> Export File Details:
+                </div>
+                <ul style="margin:.3rem 0 0 1.2rem;padding:0;color:var(--text3);line-height:1.5;">
+                    <li><strong>Filename:</strong> <code>Survey Report Analysis (<?php echo date('M d, Y'); ?>).xlsx</code></li>
+                    <li><strong>Format:</strong> Microsoft Excel (.xlsx) with 3 sheets</li>
+                    <li><strong>Includes:</strong> CSAT %, Rating Distributions, Choices, Open-ended Text Answers &amp; Raw Responses log</li>
+                </ul>
+            </div>
+
+            <div style="display:flex;gap:.75rem;flex-wrap:wrap;justify-content:flex-end;">
+                <button type="button" onclick="viewAnalysisFromModal()" class="btn btn-outline" style="padding:.6rem 1.1rem;font-size:.85rem;font-weight:600;display:flex;align-items:center;gap:.4rem;">
+                    <i class="fas fa-eye"></i> Preview Data First
+                </button>
+                <button type="submit" class="btn" style="padding:.6rem 1.3rem;font-size:.85rem;font-weight:700;background:linear-gradient(135deg,#10b981,#059669);color:#fff;border-radius:.5rem;border:none;cursor:pointer;display:flex;align-items:center;gap:.4rem;">
+                    <i class="fas fa-download"></i> Export Excel File
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+function openExportModal() {
+    document.getElementById('exportSurveyModal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+function closeExportModal() {
+    document.getElementById('exportSurveyModal').style.display = 'none';
+    document.body.style.overflow = '';
+}
+function viewAnalysisFromModal() {
+    const sel = document.getElementById('modal_survey_select').value;
+    if (!sel) {
+        alert('Please select a survey first to view its data.');
+        return;
+    }
+    window.location.href = 'report_surveys.php?survey=' + sel + '#survey-analysis-section';
+}
+document.getElementById('exportSurveyModal')?.addEventListener('click', function(e) {
+    if (e.target === this) closeExportModal();
+});
+
 const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 const gridColor = isDark ? 'rgba(255,255,255,0.08)' : '#f1f5f9';
 const tickColor = isDark ? '#94a3b8' : '#64748b';

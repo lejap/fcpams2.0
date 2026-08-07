@@ -390,7 +390,7 @@ $zip->close();
 
 // ── Send file to browser ──────────────────────────────────────────────────────
 $safeTitle = preg_replace('/[^A-Za-z0-9_\-]/', '_', $survey['title']);
-$filename  = 'Survey_Report_' . $safeTitle . '_' . date('Ymd_His') . '.xlsx';
+$filename  = 'Survey Report Analysis (' . date('M d, Y') . ').xlsx';
 
 header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 header('Content-Disposition: attachment; filename="' . $filename . '"');
