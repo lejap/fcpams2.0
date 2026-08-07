@@ -220,18 +220,10 @@ $generated = date('F d, Y \a\t h:i A');
         </div>
     </div>
     <div style="display:flex;gap:.75rem;align-items:center;flex-wrap:wrap;" class="no-print">
-        <?php if ($f_survey): ?>
-        <a href="export_survey_excel.php?survey=<?php echo $f_survey; ?><?php echo $f_branch ? '&branch='.urlencode($f_branch) : ''; ?><?php echo $f_from ? '&from='.urlencode($f_from) : ''; ?><?php echo $f_to ? '&to='.urlencode($f_to) : ''; ?>"
-           style="padding:.75rem 1.6rem;background:linear-gradient(135deg,#10b981,#059669);border:1px solid rgba(16,185,129,.5);color:#fff;border-radius:.75rem;font-weight:700;font-size:.88rem;cursor:pointer;display:flex;align-items:center;gap:.55rem;backdrop-filter:blur(6px);transition:all .2s;white-space:nowrap;text-decoration:none;box-shadow:0 4px 14px rgba(16,185,129,0.35);"
-           onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='none'">
-            <i class="fas fa-file-excel"></i> Export to Excel
-        </a>
-        <?php else: ?>
-        <button onclick="openExportModal()"
+        <button onclick="openExportModal('<?php echo $f_survey; ?>', '<?php echo htmlspecialchars($f_branch, ENT_QUOTES); ?>', '<?php echo htmlspecialchars($f_from, ENT_QUOTES); ?>', '<?php echo htmlspecialchars($f_to, ENT_QUOTES); ?>')"
                 style="padding:.75rem 1.6rem;background:linear-gradient(135deg,#10b981,#059669);border:1px solid rgba(16,185,129,.5);color:#fff;border-radius:.75rem;font-weight:700;font-size:.88rem;cursor:pointer;display:flex;align-items:center;gap:.55rem;backdrop-filter:blur(6px);transition:all .2s;white-space:nowrap;box-shadow:0 4px 14px rgba(16,185,129,0.35);">
             <i class="fas fa-file-excel"></i> Export to Excel
         </button>
-        <?php endif; ?>
         <button onclick="window.print()" style="padding:.75rem 1.6rem;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:.75rem;font-weight:700;font-size:.88rem;cursor:pointer;display:flex;align-items:center;gap:.55rem;backdrop-filter:blur(6px);transition:all .2s;white-space:nowrap;" onmouseover="this.style.background='rgba(255,255,255,.25)'" onmouseout="this.style.background='rgba(255,255,255,.15)'">
             <i class="fas fa-print"></i> Print / PDF
         </button>
@@ -381,9 +373,9 @@ $generated = date('F d, Y \a\t h:i A');
                 <a href="report_surveys.php?survey=<?php echo $s['id']; ?>" class="btn btn-outline" style="padding:.25rem .65rem;font-size:.75rem;margin-right:.3rem;" title="View Data & Statistical Analysis">
                     <i class="fas fa-chart-pie"></i> View Data
                 </a>
-                <a href="export_survey_excel.php?survey=<?php echo $s['id']; ?>" class="btn" style="padding:.25rem .65rem;font-size:.75rem;background:#10b981;color:#fff;border-radius:.4rem;text-decoration:none;font-weight:600;" title="Export Survey Report Analysis (Date).xlsx">
+                <button type="button" onclick="openExportModal(<?php echo $s['id']; ?>)" class="btn" style="padding:.25rem .65rem;font-size:.75rem;background:#10b981;color:#fff;border-radius:.4rem;font-weight:600;border:none;cursor:pointer;" title="Export Survey Report Analysis (Date).xlsx">
                     <i class="fas fa-file-excel"></i> Export Excel
-                </a>
+                </button>
             </td>
         </tr>
         <?php endwhile; ?>
@@ -406,10 +398,10 @@ $generated = date('F d, Y \a\t h:i A');
             <span style="font-size:.72rem;font-weight:600;color:var(--purple);background:rgba(139,92,246,.1);padding:.25rem .6rem;border-radius:1rem;">
                 Overall CSAT: <?php echo $csat_overall !== null ? $csat_overall.'%' : 'N/A'; ?>
             </span>
-            <a href="export_survey_excel.php?survey=<?php echo $f_survey; ?><?php echo $f_branch ? '&branch='.urlencode($f_branch) : ''; ?><?php echo $f_from ? '&from='.urlencode($f_from) : ''; ?><?php echo $f_to ? '&to='.urlencode($f_to) : ''; ?>"
-               class="btn" style="background:#10b981;color:#fff;padding:.35rem .9rem;font-size:.78rem;font-weight:700;border-radius:.5rem;text-decoration:none;display:inline-flex;align-items:center;gap:.4rem;">
+            <button type="button" onclick="openExportModal('<?php echo $f_survey; ?>', '<?php echo htmlspecialchars($f_branch, ENT_QUOTES); ?>', '<?php echo htmlspecialchars($f_from, ENT_QUOTES); ?>', '<?php echo htmlspecialchars($f_to, ENT_QUOTES); ?>')"
+               class="btn" style="background:#10b981;color:#fff;padding:.35rem .9rem;font-size:.78rem;font-weight:700;border-radius:.5rem;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:.4rem;">
                 <i class="fas fa-file-excel"></i> Export Analysis to Excel
-            </a>
+            </button>
         </div>
     </div>
     <div class="section-body">
@@ -628,7 +620,19 @@ $generated = date('F d, Y \a\t h:i A');
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-function openExportModal() {
+function openExportModal(surveyId, branch, dateFrom, dateTo) {
+    if (surveyId) {
+        document.getElementById('modal_survey_select').value = surveyId;
+    }
+    if (branch !== undefined && branch !== '') {
+        document.getElementById('modal_branch_select').value = branch;
+    }
+    if (dateFrom !== undefined && dateFrom !== '') {
+        document.getElementById('modal_from_date').value = dateFrom;
+    }
+    if (dateTo !== undefined && dateTo !== '') {
+        document.getElementById('modal_to_date').value = dateTo;
+    }
     document.getElementById('exportSurveyModal').style.display = 'flex';
     document.body.style.overflow = 'hidden';
 }
