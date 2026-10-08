@@ -106,7 +106,7 @@ include '../includes/staff_sidebar.php';
         <div>
             <div class="glass-card" style="margin-bottom:1rem;">
                 <h4 style="margin-bottom:1rem;color:#ef4444;">Member Info</h4>
-                <?php foreach(['Name'=>$detail['user_name'],'Phone'=>$detail['user_phone'],'Email'=>$detail['user_email'],'Branch'=>$detail['user_branch']] as $l=>$v): ?>
+                <?php foreach(['Name'=>$detail['user_name'],'Phone'=>$detail['user_phone'],'Email'=>$detail['user_email'],'Branch Concern'=>$detail['user_branch']] as $l=>$v): ?>
                 <div style="margin-bottom:.75rem;">
                     <div style="font-size:.72rem;color:#94a3b8;font-weight:700;text-transform:uppercase;"><?php echo $l; ?></div>
                     <div style="color:#1e293b;font-weight:500;"><?php echo htmlspecialchars($v??'-'); ?></div>
@@ -120,8 +120,8 @@ include '../includes/staff_sidebar.php';
                     'Transaction' => $detail['transaction_type'],
                     'Status'      => $detail['status'],
                     'Complexity'  => $detail['complexity'] ?? 'Unassessed',
-                    'Filed'       => date('M d, Y H:i', strtotime($detail['created_at'])),
-                    'Resolved'    => $detail['resolved_at'] ? date('M d, Y H:i', strtotime($detail['resolved_at'])) : '-',
+                    'Filed'       => date('M d, Y h:i A', strtotime($detail['created_at'])),
+                    'Resolved'    => $detail['resolved_at'] ? date('M d, Y h:i A', strtotime($detail['resolved_at'])) : '-',
                     'Resolved By' => $detail['resolved_by_name'] ?? '-',
                 ] as $l=>$v): ?>
                 <div style="margin-bottom:.75rem;">
@@ -281,7 +281,7 @@ include '../includes/staff_sidebar.php';
         <div style="overflow-x:auto;">
         <table class="admin-table">
             <thead>
-                <tr><th>ID</th><th>Member</th><th>Branch</th><th>Complaint Type</th><th>Complexity</th><th>Date Filed</th><th>Date Resolved</th><th>Resolved By</th><th>Status</th><th>Action</th></tr>
+                <tr><th>ID</th><th>Member</th><th>Branch Concern</th><th>Complaint Type</th><th>Complexity</th><th>Date Filed</th><th>Date Resolved</th><th>Resolved By</th><th>Status</th><th>Action</th></tr>
             </thead>
             <tbody>
                 <?php if ($complaints->num_rows > 0): ?>
@@ -294,8 +294,8 @@ include '../includes/staff_sidebar.php';
                     <td>
                         <?php $cx=$c['complexity']; echo '<span style="background:'.($cx==='COMPLEX'?'#fee2e2':($cx==='SIMPLE'?'#dcfce7':'#f1f5f9')).';color:'.($cx==='COMPLEX'?'#dc2626':($cx==='SIMPLE'?'#16a34a':'#64748b')).';padding:.2rem .5rem;border-radius:.25rem;font-size:.75rem;font-weight:bold;">'.($cx??'Unassessed').'</span>'; ?>
                     </td>
-                    <td><?php echo date('M d, Y', strtotime($c['created_at'])); ?></td>
-                    <td><?php echo $c['resolved_at'] ? date('M d, Y', strtotime($c['resolved_at'])) : '-'; ?></td>
+                    <td><?php echo date('M d, Y', strtotime($c['created_at'])); ?><br><span style="font-size:0.75rem;color:#64748b;"><?php echo date('h:i A', strtotime($c['created_at'])); ?></span></td>
+                    <td><?php echo $c['resolved_at'] ? date('M d, Y', strtotime($c['resolved_at'])) . '<br><span style="font-size:0.75rem;color:#64748b;">' . date('h:i A', strtotime($c['resolved_at'])) . '</span>' : '-'; ?></td>
                     <td><?php echo $c['resolved_by_name'] ? '<span style="background:#dbeafe;color:#1e40af;padding:.15rem .5rem;border-radius:.25rem;font-size:.75rem;font-weight:600;">'.htmlspecialchars($c['resolved_by_name']).'</span>' : '-'; ?></td>
                     <td><span class="badge" style="background:<?php echo $c['status']==='OPEN'?'#eab308':($c['status']==='CLOSED'?'#8b5cf6':'#10b981'); ?>;"><?php echo $c['status']; ?></span></td>
                     <td>

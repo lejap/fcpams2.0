@@ -221,7 +221,7 @@ include '../includes/admin_sidebar.php';
                 <tr>
                     <th>CRN</th>
                     <th>Member</th>
-                    <th>Branch</th>
+                    <th>Branch Concern</th>
                     <th>Complaint Type</th>
                     <th>Complexity</th>
                     <th>Date Filed</th>
@@ -245,7 +245,7 @@ include '../includes/admin_sidebar.php';
                         $cxcol = $cx==='COMPLEX'?'#dc2626':($cx==='SIMPLE'?'#16a34a':'#64748b'); ?>
                         <span style="background:<?php echo $cxbg; ?>;color:<?php echo $cxcol; ?>;padding:.2rem .5rem;border-radius:.25rem;font-size:.75rem;font-weight:bold;"><?php echo $cx ?? 'Unassessed'; ?></span>
                     </td>
-                    <td style="font-size:0.8rem;"><?php echo date('M d, Y', strtotime($c['created_at'])); ?></td>
+                    <td><?php echo date('M d, Y', strtotime($c['created_at'])); ?><br><span style="font-size:0.72rem;color:#64748b;"><?php echo date('h:i A', strtotime($c['created_at'])); ?></span></td>
                     <td style="display:flex;gap:0.3rem;">
                         <a href="complaints.php?view=<?php echo $c['id']; ?>" class="btn btn-outline" style="padding:.2rem .6rem;font-size:.8rem;border-radius:2rem;color:#b91c1c;border-color:#b91c1c;">Review</a>
                         <form method="POST" style="margin:0;" onsubmit="return confirm('Mark this complaint as SPAM?');">

@@ -82,9 +82,9 @@ include 'includes/header.php';
             </div>
             
             <div class="form-group mb-8">
-                <label class="form-label">Branch *</label>
+                <label class="form-label">Branch Concern *</label>
                 <select name="branch" class="form-select" required>
-                    <option value="">Select a branch</option>
+                    <option value="">Select a branch concern</option>
                     <?php if (!empty($branches_regular)): ?>
                         <optgroup label="── Branches ──">
                             <?php foreach ($branches_regular as $branch): ?>
@@ -101,7 +101,7 @@ include 'includes/header.php';
                     <?php endif; ?>
                 </select>
                 <?php if (empty($branches_regular) && empty($branches_ho)): ?>
-                    <p style="font-size: 0.8rem; color: #64748b; mt-6">No branches available. Admin must add branches.</p>
+                    <p style="font-size: 0.8rem; color: #64748b; mt-6">No branch concerns available. Admin must add branches.</p>
                 <?php endif; ?>
             </div>
 

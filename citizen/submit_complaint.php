@@ -74,8 +74,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!$error) {
         $stmt = $conn->prepare("
             INSERT INTO complaints 
-            (user_name, user_phone, user_email, user_branch, complaint_details, transaction_type, description, raised_previously, previous_details, desired_resolution, has_documents, document_path)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            (user_name, user_phone, user_email, user_branch, complaint_details, transaction_type, description, raised_previously, previous_details, desired_resolution, has_documents, document_path, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
         ");
         $stmt->bind_param(
             "sssssssissis",
@@ -234,7 +234,7 @@ function acceptConfidentiality() {
                     <div>
                         <div
                             style="font-size:0.75rem;color:#64748b;text-transform:uppercase;font-weight:700;margin-bottom:0.2rem;">
-                            Branch</div>
+                            Branch Concern</div>
                         <div style="color:#1e293b;"><?php echo htmlspecialchars($_SESSION['branch']); ?></div>
                     </div>
                     <div>

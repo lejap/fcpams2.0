@@ -280,7 +280,7 @@ include '../includes/admin_sidebar.php';
                 <tr>
                     <th>ID</th>
                     <th>Member</th>
-                    <th>Branch</th>
+                    <th>Branch Concern</th>
                     <th>Complaint Type</th>
                     <th>Complexity</th>
                     <th>Status</th>
@@ -311,7 +311,7 @@ include '../includes/admin_sidebar.php';
                             <span class="status-resolved">RESOLVED</span>
                         <?php endif; ?>
                     </td>
-                    <td style="font-size:0.8rem;"><?php echo $c['resolved_at'] ? date('M d, Y', strtotime($c['resolved_at'])) : '-'; ?></td>
+                    <td style="font-size:0.8rem;"><?php echo $c['resolved_at'] ? date('M d, Y', strtotime($c['resolved_at'])) . '<br><span style="font-size:0.72rem;color:#64748b;">' . date('h:i A', strtotime($c['resolved_at'])) . '</span>' : '-'; ?></td>
                     <td><?php echo $c['resolved_by_name'] ? '<span style="background:#dbeafe;color:#1e40af;padding:.15rem .5rem;border-radius:.25rem;font-size:.75rem;font-weight:600;">'.htmlspecialchars($c['resolved_by_name']).'</span>' : '-'; ?></td>
                     <td><?php echo $c['confirmed_by_name'] ? '<span style="background:#ede9fe;color:#5b21b6;padding:.15rem .5rem;border-radius:.25rem;font-size:.75rem;font-weight:600;">'.htmlspecialchars($c['confirmed_by_name']).'</span>' : '-'; ?></td>
                     <td style="display:flex;gap:0.3rem;flex-wrap:wrap;">

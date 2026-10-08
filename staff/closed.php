@@ -256,7 +256,7 @@ include '../includes/staff_sidebar.php';
                 <tr>
                     <th>CRN</th>
                     <th>Member</th>
-                    <th>Branch</th>
+                    <th>Branch Concern</th>
                     <th>Complaint Type</th>
                     <th>Complexity</th>
                     <th>Status</th>
@@ -289,7 +289,7 @@ include '../includes/staff_sidebar.php';
                             <span class="status-resolved">RESOLVED</span>
                         <?php endif; ?>
                     </td>
-                    <td style="font-size:0.8rem;"><?php echo $c['resolved_at'] ? date('M d, Y', strtotime($c['resolved_at'])) : '-'; ?></td>
+                    <td style="font-size:0.8rem;"><?php echo $c['resolved_at'] ? date('M d, Y', strtotime($c['resolved_at'])) . '<br><span style="font-size:0.72rem;color:#64748b;">' . date('h:i A', strtotime($c['resolved_at'])) . '</span>' : '-'; ?></td>
                     <td style="text-align:center;">
                         <?php
                         if ($c['resolved_at'] && $c['created_at']) {

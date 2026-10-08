@@ -112,7 +112,7 @@ include '../includes/admin_sidebar.php';
                         <td style="font-weight:bold;color:#64748b;">#<?php echo $c['id']; ?></td>
                         <td style="font-weight:600;"><?php echo htmlspecialchars($c['user_name']); ?></td>
                         <td><span style="background:#fee2e2;color:#dc2626;padding:0.2rem 0.5rem;border-radius:0.25rem;font-size:0.75rem;font-weight:bold;"><?php echo htmlspecialchars(mb_substr($c['complaint_details']??'',0,30)).(strlen($c['complaint_details']??'')>30?'...':''); ?></span></td>
-                        <td style="font-size:0.8rem;"><?php echo date('M d, Y', strtotime($c['created_at'])); ?></td>
+                        <td style="font-size:0.8rem;"><?php echo date('M d, Y', strtotime($c['created_at'])); ?><br><span style="font-size:0.72rem;color:#64748b;"><?php echo date('h:i A', strtotime($c['created_at'])); ?></span></td>
                         <td style="display: flex; gap: 0.3rem;">
                             <a href="complaints.php?view=<?php echo $c['id']; ?>" class="btn btn-outline" style="padding:0.2rem 0.6rem;font-size:0.8rem;border-radius:2rem;">View</a>
                             <form method="POST" onsubmit="return confirm('Restore this complaint back to OPEN?');" style="margin:0;">

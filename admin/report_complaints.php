@@ -103,7 +103,7 @@ include '../includes/admin_sidebar.php';
         Filters:
         <?php if($f_status) echo "Status: <strong>$f_status</strong> &nbsp;"; ?>
         <?php if($f_complexity) echo "Complexity: <strong>$f_complexity</strong> &nbsp;"; ?>
-        <?php if($f_branch) echo "Branch: <strong>$f_branch</strong> &nbsp;"; ?>
+        <?php if($f_branch) echo "Branch Concern: <strong>$f_branch</strong> &nbsp;"; ?>
         <?php if($f_from) echo "From: <strong>$f_from</strong> &nbsp;"; ?>
         <?php if($f_to) echo "To: <strong>$f_to</strong>"; ?>
     </p>
@@ -159,9 +159,9 @@ include '../includes/admin_sidebar.php';
         </select>
     </div>
     <div class="filter-grp">
-        <label>Branch</label>
+        <label>Branch Concern</label>
         <select name="branch">
-            <option value="">All Branches</option>
+            <option value="">All Branch Concerns</option>
             <?php $branches->data_seek(0); while($b=$branches->fetch_assoc()): ?>
             <option value="<?php echo htmlspecialchars($b['name']);?>" <?php echo $f_branch===$b['name']?'selected':'';?>><?php echo htmlspecialchars($b['name']);?></option>
             <?php endwhile; ?>
@@ -193,7 +193,7 @@ include '../includes/admin_sidebar.php';
     <table class="rtbl">
         <thead>
             <tr>
-                <th>CRN</th><th>Member</th><th>Phone</th><th>Branch</th><th>Complaint Type</th>
+                <th>CRN</th><th>Member</th><th>Phone</th><th>Branch Concern</th><th>Complaint Type</th>
                 <th>Transaction</th><th>Complexity</th><th>Status</th>
                 <th>Date Filed</th><th>Date Resolved</th><th>Aging (Days)</th><th>Resolved By</th><th>Confirmed By</th><th>Resolution Remark (Staff)</th><th>Resolution of Complaint (Admin)</th>
             </tr>
@@ -216,8 +216,8 @@ include '../includes/admin_sidebar.php';
             <td style="font-size:.8rem;max-width:120px;"><?php echo htmlspecialchars($c['transaction_type']??'-');?></td>
             <td><span class="badge" style="background:<?php echo $xcol;?>22;color:<?php echo $xcol;?>;"><?php echo $c['complexity']??'Unassessed';?></span></td>
             <td><span class="badge" style="background:<?php echo $scol;?>22;color:<?php echo $scol;?>;"><?php echo $c['status'];?></span></td>
-            <td style="white-space:nowrap;font-size:.8rem;"><?php echo date('M d, Y',strtotime($c['created_at']));?></td>
-            <td style="white-space:nowrap;font-size:.8rem;"><?php echo $c['resolved_at']?date('M d, Y',strtotime($c['resolved_at'])):'-';?></td>
+            <td style="white-space:nowrap;font-size:.8rem;"><?php echo date('M d, Y',strtotime($c['created_at']));?><br><span style="font-size:0.72rem;color:#64748b;"><?php echo date('h:i A',strtotime($c['created_at']));?></span></td>
+            <td style="white-space:nowrap;font-size:.8rem;"><?php echo $c['resolved_at']?(date('M d, Y',strtotime($c['resolved_at'])).'<br><span style="font-size:0.72rem;color:#64748b;">'.date('h:i A',strtotime($c['resolved_at'])).'</span>'):'-';?></td>
             <td style="text-align:center;">
                 <?php
                 if ($c['resolved_at'] && $c['created_at']) {

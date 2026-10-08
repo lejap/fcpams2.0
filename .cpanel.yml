@@ -13,3 +13,7 @@ deployment:
     - /bin/cp logout.php $DEPLOYPATH
     - /bin/cp register.php $DEPLOYPATH
     - /bin/cp migrate_is_ho.php $DEPLOYPATH
+    - /bin/cp trigger_alarm.php $DEPLOYPATH
+    - /bin/cp update_location.php $DEPLOYPATH
+    - /bin/cp get_active_devices.php $DEPLOYPATH
+    - /bin/cp live_map.php $DEPLOYPATH
