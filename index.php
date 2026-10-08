@@ -84,7 +84,7 @@ include 'includes/header.php';
             <div class="form-group mb-8">
                 <label class="form-label">Branch Concern *</label>
                 <select name="branch" class="form-select" required>
-                    <option value="">Select a branch concern</option>
+                    <option value="">Select the correct branch for your concern</option>
                     <?php if (!empty($branches_regular)): ?>
                         <optgroup label="── Branches ──">
                             <?php foreach ($branches_regular as $branch): ?>
