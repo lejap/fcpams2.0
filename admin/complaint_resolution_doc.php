@@ -17,10 +17,22 @@ if (!$c) {
     exit();
 }
 
-$day        = $c['confirmed_at'] ? date('j',    strtotime($c['confirmed_at'])) : '___';
-$month      = $c['confirmed_at'] ? date('F',    strtotime($c['confirmed_at'])) : '___________';
-$year       = $c['confirmed_at'] ? date('y',    strtotime($c['confirmed_at'])) : '__';
-$filed_date = date('F j, Y', strtotime($c['created_at']));
+// Convert stored timestamps to Asia/Manila (handles both UTC-stored old records and +08:00 new records)
+$ph_tz = new DateTimeZone('Asia/Manila');
+if ($c['confirmed_at']) {
+    $confirmed_dt = new DateTime($c['confirmed_at'], new DateTimeZone('UTC'));
+    $confirmed_dt->setTimezone($ph_tz);
+    $day   = $confirmed_dt->format('j');
+    $month = $confirmed_dt->format('F');
+    $year  = $confirmed_dt->format('y');
+} else {
+    $day   = '___';
+    $month = '___________';
+    $year  = '__';
+}
+$filed_dt   = new DateTime($c['created_at'], new DateTimeZone('UTC'));
+$filed_dt->setTimezone($ph_tz);
+$filed_date = $filed_dt->format('F j, Y');
 ?>
 <!DOCTYPE html>
 <html lang="en">
