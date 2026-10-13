@@ -26,8 +26,8 @@ if ($conn->connect_error) {
 }
 
 // Set Timezone
-date_default_timezone_set('Asia/Manila'); // Adjust as per USER'S region
+date_default_timezone_set('Asia/Manila'); // Philippine Standard Time (UTC+8)
 
-// Sync database timezone with PHP timezone
-$conn->query("SET time_zone = '" . date('P') . "';");
+// Force MySQL session timezone to Asia/Manila (UTC+8)
+$conn->query("SET time_zone = '+08:00'");
 ?>
