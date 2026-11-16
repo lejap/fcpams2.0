@@ -110,7 +110,7 @@ $pending_users     = $is_admin ? $conn->query("SELECT COUNT(*) as c FROM users W
     </a>
 
     <?php
-    $report_pages = ['report_submissions.php','report_complaints.php','report_surveys.php'];
+    $report_pages = ['report_submissions.php','report_complaints.php','report_surveys.php','report_visitor.php'];
     $on_report = in_array($current_page, $report_pages);
     ?>
     <!-- Reports submenu -->
@@ -123,7 +123,7 @@ $pending_users     = $is_admin ? $conn->query("SELECT COUNT(*) as c FROM users W
             <span style="flex:1;">Reports</span>
             <i class="fas fa-chevron-down" id="reports-chevron" style="font-size:0.7rem;transition:transform 0.25s;<?php echo $on_report?'transform:rotate(180deg)':'';?>"></i>
         </button>
-        <div id="reports-submenu" style="overflow:hidden;max-height:<?php echo $on_report?'300px':'0';?>;transition:max-height 0.35s ease;padding-left:0.75rem;">
+        <div id="reports-submenu" style="overflow:hidden;max-height:<?php echo $on_report?'400px':'0';?>;transition:max-height 0.35s ease;padding-left:0.75rem;">
             <a href="<?php echo BASE_URL; ?>admin/report_submissions.php"
                class="admin-nav-link <?php echo $current_page==='report_submissions.php'?'active':''; ?>"
                style="font-size:0.82rem;padding:0.45rem 1rem;">
@@ -141,6 +141,12 @@ $pending_users     = $is_admin ? $conn->query("SELECT COUNT(*) as c FROM users W
                 <span style="color:rgba(192,160,255,0.95);">Surveys</span>
                 <span style="margin-left:auto;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;font-size:0.6rem;font-weight:800;padding:0.1rem 0.45rem;border-radius:1rem;letter-spacing:0.04em;text-transform:uppercase;">New</span>
             </a>
+            <a href="<?php echo BASE_URL; ?>admin/report_visitor.php"
+               class="admin-nav-link <?php echo $current_page==='report_visitor.php'?'active':''; ?>"
+               style="font-size:0.82rem;padding:0.45rem 1rem;display:flex;align-items:center;gap:0.5rem;">
+                <i class="fas fa-eye" style="color:rgba(56,189,248,0.95);"></i>
+                <span style="color:rgba(56,189,248,0.95);">Visitor Analytics</span>
+            </a>
         </div>
     </div>
     <?php endif; ?>
@@ -151,7 +157,7 @@ function toggleReportsMenu(){
     var c=document.getElementById('reports-chevron');
     var b=document.getElementById('reports-toggle');
     window._rptOpen=!window._rptOpen;
-    m.style.maxHeight=window._rptOpen?'200px':'0';
+    m.style.maxHeight=window._rptOpen?'400px':'0';
     c.style.transform=window._rptOpen?'rotate(180deg)':'rotate(0deg)';
     b.style.background=window._rptOpen?'rgba(255,255,255,0.12)':'transparent';
     b.style.color=window._rptOpen?'#fff':'rgba(255,255,255,0.75)';

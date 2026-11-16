@@ -1,6 +1,7 @@
 <?php
 require_once 'config/db.php';
 require_once 'includes/functions.php';
+require_once 'includes/track_visitor.php'; // Visitor tracking
 
 // Handle guest login submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['citizen_login'])) {

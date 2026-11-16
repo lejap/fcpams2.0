@@ -1,6 +1,7 @@
 <?php
 require_once 'config/db.php';
 require_once 'includes/functions.php';
+require_once 'includes/track_visitor.php'; // Visitor tracking
 
 if (isset($_SESSION['user_id']) && $_SESSION['role'] !== 'CITIZEN') {
     if ($_SESSION['role'] === 'ADMIN') header("Location: admin/dashboard.php");
