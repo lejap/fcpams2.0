@@ -19,16 +19,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($action === 'approve' && $uid) {
         $conn->query("UPDATE users SET is_approved=TRUE WHERE id=$uid");
-        header("Location: users.php?msg=approved"); exit();
+        header("Location: users?msg=approved"); exit();
     } elseif ($action === 'delete' && $uid && $uid !== $_SESSION['user_id']) {
         $conn->query("DELETE FROM users WHERE id=$uid");
-        header("Location: users.php?msg=deleted"); exit();
+        header("Location: users?msg=deleted"); exit();
     } elseif ($action === 'role' && $uid) {
         $new_role = sanitize($_POST['role']);
         if (in_array($new_role, ['ADMIN','STAFF']) && $uid !== $_SESSION['user_id']) {
             $conn->query("UPDATE users SET role='$new_role' WHERE id=$uid");
         }
-        header("Location: users.php?msg=role"); exit();
+        header("Location: users?msg=role"); exit();
     } elseif ($action === 'branch' && $uid) {
         $new_branch = $_POST['branch_id'];
         if ($new_branch === '' || $new_branch === null) {
@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->bind_param("ii", $new_branch, $uid);
             $stmt->execute();
         }
-        header("Location: users.php?msg=branch"); exit();
+        header("Location: users?msg=branch"); exit();
     }
 }
 

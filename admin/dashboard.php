@@ -8,13 +8,13 @@ auth_guard('ADMIN');
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_spam'])) {
     $tid = (int)$_POST['mark_spam'];
     $conn->query("UPDATE tickets SET status='SPAM' WHERE id=$tid");
-    header("Location: dashboard.php");
+    header("Location: dashboard");
     exit();
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_spam_complaint'])) {
     $cid = (int)$_POST['mark_spam_complaint'];
     $conn->query("UPDATE complaints SET status='SPAM' WHERE id=$cid");
-    header("Location: dashboard.php");
+    header("Location: dashboard");
     exit();
 }
 

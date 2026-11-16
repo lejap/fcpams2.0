@@ -5,7 +5,7 @@ require_once '../includes/functions.php';
 auth_guard('STAFF');
 
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
-if (!$id) { header("Location: complaints.php"); exit(); }
+if (!$id) { header("Location: complaints"); exit(); }
 
 $stmt = $conn->prepare("SELECT * FROM complaints WHERE id = ? AND status = 'CLOSED'");
 $stmt->bind_param("i", $id);

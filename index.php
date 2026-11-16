@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['citizen_login'])) {
     $_SESSION['branch'] = sanitize($_POST['branch']);
     $_SESSION['role'] = 'CITIZEN';
     
-    header("Location: citizen/dashboard.php");
+    header("Location: citizen/dashboard");
     exit();
 }
 

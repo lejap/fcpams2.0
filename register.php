@@ -40,9 +40,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->close();
             if ($is_first) {
                 // First user = Admin, auto-approved, send directly to login
-                header("Location: " . BASE_URL . "login.php?registered=admin");
+                header("Location: " . BASE_URL . "login?registered=admin");
             } else {
-                header("Location: " . BASE_URL . "login.php?registered=pending");
+                header("Location: " . BASE_URL . "login?registered=pending");
             }
             exit();
         } else {

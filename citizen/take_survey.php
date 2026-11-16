@@ -5,10 +5,10 @@ require_once '../includes/functions.php';
 auth_guard('CITIZEN');
 
 $survey_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
-if (!$survey_id) { header("Location: surveys.php"); exit(); }
+if (!$survey_id) { header("Location: surveys"); exit(); }
 
 $survey = $conn->query("SELECT * FROM surveys WHERE id=$survey_id AND is_active=1")->fetch_assoc();
-if (!$survey) { header("Location: surveys.php"); exit(); }
+if (!$survey) { header("Location: surveys"); exit(); }
 
 $questions = $conn->query("SELECT * FROM questions WHERE survey_id=$survey_id ORDER BY id ASC");
 $questions_arr = [];
@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $astmt->execute();
         }
 
-        header("Location: dashboard.php?survey_success=1");
+        header("Location: dashboard?survey_success=1");
         exit();
     } else {
         $error = "Failed to submit your response. Please try again.";

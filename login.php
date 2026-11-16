@@ -4,8 +4,8 @@ require_once 'includes/functions.php';
 require_once 'includes/track_visitor.php'; // Visitor tracking
 
 if (isset($_SESSION['user_id']) && $_SESSION['role'] !== 'CITIZEN') {
-    if ($_SESSION['role'] === 'ADMIN') header("Location: admin/dashboard.php");
-    elseif ($_SESSION['role'] === 'STAFF') header("Location: staff/dashboard.php");
+    if ($_SESSION['role'] === 'ADMIN') header("Location: admin/dashboard");
+    elseif ($_SESSION['role'] === 'STAFF') header("Location: staff/dashboard");
     exit();
 }
 
@@ -38,9 +38,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['branch_name'] = $user['branch_name'];
                 $_SESSION['is_ho']      = (int)$user['is_ho_branch'];
 
-                if ($user['role'] === 'ADMIN') header("Location: admin/dashboard.php");
-                elseif ($user['role'] === 'STAFF') header("Location: staff/dashboard.php");
-                else header("Location: citizen/dashboard.php");
+                if ($user['role'] === 'ADMIN') header("Location: admin/dashboard");
+                elseif ($user['role'] === 'STAFF') header("Location: staff/dashboard");
+                else header("Location: citizen/dashboard");
                 exit();
             }
         } else {

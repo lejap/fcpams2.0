@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['restore'])) {
     } elseif ($type === 'complaint') {
         $conn->query("UPDATE complaints SET status='OPEN' WHERE id=$id");
     }
-    header("Location: spam.php");
+    header("Location: spam");
     exit();
 }
 

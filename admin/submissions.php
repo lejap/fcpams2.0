@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['resolve'])) {
     $stmt = $conn->prepare("UPDATE tickets SET status='RESOLVED', admin_remark=?, resolved_at=NOW(), resolved_by_name=? WHERE id=?");
     $stmt->bind_param("ssi", $remark, $name, $tid);
     $stmt->execute();
-    header("Location: submissions.php");
+    header("Location: submissions");
     exit();
 }
 
@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_spam'])) {
     $stmt = $conn->prepare("UPDATE tickets SET status='SPAM' WHERE id=?");
     $stmt->bind_param("i", $tid);
     $stmt->execute();
-    header("Location: submissions.php");
+    header("Location: submissions");
     exit();
 }
 
@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm'])) {
     $stmt = $conn->prepare("UPDATE tickets SET status='CLOSED', confirmed_at=NOW(), confirmed_by_name=?, confirm_remark=? WHERE id=?");
     $stmt->bind_param("ssi", $name, $confirm_remark, $tid);
     $stmt->execute();
-    header("Location: submissions.php");
+    header("Location: submissions");
     exit();
 }
 

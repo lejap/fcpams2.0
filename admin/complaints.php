@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['resolve'])) {
     $stmt   = $conn->prepare("UPDATE complaints SET status='RESOLVED', admin_remark=?, resolved_at=NOW(), resolved_by_name=? WHERE id=?");
     $stmt->bind_param("ssi", $remark, $name, $cid);
     $stmt->execute();
-    header("Location: complaints.php?view=$cid");
+    header("Location: complaints?view=$cid");
     exit();
 }
 
@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm'])) {
     $stmt = $conn->prepare("UPDATE complaints SET status='CLOSED', confirmed_at=NOW(), confirmed_by_name=?, confirm_remark=? WHERE id=?");
     $stmt->bind_param("ssi", $name, $confirm_remark, $cid);
     $stmt->execute();
-    header("Location: complaints.php");
+    header("Location: complaints");
     exit();
 }
 
@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['mark_spam_complaint']
     $stmt = $conn->prepare("UPDATE complaints SET status='SPAM' WHERE id=?");
     $stmt->bind_param("i", $cid);
     $stmt->execute();
-    header("Location: complaints.php");
+    header("Location: complaints");
     exit();
 }
 
@@ -61,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_signed'])) {
             }
         }
     }
-    header("Location: complaints.php?view=$cid");
+    header("Location: complaints?view=$cid");
     exit();
 }
 
@@ -73,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['complexity'])) {
     $stmt = $conn->prepare("UPDATE complaints SET complexity=? WHERE id=?");
     $stmt->bind_param("si", $val, $cid);
     $stmt->execute();
-    header("Location: complaints.php" . ($view_id ? "?view=$view_id" : ""));
+    header("Location: complaints" . ($view_id ? "?view=$view_id" : ""));
     exit();
 }
 

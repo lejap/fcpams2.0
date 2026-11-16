@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_signed'])) {
             }
         }
     }
-    header("Location: closed.php?tab=complaints");
+    header("Location: closed?tab=complaints");
     exit();
 }
 

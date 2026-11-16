@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_ticket'])) {
     $stmt = $conn->prepare("UPDATE tickets SET status='CLOSED', confirmed_at=NOW(), confirmed_by_name=? WHERE id=? AND status='RESOLVED'");
     $stmt->bind_param("si", $name, $tid);
     $stmt->execute();
-    header("Location: closed.php?tab=submissions");
+    header("Location: closed?tab=submissions");
     exit();
 }
 
@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_complaint']))
     $stmt = $conn->prepare("UPDATE complaints SET status='CLOSED', confirmed_at=NOW(), confirmed_by_name=? WHERE id=? AND status='RESOLVED'");
     $stmt->bind_param("si", $name, $cid);
     $stmt->execute();
-    header("Location: closed.php?tab=complaints");
+    header("Location: closed?tab=complaints");
     exit();
 }
 
@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_signed'])) {
             }
         }
     }
-    header("Location: closed.php?tab=complaints");
+    header("Location: closed?tab=complaints");
     exit();
 }
 

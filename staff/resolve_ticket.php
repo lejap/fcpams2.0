@@ -5,7 +5,7 @@ require_once '../includes/functions.php';
 auth_guard('STAFF');
 
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
-if (!$id) { header("Location: dashboard.php"); exit(); }
+if (!$id) { header("Location: dashboard"); exit(); }
 
 // Fetch ticket — no JOIN needed, tickets are self-contained
 $stmt = $conn->prepare("SELECT * FROM tickets WHERE id = ?");
@@ -14,7 +14,7 @@ $stmt->execute();
 $ticket = $stmt->get_result()->fetch_assoc();
 
 if (!$ticket) {
-    header("Location: dashboard.php");
+    header("Location: dashboard");
     exit();
 }
 
@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ticket['status'] === 'OPEN') {
     $stmt->bind_param("ssi", $note, $staff_name, $id);
     
     if ($stmt->execute()) {
-        header("Location: submissions.php?view=$id&resolved=1");
+        header("Location: submissions?view=$id&resolved=1");
         exit();
     } else {
         $error = "Failed to save resolution. Please try again.";

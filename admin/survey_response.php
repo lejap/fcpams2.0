@@ -5,11 +5,11 @@ require_once '../includes/functions.php';
 auth_guard('ADMIN');
 
 $res_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
-if (!$res_id) { header("Location: surveys.php"); exit(); }
+if (!$res_id) { header("Location: surveys"); exit(); }
 
 // Fetch response with answers
 $response = $conn->query("SELECT * FROM survey_responses WHERE id=$res_id")->fetch_assoc();
-if (!$response) { header("Location: surveys.php"); exit(); }
+if (!$response) { header("Location: surveys"); exit(); }
 
 $survey   = $conn->query("SELECT * FROM surveys WHERE id={$response['survey_id']}")->fetch_assoc();
 $answers  = $conn->query("

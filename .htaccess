@@ -1,0 +1,45 @@
+Options -Indexes
+Options +FollowSymLinks
+
+RewriteEngine On
+
+# ─────────────────────────────────────────────────────────────────────────────
+# PHP Extension Removal — Clean URLs for FCPAMS
+# Live site: https://fcpams.bansalancoop.com
+# ─────────────────────────────────────────────────────────────────────────────
+
+# 1. If someone visits /page.php, redirect them to /page (301 permanent)
+#    This keeps URLs canonical so search engines and bookmarks update cleanly.
+#    Skip real files that are intentionally accessed with .php (e.g. AJAX endpoints).
+RewriteCond %{THE_REQUEST} \s/+(.+?)\.php[\s?] [NC]
+RewriteRule ^ /%1 [R=301,L,NE]
+
+# 2. If the request has no extension and the matching .php file exists, serve it.
+#    This makes /login actually serve login.php transparently.
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME}.php -f
+RewriteRule ^(.+?)/?$ $1.php [L,QSA]
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Security headers
+# ─────────────────────────────────────────────────────────────────────────────
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Block direct access to sensitive files
+# ─────────────────────────────────────────────────────────────────────────────
+<FilesMatch "\.(sql|log|yml|env|gitignore|md)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Block access to config directory
+<IfModule mod_rewrite.c>
+    RewriteRule ^config/ - [F,L]
+</IfModule>

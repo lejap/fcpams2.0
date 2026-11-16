@@ -5,7 +5,7 @@ require_once '../includes/functions.php';
 auth_guard('CITIZEN');
 
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
-if (!$id) { header("Location: dashboard.php"); exit(); }
+if (!$id) { header("Location: dashboard"); exit(); }
 
 // Fetch ticket belonging to this citizen (match by name+phone)
 $stmt = $conn->prepare("SELECT * FROM tickets WHERE id=? AND user_name=? AND user_phone=?");
@@ -14,7 +14,7 @@ $stmt->execute();
 $ticket = $stmt->get_result()->fetch_assoc();
 
 if (!$ticket) {
-    header("Location: dashboard.php");
+    header("Location: dashboard");
     exit();
 }
 

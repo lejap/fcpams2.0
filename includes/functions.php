@@ -51,7 +51,7 @@ if (!function_exists('validate_csrf')) {
 if (!function_exists('auth_guard')) {
     function auth_guard($required_role = null) {
         if (!isset($_SESSION['user_id'])) {
-            header("Location: " . BASE_URL . "login.php");
+            header("Location: " . BASE_URL . "login");
             exit();
         }
 
@@ -60,9 +60,9 @@ if (!function_exists('auth_guard')) {
             // ADMIN can also access STAFF pages
             if ($required_role === 'STAFF' && ($role === 'STAFF' || $role === 'ADMIN')) return;
             if ($role !== $required_role) {
-                if ($role === 'ADMIN')    { header("Location: " . BASE_URL . "admin/dashboard.php"); }
-                elseif ($role === 'STAFF')  { header("Location: " . BASE_URL . "staff/dashboard.php"); }
-                else                       { header("Location: " . BASE_URL . "citizen/dashboard.php"); }
+                if ($role === 'ADMIN')    { header("Location: " . BASE_URL . "admin/dashboard"); }
+                elseif ($role === 'STAFF')  { header("Location: " . BASE_URL . "staff/dashboard"); }
+                else                       { header("Location: " . BASE_URL . "citizen/dashboard"); }
                 exit();
             }
         }

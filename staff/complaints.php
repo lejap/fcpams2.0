@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['resolve'])) {
     $stmt = $conn->prepare("UPDATE complaints SET status='RESOLVED', admin_remark=?, resolved_at=NOW(), resolved_by_name=? WHERE id=? AND status='OPEN'");
     $stmt->bind_param("ssi", $remark, $name, $cid);
     $stmt->execute();
-    header("Location: complaints.php?view=$cid&resolved=1");
+    header("Location: complaints?view=$cid&resolved=1");
     exit();
 }
 
@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_signed'])) {
             }
         }
     }
-    header("Location: complaints.php?view=$cid");
+    header("Location: complaints?view=$cid");
     exit();
 }
 
@@ -82,7 +82,7 @@ if ($view_id > 0) {
     // For detail view, also enforce branch access
     $detail_where = "WHERE id=$view_id AND status != 'SPAM' AND complexity IS NOT NULL" . $branch_condition;
     $detail = $conn->query("SELECT * FROM complaints $detail_where")->fetch_assoc();
-    if (!$detail) { header("Location: complaints.php"); exit(); }
+    if (!$detail) { header("Location: complaints"); exit(); }
 }
 
 $page_title = "Complaints";

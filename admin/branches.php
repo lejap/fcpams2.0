@@ -22,17 +22,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->bind_param("si", $name, $is_ho);
             $stmt->execute();
         }
-        header("Location: branches.php?msg=added");
+        header("Location: branches?msg=added");
         exit();
     } elseif ($action === 'toggle_ho') {
         $bid = (int)$_POST['id'];
         $conn->query("UPDATE branches SET is_ho = IF(is_ho, 0, 1) WHERE id=$bid");
-        header("Location: branches.php?msg=updated");
+        header("Location: branches?msg=updated");
         exit();
     } elseif ($action === 'delete') {
         $bid = (int)$_POST['id'];
         $conn->query("DELETE FROM branches WHERE id=$bid");
-        header("Location: branches.php?msg=deleted");
+        header("Location: branches?msg=deleted");
         exit();
     }
 }

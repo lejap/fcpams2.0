@@ -22,17 +22,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->bind_param("ss", $title, $description);
             $stmt->execute();
         }
-        header("Location: surveys.php?msg=created");
+        header("Location: surveys?msg=created");
         exit();
     } elseif ($action === 'toggle') {
         $sid = (int)$_POST['id'];
         $conn->query("UPDATE surveys SET is_active = NOT is_active WHERE id=$sid");
-        header("Location: surveys.php?msg=toggled");
+        header("Location: surveys?msg=toggled");
         exit();
     } elseif ($action === 'delete') {
         $sid = (int)$_POST['id'];
         $conn->query("DELETE FROM surveys WHERE id=$sid");
-        header("Location: surveys.php?msg=deleted");
+        header("Location: surveys?msg=deleted");
         exit();
     } elseif ($action === 'add_question') {
         $sid      = (int)$_POST['survey_id'];
@@ -53,19 +53,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $conn->prepare("INSERT INTO questions (survey_id, text, type, options) VALUES (?, ?, ?, ?)");
             $stmt->bind_param("isss", $sid, $text, $type, $options);
             if ($stmt->execute()) {
-                header("Location: surveys.php?view=$sid&msg=q_added");
+                header("Location: surveys?view=$sid&msg=q_added");
             } else {
-                header("Location: surveys.php?view=$sid&msg=q_error");
+                header("Location: surveys?view=$sid&msg=q_error");
             }
         } else {
-            header("Location: surveys.php?view=$sid&msg=q_error");
+            header("Location: surveys?view=$sid&msg=q_error");
         }
         exit();
     } elseif ($action === 'delete_question') {
         $qid = (int)$_POST['id'];
         $sid = (int)$_POST['survey_id'];
         $conn->query("DELETE FROM questions WHERE id=$qid");
-        header("Location: surveys.php?view=$sid&msg=q_deleted");
+        header("Location: surveys?view=$sid&msg=q_deleted");
         exit();
     } elseif ($action === 'edit_question') {
         $qid      = (int)$_POST['id'];
@@ -87,12 +87,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $conn->prepare("UPDATE questions SET text=?, type=?, options=? WHERE id=?");
             $stmt->bind_param("sssi", $text, $type, $options, $qid);
             if ($stmt->execute()) {
-                header("Location: surveys.php?view=$sid&msg=q_updated");
+                header("Location: surveys?view=$sid&msg=q_updated");
             } else {
-                header("Location: surveys.php?view=$sid&msg=q_error");
+                header("Location: surveys?view=$sid&msg=q_error");
             }
         } else {
-            header("Location: surveys.php?view=$sid&msg=q_error");
+            header("Location: surveys?view=$sid&msg=q_error");
         }
         exit();
     } elseif ($action === 'edit_survey') {
@@ -117,7 +117,7 @@ $view_id = isset($_GET['view']) ? (int)$_GET['view'] : 0;
 if ($view_id) {
     // ---- DETAIL VIEW ----
     $survey = $conn->query("SELECT * FROM surveys WHERE id=$view_id")->fetch_assoc();
-    if (!$survey) { header("Location: surveys.php"); exit(); }
+    if (!$survey) { header("Location: surveys"); exit(); }
 
     $questions = $conn->query("SELECT * FROM questions WHERE survey_id=$view_id ORDER BY id ASC");
     $responses = $conn->query("SELECT * FROM survey_responses WHERE survey_id=$view_id ORDER BY created_at DESC");

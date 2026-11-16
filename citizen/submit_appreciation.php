@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->bind_param("ssssss", $user_name, $user_phone, $user_email, $user_branch, $staff_name, $appreciation);
 
         if ($stmt->execute()) {
-            header("Location: dashboard.php?success=appreciation");
+            header("Location: dashboard?success=appreciation");
             exit();
         } else {
             $error = "Failed to submit appreciation. Please try again.";

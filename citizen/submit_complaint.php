@@ -94,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         );
 
         if ($stmt->execute()) {
-            header("Location: dashboard.php?success=complaint");
+            header("Location: dashboard?success=complaint");
             exit();
         } else {
             $error = "Failed to submit complaint. Please try again.";

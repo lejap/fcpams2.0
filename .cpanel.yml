@@ -17,3 +17,4 @@ deployment:
     - /bin/cp update_location.php $DEPLOYPATH
     - /bin/cp get_active_devices.php $DEPLOYPATH
     - /bin/cp live_map.php $DEPLOYPATH
+    - /bin/cp .htaccess $DEPLOYPATH

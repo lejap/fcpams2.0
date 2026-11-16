@@ -26,14 +26,14 @@ if ($ticket_id > 0) {
         $stmt->execute();
 
         $conn->commit();
-        header("Location: submissions.php?confirmed=1");
+        header("Location: submissions?confirmed=1");
         exit();
     } catch (Exception $e) {
         $conn->rollback();
         die("Confirmation failed: " . $e->getMessage());
     }
 } else {
-    header("Location: submissions.php");
+    header("Location: submissions");
     exit();
 }
 ?>

@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['resolve'])) {
     $stmt = $conn->prepare("UPDATE tickets SET status='RESOLVED', admin_remark=?, resolved_at=NOW(), resolved_by_name=? WHERE id=? AND status='OPEN'");
     $stmt->bind_param("ssi", $remark, $name, $tid);
     $stmt->execute();
-    header("Location: submissions.php?view=$tid&resolved=1");
+    header("Location: submissions?view=$tid&resolved=1");
     exit();
 }
 
@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['resolve'])) {
 $detail = null;
 if ($view_id > 0) {
     $detail = $conn->query("SELECT *, (SELECT label FROM dropdown_options WHERE id = tickets.option_id) as option_label FROM tickets WHERE id=$view_id AND status != 'SPAM'")->fetch_assoc();
-    if (!$detail) { header("Location: submissions.php"); exit(); }
+    if (!$detail) { header("Location: submissions"); exit(); }
 }
 
 // Filters

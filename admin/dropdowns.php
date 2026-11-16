@@ -29,12 +29,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $conn->prepare("INSERT INTO dropdown_options (type, label) VALUES (?, ?)");
             $stmt->bind_param("ss", $type, $label);
             if ($stmt->execute()) {
-                header("Location: dropdowns.php?msg=added");
+                header("Location: dropdowns?msg=added");
             } else {
-                header("Location: dropdowns.php?msg=failed");
+                header("Location: dropdowns?msg=failed");
             }
         } else {
-            header("Location: dropdowns.php?msg=invalid");
+            header("Location: dropdowns?msg=invalid");
         }
         exit();
     } elseif ($action === 'edit') {
@@ -44,13 +44,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $conn->prepare("UPDATE dropdown_options SET label=? WHERE id=?");
             $stmt->bind_param("si", $label, $oid);
             $stmt->execute();
-            header("Location: dropdowns.php?msg=updated");
+            header("Location: dropdowns?msg=updated");
             exit();
         }
     } elseif ($action === 'delete') {
         $oid = (int)$_POST['id'];
         $conn->query("DELETE FROM dropdown_options WHERE id=$oid");
-        header("Location: dropdowns.php?msg=deleted");
+        header("Location: dropdowns?msg=deleted");
         exit();
     }
 }
