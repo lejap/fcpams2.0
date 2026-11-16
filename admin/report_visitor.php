@@ -1,47 +1,39 @@
 <?php
 require_once '../config/db.php';
 require_once '../includes/functions.php';
-auth_guard('ADMIN'); // Admin-only
+auth_guard('ADMIN');
 
 // ── Filters ───────────────────────────────────────────────────────────────────
-$f_from = isset($_GET['from']) ? sanitize($_GET['from']) : date('Y-m-01'); // Default: 1st of current month
-$f_to   = isset($_GET['to'])   ? sanitize($_GET['to'])   : date('Y-m-d');  // Default: today
+$f_from = isset($_GET['from']) ? sanitize($_GET['from']) : date('Y-m-01');
+$f_to   = isset($_GET['to'])   ? sanitize($_GET['to'])   : date('Y-m-d');
 $f_page = isset($_GET['page_filter']) ? sanitize($_GET['page_filter']) : '';
 
-// Validate dates
 if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $f_from)) $f_from = date('Y-m-01');
 if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $f_to))   $f_to   = date('Y-m-d');
 
 $where_base = "WHERE DATE(visited_at) BETWEEN '$f_from' AND '$f_to'";
 if ($f_page) $where_base .= " AND page = '" . $conn->real_escape_string($f_page) . "'";
 
-// ── KPI Summary ───────────────────────────────────────────────────────────────
-// Total page views (all rows in range)
-$total_views = $conn->query("SELECT COUNT(*) c FROM visitor_logs $where_base")->fetch_assoc()['c'];
+// ── KPIs ──────────────────────────────────────────────────────────────────────
+// Unique visitors = SUM(is_unique_today) in range (1 per person per day)
+$unique_visitors = $conn->query("SELECT SUM(is_unique_today) c FROM visitor_logs $where_base")->fetch_assoc()['c'] ?? 0;
+$total_views     = $conn->query("SELECT COUNT(*) c FROM visitor_logs $where_base")->fetch_assoc()['c'];
 
-// Unique visitors (distinct session_key in range)
-$unique_visitors = $conn->query("SELECT COUNT(DISTINCT session_key) c FROM visitor_logs $where_base")->fetch_assoc()['c'];
+$today_str    = date('Y-m-d');
+$today_visits = $conn->query("SELECT SUM(is_unique_today) c FROM visitor_logs WHERE DATE(visited_at)='$today_str'")->fetch_assoc()['c'] ?? 0;
 
-// Today's visitors
-$today_str = date('Y-m-d');
-$today_visits = $conn->query("SELECT COUNT(DISTINCT session_key) c FROM visitor_logs WHERE DATE(visited_at) = '$today_str'")->fetch_assoc()['c'];
+$month_start  = date('Y-m-01');
+$month_visits = $conn->query("SELECT SUM(is_unique_today) c FROM visitor_logs WHERE DATE(visited_at) BETWEEN '$month_start' AND '$today_str'")->fetch_assoc()['c'] ?? 0;
 
-// This month total
-$month_start = date('Y-m-01');
-$month_visits = $conn->query("SELECT COUNT(DISTINCT session_key) c FROM visitor_logs WHERE DATE(visited_at) BETWEEN '$month_start' AND '$today_str'")->fetch_assoc()['c'];
+$alltime_visits = $conn->query("SELECT SUM(is_unique_today) c FROM visitor_logs")->fetch_assoc()['c'] ?? 0;
 
-// All-time total
-$alltime_visits = $conn->query("SELECT COUNT(DISTINCT session_key) c FROM visitor_logs")->fetch_assoc()['c'];
-
-// ── Daily breakdown chart data ─────────────────────────────────────────────────
+// ── Daily chart data ──────────────────────────────────────────────────────────
 $daily_res = $conn->query(
     "SELECT DATE(visited_at) AS day,
             COUNT(*) AS views,
-            COUNT(DISTINCT session_key) AS unique_v
-     FROM visitor_logs
-     $where_base
-     GROUP BY DATE(visited_at)
-     ORDER BY day ASC"
+            SUM(is_unique_today) AS unique_v
+     FROM visitor_logs $where_base
+     GROUP BY DATE(visited_at) ORDER BY day ASC"
 );
 $chart_days = []; $chart_views = []; $chart_unique = [];
 while ($r = $daily_res->fetch_assoc()) {
@@ -51,30 +43,30 @@ while ($r = $daily_res->fetch_assoc()) {
 }
 
 // ── Top pages ─────────────────────────────────────────────────────────────────
-$top_pages = $conn->query(
-    "SELECT page,
-            COUNT(*) AS views,
-            COUNT(DISTINCT session_key) AS unique_v
-     FROM visitor_logs
-     $where_base
-     GROUP BY page
-     ORDER BY unique_v DESC
-     LIMIT 10"
+$top_pages_res = $conn->query(
+    "SELECT page, COUNT(*) AS views, SUM(is_unique_today) AS unique_v
+     FROM visitor_logs $where_base
+     GROUP BY page ORDER BY unique_v DESC LIMIT 8"
 );
+$top_rows = []; $max_uv = 1;
+while ($r = $top_pages_res->fetch_assoc()) {
+    $top_rows[] = $r;
+    if ($r['unique_v'] > $max_uv) $max_uv = $r['unique_v'];
+}
 
 // ── Page filter options ───────────────────────────────────────────────────────
 $pages_res = $conn->query("SELECT DISTINCT page FROM visitor_logs ORDER BY page ASC");
 
-// ── Detail table ──────────────────────────────────────────────────────────────
+// ── Daily breakdown table ─────────────────────────────────────────────────────
 $detail_res = $conn->query(
     "SELECT DATE(visited_at) AS visit_date,
             COUNT(*) AS total_views,
-            COUNT(DISTINCT session_key) AS unique_visitors
-     FROM visitor_logs
-     $where_base
-     GROUP BY DATE(visited_at)
-     ORDER BY visit_date DESC"
+            SUM(is_unique_today) AS unique_visitors
+     FROM visitor_logs $where_base
+     GROUP BY DATE(visited_at) ORDER BY visit_date DESC"
 );
+$rows_buf = [];
+while ($row = $detail_res->fetch_assoc()) $rows_buf[] = $row;
 
 $page_title = "Visitor Analytics";
 include '../includes/admin_header.php';
@@ -82,7 +74,7 @@ include '../includes/admin_sidebar.php';
 ?>
 
 <style>
-/* ── Shared with other report pages ── */
+/* ── Screen styles ── */
 .rpt-hero{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2rem;flex-wrap:wrap;gap:1rem;}
 .rpt-hero h1{font-size:2rem;margin-bottom:.2rem;color:#0e83b5;}
 .rpt-hero p{color:#64748b;font-size:.9rem;}
@@ -102,6 +94,10 @@ include '../includes/admin_sidebar.php';
 .btn-filter:hover{background:#0a6a94;}
 .btn-reset{padding:.48rem 1rem;background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0;border-radius:.5rem;font-size:.85rem;font-weight:600;cursor:pointer;align-self:flex-end;text-decoration:none;display:inline-flex;align-items:center;gap:.35rem;}
 .btn-reset:hover{background:#e2e8f0;}
+.btn-pdf{padding:.48rem 1.1rem;background:#ef4444;color:#fff;border:none;border-radius:.5rem;font-size:.85rem;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:.4rem;}
+.btn-pdf:hover{background:#dc2626;}
+.btn-print{padding:.48rem 1.1rem;background:#334155;color:#fff;border:none;border-radius:.5rem;font-size:.85rem;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:.4rem;}
+.btn-print:hover{background:#1e293b;}
 .tbl-wrap{background:#fff;border:1px solid #e2e8f0;border-radius:1rem;overflow:hidden;margin-bottom:1.5rem;}
 .tbl-hd{background:#f8fafc;padding:.8rem 1.25rem;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#64748b;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;}
 .rtbl{width:100%;border-collapse:collapse;font-size:.85rem;}
@@ -112,48 +108,153 @@ include '../includes/admin_sidebar.php';
 .two-col{display:grid;grid-template-columns:2fr 1fr;gap:1.5rem;margin-bottom:1.5rem;}
 .empty-note{text-align:center;padding:3rem 1rem;color:#94a3b8;font-size:.9rem;}
 .empty-note i{font-size:2.5rem;margin-bottom:.75rem;display:block;}
-.bar-mini{display:inline-block;height:8px;background:#0e83b5;border-radius:4px;min-width:4px;}
 .date-range-badge{background:#dbeafe;color:#1d4ed8;padding:.2rem .65rem;border-radius:.4rem;font-size:.75rem;font-weight:700;}
-
 @media(max-width:768px){.two-col{grid-template-columns:1fr;}.kpi-row{grid-template-columns:repeat(2,1fr);}}
-@media print{
-    @page{size:A4 landscape;margin:10mm 12mm;}
-    .admin-sidebar,.admin-header,.filter-bar,.no-print{display:none!important;}
-    .admin-wrapper,.admin-body,.admin-content{display:block!important;overflow:visible!important;height:auto!important;padding:0!important;margin:0!important;width:100%!important;position:static!important;}
-    body,html{background:#fff!important;overflow:visible!important;height:auto!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
-    .print-hd{display:block!important;}
-    .tbl-wrap,div[style*="overflow"]{overflow:visible!important;max-height:none!important;height:auto!important;}
+
+/* ── Print / PDF styles ── */
+@media print {
+    @page { size: A4 portrait; margin: 12mm 14mm; }
+    /* Hide everything that isn't content */
+    .admin-sidebar, .admin-header, .filter-bar, .no-print,
+    .btn-pdf, .btn-print, .btn-reset, .btn-filter { display: none !important; }
+    /* Flatten layout */
+    .admin-wrapper, .admin-body, .admin-content {
+        display: block !important; overflow: visible !important;
+        height: auto !important; padding: 0 !important;
+        margin: 0 !important; width: 100% !important; position: static !important;
+    }
+    body, html { background: #fff !important; overflow: visible !important; height: auto !important; }
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+    /* Show print header */
+    .print-hd { display: block !important; }
+    /* Two-col becomes single col */
+    .two-col { grid-template-columns: 1fr !important; }
+    /* Tables */
+    .tbl-wrap, div[style*="overflow"] { overflow: visible !important; max-height: none !important; height: auto !important; }
+    .rtbl { font-size: .75rem; }
+    .rtbl th { background: #e2e8f0 !important; }
+    .rtbl td, .rtbl th { padding: .4rem .6rem; }
+    /* KPI cards */
+    .kpi-row { grid-template-columns: repeat(5, 1fr) !important; }
+    .kpi { border: 1px solid #cbd5e1 !important; border-radius: .5rem !important; padding: .6rem .8rem !important; }
+    .kpi-val { font-size: 1.4rem !important; }
+    /* Charts — make them visible */
+    .chart-wrap { height: 180px !important; }
+    .chart-box { border: 1px solid #cbd5e1 !important; break-inside: avoid; }
+    /* Page breaks */
+    .tbl-wrap { break-inside: auto; }
+    .rtbl tr { break-inside: avoid; }
+    .kpi-row, .chart-box, .kpi { break-inside: avoid; }
+    /* Signature section */
+    .pdf-sig { display: flex !important; }
 }
-.print-hd{display:none;text-align:center;margin-bottom:1.25rem;padding-bottom:.75rem;border-bottom:2px solid #0e83b5;}
-.print-hd h1{font-size:1.4rem;color:#0f172a;margin-bottom:.2rem;}
-.print-hd p{font-size:.78rem;color:#64748b;}
+
+/* Print header (hidden on screen, shown in print) */
+.print-hd { display:none; margin-bottom:1.5rem; padding-bottom:.75rem; border-bottom:3px solid #0e83b5; }
+.print-hd .ph-logo { display:flex; align-items:center; justify-content:space-between; margin-bottom:.5rem; }
+.print-hd h1 { font-size:1.3rem; color:#0f172a; margin:0; }
+.print-hd .ph-sub { font-size:.75rem; color:#64748b; margin-top:.2rem; }
+.print-hd .ph-meta { font-size:.72rem; color:#94a3b8; text-align:right; }
+
+/* Signature block (PDF only) */
+.pdf-sig { display:none; margin-top:2.5rem; border-top:1px solid #e2e8f0; padding-top:1.5rem; }
+.pdf-sig-col { flex:1; text-align:center; }
+.pdf-sig-line { border-top:1px solid #334155; margin:0 2rem 0.3rem; }
+.pdf-sig-lbl { font-size:.72rem; color:#64748b; }
+
+/* Export spinner */
+#pdf-spinner { display:none; position:fixed; top:0; left:0; width:100%; height:100%;
+    background:rgba(0,0,0,.45); z-index:9999; align-items:center; justify-content:center; flex-direction:column; gap:1rem; }
+#pdf-spinner span { color:#fff; font-size:1rem; font-weight:600; }
 </style>
 
-<div class="fade-in">
-
-<!-- Print Header (hidden on screen) -->
-<div class="print-hd">
-    <h1>FCPAMS — Visitor Analytics Report</h1>
-    <p>Generated: <?php echo date('F d, Y \a\t h:i A'); ?> · Period: <?php echo date('M d, Y', strtotime($f_from)); ?> – <?php echo date('M d, Y', strtotime($f_to)); ?></p>
+<!-- PDF export spinner -->
+<div id="pdf-spinner">
+    <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style="animation:spin 1s linear infinite;">
+        <circle cx="24" cy="24" r="20" stroke="rgba(255,255,255,0.3)" stroke-width="4"/>
+        <path d="M44 24a20 20 0 0 0-20-20" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+        <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+    </svg>
+    <span>Generating PDF, please wait…</span>
 </div>
 
-<!-- Hero -->
-<div class="rpt-hero">
+<div class="fade-in" id="report-content">
+
+<!-- ── Print/PDF Header (hidden on screen) ── -->
+<div class="print-hd">
+    <div class="ph-logo">
+        <div>
+            <h1><i class="fas fa-eye"></i> FCPAMS — Visitor Analytics Report</h1>
+            <div class="ph-sub">First CBISCO Pampanga Area Multi-Purpose Cooperative</div>
+        </div>
+        <div class="ph-meta">
+            Generated: <?php echo date('F d, Y \a\t h:i A'); ?><br>
+            Prepared by: <?php echo htmlspecialchars($_SESSION['name'] ?? ''); ?><br>
+            Period: <?php echo date('M d, Y', strtotime($f_from)); ?> – <?php echo date('M d, Y', strtotime($f_to)); ?>
+        </div>
+    </div>
+</div>
+
+<!-- ── Hero (screen only) ── -->
+<div class="rpt-hero no-print" style="margin-bottom:1.25rem;">
     <div>
         <h1><i class="fas fa-eye" style="font-size:1.6rem;"></i> Visitor Analytics</h1>
-        <p>Track how many people visited the FCPAMS website, with daily breakdowns and page-level insight.</p>
+        <p>Track how many people visited FCPAMS, with daily breakdowns and page-level insight.</p>
     </div>
-    <div class="no-print" style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;">
+    <div style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;">
         <span class="date-range-badge"><i class="fas fa-calendar-alt"></i>
             <?php echo date('M d, Y', strtotime($f_from)); ?> – <?php echo date('M d, Y', strtotime($f_to)); ?>
         </span>
-        <button onclick="window.print()" style="padding:.45rem 1rem;background:#0e83b5;color:#fff;border:none;border-radius:.5rem;font-size:.82rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:.35rem;">
-            <i class="fas fa-print"></i> Print
-        </button>
+        <button class="btn-print" onclick="window.print()"><i class="fas fa-print"></i> Print</button>
+        <button class="btn-pdf" id="btn-export-pdf"><i class="fas fa-file-pdf"></i> Export PDF</button>
     </div>
 </div>
 
-<!-- KPI Cards -->
+<!-- ── Filter Bar ── -->
+<form method="GET" action="" class="filter-bar no-print">
+    <div class="filter-grp">
+        <label><i class="fas fa-calendar"></i> From</label>
+        <input type="date" name="from" value="<?php echo htmlspecialchars($f_from); ?>" max="<?php echo date('Y-m-d'); ?>">
+    </div>
+    <div class="filter-grp">
+        <label><i class="fas fa-calendar"></i> To</label>
+        <input type="date" name="to" value="<?php echo htmlspecialchars($f_to); ?>" max="<?php echo date('Y-m-d'); ?>">
+    </div>
+    <div class="filter-grp">
+        <label><i class="fas fa-file-alt"></i> Page</label>
+        <select name="page_filter">
+            <option value="">All Pages</option>
+            <?php while ($pg = $pages_res->fetch_assoc()): ?>
+            <option value="<?php echo htmlspecialchars($pg['page']); ?>" <?php echo $f_page === $pg['page'] ? 'selected' : ''; ?>>
+                <?php echo htmlspecialchars($pg['page']); ?>
+            </option>
+            <?php endwhile; ?>
+        </select>
+    </div>
+    <button type="submit" class="btn-filter"><i class="fas fa-search"></i> Apply</button>
+    <a href="report_visitor" class="btn-reset"><i class="fas fa-undo"></i> Reset</a>
+    <div class="filter-grp" style="margin-left:auto;">
+        <label>Quick Select</label>
+        <div style="display:flex;gap:.4rem;flex-wrap:wrap;">
+            <?php
+            $presets = [
+                'Today'       => [date('Y-m-d'), date('Y-m-d')],
+                'Last 7 Days' => [date('Y-m-d', strtotime('-6 days')), date('Y-m-d')],
+                'Last 30 Days'=> [date('Y-m-d', strtotime('-29 days')), date('Y-m-d')],
+                'This Month'  => [date('Y-m-01'), date('Y-m-d')],
+            ];
+            foreach ($presets as $label => [$pf, $pt]):
+                $active = ($f_from === $pf && $f_to === $pt);
+            ?>
+            <a href="report_visitor?from=<?php echo $pf; ?>&to=<?php echo $pt; ?>"
+               style="padding:.38rem .7rem;background:<?php echo $active ? '#0e83b5' : '#f1f5f9'; ?>;color:<?php echo $active ? '#fff' : '#334155'; ?>;border-radius:.4rem;font-size:.75rem;font-weight:600;text-decoration:none;">
+               <?php echo $label; ?></a>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</form>
+
+<!-- ── KPI Cards ── -->
 <div class="kpi-row">
     <div class="kpi">
         <div class="kpi-lbl">Today's Visitors</div>
@@ -182,90 +283,35 @@ include '../includes/admin_sidebar.php';
     </div>
 </div>
 
-<!-- Filter Bar -->
-<form method="GET" action="" class="filter-bar no-print">
-    <div class="filter-grp">
-        <label><i class="fas fa-calendar"></i> From</label>
-        <input type="date" name="from" value="<?php echo htmlspecialchars($f_from); ?>" max="<?php echo date('Y-m-d'); ?>">
-    </div>
-    <div class="filter-grp">
-        <label><i class="fas fa-calendar"></i> To</label>
-        <input type="date" name="to" value="<?php echo htmlspecialchars($f_to); ?>" max="<?php echo date('Y-m-d'); ?>">
-    </div>
-    <div class="filter-grp">
-        <label><i class="fas fa-file-alt"></i> Page</label>
-        <select name="page_filter">
-            <option value="">All Pages</option>
-            <?php while ($pg = $pages_res->fetch_assoc()): ?>
-            <option value="<?php echo htmlspecialchars($pg['page']); ?>" <?php echo $f_page === $pg['page'] ? 'selected' : ''; ?>>
-                <?php echo htmlspecialchars($pg['page']); ?>
-            </option>
-            <?php endwhile; ?>
-        </select>
-    </div>
-    <button type="submit" class="btn-filter"><i class="fas fa-search"></i> Apply Filter</button>
-    <a href="report_visitor.php" class="btn-reset"><i class="fas fa-undo"></i> Reset</a>
-    <!-- Quick presets -->
-    <div class="filter-grp" style="margin-left:auto;">
-        <label>Quick Select</label>
-        <div style="display:flex;gap:.4rem;flex-wrap:wrap;">
-            <a href="report_visitor.php?from=<?php echo date('Y-m-d'); ?>&to=<?php echo date('Y-m-d'); ?>"
-               style="padding:.38rem .7rem;background:<?php echo ($f_from === date('Y-m-d') && $f_to === date('Y-m-d')) ? '#0e83b5' : '#f1f5f9'; ?>;color:<?php echo ($f_from === date('Y-m-d') && $f_to === date('Y-m-d')) ? '#fff' : '#334155'; ?>;border-radius:.4rem;font-size:.75rem;font-weight:600;text-decoration:none;">Today</a>
-            <a href="report_visitor.php?from=<?php echo date('Y-m-d', strtotime('-6 days')); ?>&to=<?php echo date('Y-m-d'); ?>"
-               style="padding:.38rem .7rem;background:#f1f5f9;color:#334155;border-radius:.4rem;font-size:.75rem;font-weight:600;text-decoration:none;">Last 7 Days</a>
-            <a href="report_visitor.php?from=<?php echo date('Y-m-d', strtotime('-29 days')); ?>&to=<?php echo date('Y-m-d'); ?>"
-               style="padding:.38rem .7rem;background:#f1f5f9;color:#334155;border-radius:.4rem;font-size:.75rem;font-weight:600;text-decoration:none;">Last 30 Days</a>
-            <a href="report_visitor.php?from=<?php echo date('Y-m-01'); ?>&to=<?php echo date('Y-m-d'); ?>"
-               style="padding:.38rem .7rem;background:<?php echo ($f_from === date('Y-m-01') && $f_to === date('Y-m-d')) ? '#0e83b5' : '#f1f5f9'; ?>;color:<?php echo ($f_from === date('Y-m-01') && $f_to === date('Y-m-d')) ? '#fff' : '#334155'; ?>;border-radius:.4rem;font-size:.75rem;font-weight:600;text-decoration:none;">This Month</a>
-        </div>
-    </div>
-</form>
-
-<!-- Daily Chart + Top Pages -->
+<!-- ── Chart + Top Pages ── -->
 <div class="two-col">
-    <!-- Daily Visitors Chart -->
     <div class="chart-box">
-        <h4><i class="fas fa-chart-line" style="color:#0e83b5;"></i> Daily Visitors — <?php echo date('M d', strtotime($f_from)); ?> to <?php echo date('M d, Y', strtotime($f_to)); ?></h4>
+        <h4><i class="fas fa-chart-bar" style="color:#0e83b5;"></i>
+            Daily Visitors — <?php echo date('M d', strtotime($f_from)); ?> to <?php echo date('M d, Y', strtotime($f_to)); ?>
+        </h4>
         <?php if (empty($chart_days)): ?>
         <div class="empty-note"><i class="fas fa-chart-line"></i>No visitor data for this period.</div>
         <?php else: ?>
-        <div class="chart-wrap">
-            <canvas id="dailyChart"></canvas>
-        </div>
+        <div class="chart-wrap"><canvas id="dailyChart"></canvas></div>
         <?php endif; ?>
     </div>
 
-    <!-- Top Pages -->
     <div class="chart-box">
         <h4><i class="fas fa-list-ol" style="color:#8b5cf6;"></i> Top Pages Visited</h4>
-        <?php
-        // Re-query top pages for display (we already fetched above)
-        $top_pages2 = $conn->query(
-            "SELECT page,
-                    COUNT(*) AS views,
-                    COUNT(DISTINCT session_key) AS unique_v
-             FROM visitor_logs
-             $where_base
-             GROUP BY page
-             ORDER BY unique_v DESC
-             LIMIT 8"
-        );
-        $max_uv = 1;
-        $top_rows = [];
-        while ($r = $top_pages2->fetch_assoc()) { $top_rows[] = $r; if ($r['unique_v'] > $max_uv) $max_uv = $r['unique_v']; }
-        ?>
         <?php if (empty($top_rows)): ?>
-        <div class="empty-note"><i class="fas fa-file-alt"></i>No data for this period.</div>
+        <div class="empty-note"><i class="fas fa-file-alt"></i>No data.</div>
         <?php else: ?>
-        <div style="display:flex;flex-direction:column;gap:.6rem;margin-top:.25rem;">
-            <?php foreach ($top_rows as $r): ?>
+        <div style="display:flex;flex-direction:column;gap:.65rem;margin-top:.25rem;">
+            <?php foreach ($top_rows as $r):
+                $pct = $max_uv > 0 ? round(($r['unique_v'] / $max_uv) * 100) : 0;
+            ?>
             <div>
                 <div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:.2rem;">
                     <span style="font-weight:600;color:#334155;"><?php echo htmlspecialchars($r['page']); ?></span>
                     <span style="color:#64748b;"><?php echo number_format($r['unique_v']); ?> visitors · <?php echo number_format($r['views']); ?> views</span>
                 </div>
                 <div style="background:#f1f5f9;border-radius:4px;height:8px;overflow:hidden;">
-                    <div style="width:<?php echo round(($r['unique_v'] / $max_uv) * 100); ?>%;height:8px;background:linear-gradient(90deg,#0e83b5,#38bdf8);border-radius:4px;"></div>
+                    <div style="width:<?php echo $pct; ?>%;height:8px;background:linear-gradient(90deg,#0e83b5,#38bdf8);border-radius:4px;"></div>
                 </div>
             </div>
             <?php endforeach; ?>
@@ -274,13 +320,13 @@ include '../includes/admin_sidebar.php';
     </div>
 </div>
 
-<!-- Daily Breakdown Table -->
+<!-- ── Daily Breakdown Table ── -->
 <div class="tbl-wrap">
     <div class="tbl-hd">
         <span><i class="fas fa-table"></i> Daily Breakdown</span>
-        <span style="color:#94a3b8;font-size:.78rem;"><?php echo $detail_res->num_rows; ?> day(s) in range</span>
+        <span style="color:#94a3b8;font-size:.78rem;"><?php echo count($rows_buf); ?> day(s) · Period: <?php echo date('M d, Y', strtotime($f_from)); ?> – <?php echo date('M d, Y', strtotime($f_to)); ?></span>
     </div>
-    <?php if ($detail_res->num_rows === 0): ?>
+    <?php if (empty($rows_buf)): ?>
     <div class="empty-note">
         <i class="fas fa-eye-slash"></i>
         No visitor data recorded for the selected date range.<br>
@@ -288,23 +334,20 @@ include '../includes/admin_sidebar.php';
     </div>
     <?php else: ?>
     <div style="overflow-x:auto;">
-    <table class="rtbl">
+    <table class="rtbl" id="daily-table">
         <thead>
             <tr>
-                <th>#</th>
-                <th><i class="fas fa-calendar"></i> Date</th>
-                <th><i class="fas fa-day"></i> Day</th>
-                <th style="text-align:center;"><i class="fas fa-users"></i> Unique Visitors</th>
-                <th style="text-align:center;"><i class="fas fa-eye"></i> Total Page Views</th>
-                <th style="text-align:center;">Avg. Views / Visitor</th>
+                <th style="width:40px;">#</th>
+                <th>Date</th>
+                <th>Day</th>
+                <th style="text-align:center;">Unique Visitors</th>
+                <th style="text-align:center;">Total Page Views</th>
+                <th style="text-align:center;">Avg Views / Visitor</th>
             </tr>
         </thead>
         <tbody>
         <?php
-        $row_num = 1;
-        $grand_uv = 0; $grand_views = 0;
-        $rows_buf = [];
-        while ($row = $detail_res->fetch_assoc()) { $rows_buf[] = $row; }
+        $n = 1; $grand_uv = 0; $grand_views = 0;
         foreach ($rows_buf as $row):
             $grand_uv    += $row['unique_visitors'];
             $grand_views += $row['total_views'];
@@ -312,10 +355,12 @@ include '../includes/admin_sidebar.php';
             $is_today = ($row['visit_date'] === date('Y-m-d'));
         ?>
         <tr <?php echo $is_today ? 'style="background:#eff6ff;"' : ''; ?>>
-            <td style="color:#94a3b8;"><?php echo $row_num++; ?></td>
+            <td style="color:#94a3b8;"><?php echo $n++; ?></td>
             <td>
                 <strong><?php echo date('F d, Y', strtotime($row['visit_date'])); ?></strong>
-                <?php if ($is_today): ?><span style="margin-left:.4rem;background:#dbeafe;color:#1d4ed8;font-size:.65rem;font-weight:700;padding:.1rem .4rem;border-radius:.3rem;">TODAY</span><?php endif; ?>
+                <?php if ($is_today): ?>
+                <span style="margin-left:.35rem;background:#dbeafe;color:#1d4ed8;font-size:.62rem;font-weight:700;padding:.1rem .4rem;border-radius:.3rem;">TODAY</span>
+                <?php endif; ?>
             </td>
             <td style="color:#64748b;"><?php echo date('l', strtotime($row['visit_date'])); ?></td>
             <td style="text-align:center;">
@@ -343,15 +388,70 @@ include '../includes/admin_sidebar.php';
     <?php endif; ?>
 </div>
 
-<!-- Note at bottom -->
-<p style="font-size:.75rem;color:#94a3b8;text-align:center;margin-top:.5rem;" class="no-print">
+<!-- ── Top Pages Table (for print/PDF) ── -->
+<div class="tbl-wrap" style="margin-top:1rem;" id="top-pages-table">
+    <div class="tbl-hd">
+        <span><i class="fas fa-list-ol"></i> Top Pages — Detailed</span>
+    </div>
+    <?php if (empty($top_rows)): ?>
+    <div class="empty-note"><i class="fas fa-file"></i>No page data.</div>
+    <?php else: ?>
+    <table class="rtbl">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Page</th>
+                <th style="text-align:center;">Unique Visitors</th>
+                <th style="text-align:center;">Total Views</th>
+                <th style="text-align:center;">Avg Views / Visitor</th>
+            </tr>
+        </thead>
+        <tbody>
+        <?php foreach ($top_rows as $i => $r):
+            $pavg = $r['unique_v'] > 0 ? round($r['views'] / $r['unique_v'], 1) : 0;
+        ?>
+        <tr>
+            <td style="color:#94a3b8;"><?php echo $i + 1; ?></td>
+            <td><strong><?php echo htmlspecialchars($r['page']); ?></strong></td>
+            <td style="text-align:center;"><strong style="color:#0e83b5;"><?php echo number_format($r['unique_v']); ?></strong></td>
+            <td style="text-align:center;"><?php echo number_format($r['views']); ?></td>
+            <td style="text-align:center;color:#64748b;"><?php echo $pavg; ?>x</td>
+        </tr>
+        <?php endforeach; ?>
+        </tbody>
+    </table>
+    <?php endif; ?>
+</div>
+
+<!-- ── Signature block (shows in PDF/print) ── -->
+<div class="pdf-sig">
+    <div class="pdf-sig-col">
+        <div class="pdf-sig-line"></div>
+        <div class="pdf-sig-lbl">Prepared by</div>
+        <div style="font-size:.8rem;font-weight:700;color:#334155;margin-top:.15rem;"><?php echo htmlspecialchars($_SESSION['name'] ?? ''); ?></div>
+    </div>
+    <div class="pdf-sig-col">
+        <div class="pdf-sig-line"></div>
+        <div class="pdf-sig-lbl">Date Generated</div>
+        <div style="font-size:.8rem;font-weight:700;color:#334155;margin-top:.15rem;"><?php echo date('F d, Y \a\t h:i A'); ?></div>
+    </div>
+    <div class="pdf-sig-col">
+        <div class="pdf-sig-line"></div>
+        <div class="pdf-sig-lbl">Reviewed by</div>
+        <div style="font-size:.8rem;color:#94a3b8;margin-top:.15rem;">____________________</div>
+    </div>
+</div>
+
+<!-- ── Note ── -->
+<p style="font-size:.73rem;color:#94a3b8;text-align:center;margin-top:.75rem;" class="no-print">
     <i class="fas fa-info-circle"></i>
-    "Unique Visitors" counts each person once per day based on a hashed combination of IP + browser. Page views count every tracked page load.
-    Tracking is active on the <strong>Home (index)</strong> and <strong>Login</strong> pages.
+    <strong>Unique Visitors</strong> = 1 person counted once per calendar day (regardless of how many pages they visit).
+    <strong>Page Views</strong> = every page load. Tracking active on <strong>index</strong> and <strong>login</strong> pages.
 </p>
 
-</div><!-- /.fade-in -->
+</div><!-- /#report-content -->
 
+<!-- ── Scripts ── -->
 <?php if (!empty($chart_days)): ?>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 <script>
@@ -360,10 +460,10 @@ const views  = <?php echo json_encode($chart_views); ?>;
 const unique = <?php echo json_encode($chart_unique); ?>;
 
 const ctx = document.getElementById('dailyChart').getContext('2d');
-new Chart(ctx, {
+window._dailyChart = new Chart(ctx, {
     type: 'bar',
     data: {
-        labels: labels,
+        labels,
         datasets: [
             {
                 label: 'Unique Visitors',
@@ -390,26 +490,84 @@ new Chart(ctx, {
     options: {
         responsive: true,
         maintainAspectRatio: false,
+        animation: { duration: 400 },
         interaction: { mode: 'index', intersect: false },
         plugins: {
-            legend: { position: 'bottom', labels: { font: { size: 11 } } },
-            tooltip: {
-                callbacks: {
-                    label: ctx => ' ' + ctx.dataset.label + ': ' + ctx.formattedValue
-                }
-            }
+            legend: { position: 'bottom', labels: { font: { size: 11 } } }
         },
         scales: {
-            y: {
-                beginAtZero: true,
-                ticks: { stepSize: 1, precision: 0 },
-                grid: { color: '#f1f5f9' }
-            },
+            y: { beginAtZero: true, ticks: { stepSize: 1, precision: 0 }, grid: { color: '#f1f5f9' } },
             x: { grid: { display: false } }
         }
     }
 });
 </script>
 <?php endif; ?>
+
+<!-- jsPDF + html2canvas for PDF export -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+document.getElementById('btn-export-pdf')?.addEventListener('click', async function () {
+    const spinner = document.getElementById('pdf-spinner');
+    spinner.style.display = 'flex';
+
+    try {
+        const { jsPDF } = window.jspdf;
+
+        // Temporarily show print-only elements for capture
+        document.querySelectorAll('.print-hd, .pdf-sig').forEach(el => el.style.display = 'block');
+        document.querySelectorAll('.no-print').forEach(el => el.style.display = 'none');
+
+        // Wait for chart animation to settle
+        await new Promise(r => setTimeout(r, 300));
+
+        const element = document.getElementById('report-content');
+
+        const canvas = await html2canvas(element, {
+            scale: 1.8,
+            useCORS: true,
+            backgroundColor: '#ffffff',
+            logging: false,
+            windowWidth: 1100
+        });
+
+        // Restore UI
+        document.querySelectorAll('.print-hd, .pdf-sig').forEach(el => el.style.display = '');
+        document.querySelectorAll('.no-print').forEach(el => el.style.display = '');
+
+        const imgData   = canvas.toDataURL('image/jpeg', 0.9);
+        const pdf       = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+        const pageW     = pdf.internal.pageSize.getWidth();
+        const pageH     = pdf.internal.pageSize.getHeight();
+        const margin    = 10;
+        const imgW      = pageW - margin * 2;
+        const imgH      = (canvas.height * imgW) / canvas.width;
+        const totalPages = Math.ceil(imgH / (pageH - margin * 2));
+
+        for (let i = 0; i < totalPages; i++) {
+            if (i > 0) pdf.addPage();
+            const yOffset = -(i * (pageH - margin * 2));
+            pdf.addImage(imgData, 'JPEG', margin, margin + yOffset, imgW, imgH);
+            // Footer
+            pdf.setFontSize(7);
+            pdf.setTextColor(150);
+            pdf.text(
+                `FCPAMS Visitor Analytics · Page ${i + 1} of ${totalPages} · Generated ${new Date().toLocaleString('en-PH', {timeZone:'Asia/Manila'})}`,
+                margin, pageH - 4
+            );
+        }
+
+        const fname = `FCPAMS_Visitor_Analytics_<?php echo $f_from; ?>_to_<?php echo $f_to; ?>.pdf`;
+        pdf.save(fname);
+
+    } catch (err) {
+        console.error('PDF export error:', err);
+        alert('PDF export failed. Please try using the Print button instead.');
+    } finally {
+        spinner.style.display = 'none';
+    }
+});
+</script>
 
 <?php include '../includes/admin_footer.php'; ?>
