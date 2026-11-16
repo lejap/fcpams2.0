@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['citizen_login'])) {
     $_SESSION['branch'] = sanitize($_POST['branch']);
     $_SESSION['role'] = 'CITIZEN';
     
-    header("Location: citizen/dashboard");
+    header("Location: " . BASE_URL . "citizen/dashboard");
     exit();
 }
 
@@ -64,7 +64,7 @@ include 'includes/header.php';
             </p>
         </div>
         
-        <form action="index.php" method="POST">
+        <form method="POST">
             <input type="hidden" name="citizen_login" value="1">
             
             <div class="form-group">
@@ -112,7 +112,7 @@ include 'includes/header.php';
         </form>
 
         <div class="mt-10 text-center" style="border-top: 1px solid rgba(0,0,0,0.1); paddingTop: 1.5rem;">
-            <a href="login.php" style="font-size: 0.9rem; color: #3b82f6; font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem;">
+            <a href="<?php echo BASE_URL; ?>login" style="font-size: 0.9rem; color: #3b82f6; font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem;">
                 <i class="fas fa-lock" style="font-size: 14px;"></i> Admin Portal
             </a>
         </div>

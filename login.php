@@ -4,8 +4,8 @@ require_once 'includes/functions.php';
 require_once 'includes/track_visitor.php'; // Visitor tracking
 
 if (isset($_SESSION['user_id']) && $_SESSION['role'] !== 'CITIZEN') {
-    if ($_SESSION['role'] === 'ADMIN') header("Location: admin/dashboard");
-    elseif ($_SESSION['role'] === 'STAFF') header("Location: staff/dashboard");
+    if ($_SESSION['role'] === 'ADMIN') header("Location: " . BASE_URL . "admin/dashboard");
+    elseif ($_SESSION['role'] === 'STAFF') header("Location: " . BASE_URL . "staff/dashboard");
     exit();
 }
 
@@ -38,9 +38,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['branch_name'] = $user['branch_name'];
                 $_SESSION['is_ho']      = (int)$user['is_ho_branch'];
 
-                if ($user['role'] === 'ADMIN') header("Location: admin/dashboard");
-                elseif ($user['role'] === 'STAFF') header("Location: staff/dashboard");
-                else header("Location: citizen/dashboard");
+                if ($user['role'] === 'ADMIN') header("Location: " . BASE_URL . "admin/dashboard");
+                elseif ($user['role'] === 'STAFF') header("Location: " . BASE_URL . "staff/dashboard");
+                else header("Location: " . BASE_URL . "citizen/dashboard");
                 exit();
             }
         } else {
@@ -81,7 +81,7 @@ include 'includes/header.php';
             <?php endif; ?>
         <?php endif; ?>
         
-        <form action="login.php" method="POST">
+        <form method="POST">
             <div class="form-group">
                 <label class="form-label">Email Address</label>
                 <input type="email" name="email" class="form-input" required placeholder="admin@example.com" style="background: rgba(255,255,255,0.5);">
@@ -101,13 +101,13 @@ include 'includes/header.php';
         </form>
 
         <div class="mt-6 text-center">
-            <a href="register.php" style="background: none; border: none; color: #3b82f6; cursor: pointer; font-size: 0.95rem; font-weight: 600; text-decoration: none;">
+            <a href="<?php echo BASE_URL; ?>register" style="background: none; border: none; color: #3b82f6; cursor: pointer; font-size: 0.95rem; font-weight: 600; text-decoration: none;">
                 Need an account? Register
             </a>
         </div>
 
         <div class="mt-8 text-center pt-6" style="border-top: 1px solid rgba(0,0,0,0.1);">
-            <a href="index.php" style="font-size: 0.9rem; color: #64748b; font-weight: 500; display: inline-flex; align-items: center; gap: 0.5rem; justify-content: center; width: 100%;">
+            <a href="<?php echo BASE_URL; ?>" style="font-size: 0.9rem; color: #64748b; font-weight: 500; display: inline-flex; align-items: center; gap: 0.5rem; justify-content: center; width: 100%;">
                 <i class="fas fa-arrow-left" style="font-size: 12px;"></i> Back to User Portal
             </a>
         </div>

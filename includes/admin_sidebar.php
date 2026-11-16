@@ -14,7 +14,7 @@ $pending_users     = $is_admin ? $conn->query("SELECT COUNT(*) as c FROM users W
 <!-- Admin Sidebar -->
 <nav class="admin-sidebar" id="admin-sidebar">
 
-    <a href="<?php echo BASE_URL; ?>admin/dashboard.php" class="admin-nav-link <?php echo $current_page === 'dashboard.php' ? 'active' : ''; ?>">
+    <a href="<?php echo BASE_URL; ?>admin/dashboard" class="admin-nav-link <?php echo $current_page === 'dashboard.php' ? 'active' : ''; ?>">
         <i class="fas fa-tachometer-alt"></i> Dashboard
         <?php if ($open_submissions > 0): ?>
         <span style="margin-left:auto;background:#ef4444;color:white;border-radius:9px;min-width:18px;height:18px;font-size:0.65rem;font-weight:800;display:inline-flex;align-items:center;justify-content:center;padding:0 4px;"><?php echo $open_submissions; ?></span>
@@ -38,22 +38,22 @@ $pending_users     = $is_admin ? $conn->query("SELECT COUNT(*) as c FROM users W
             <i class="fas fa-chevron-down" id="submissions-chevron" style="font-size:0.7rem;transition:transform 0.25s;<?php echo $on_submissions?'transform:rotate(180deg)':'';?>"></i>
         </button>
         <div id="submissions-submenu" style="overflow:hidden;max-height:<?php echo $on_submissions?'200px':'0';?>;transition:max-height 0.3s ease;padding-left:0.75rem;">
-            <a href="<?php echo BASE_URL; ?>admin/submissions.php"
+            <a href="<?php echo BASE_URL; ?>admin/submissions"
                class="admin-nav-link <?php echo ($current_page==='submissions.php' && !isset($_GET['type']))?'active':''; ?>"
                style="font-size:0.82rem;padding:0.45rem 1rem;">
                 <i class="fas fa-layer-group"></i> All
             </a>
-            <a href="<?php echo BASE_URL; ?>admin/submissions.php?type=INQUIRY"
+            <a href="<?php echo BASE_URL; ?>admin/submissions?type=INQUIRY"
                class="admin-nav-link <?php echo ($current_page==='submissions.php' && isset($_GET['type']) && $_GET['type']==='INQUIRY')?'active':''; ?>"
                style="font-size:0.82rem;padding:0.45rem 1rem;color:rgba(255,180,180,0.95) !important;">
                 <i class="fas fa-question-circle"></i> Inquiries
             </a>
-            <a href="<?php echo BASE_URL; ?>admin/submissions.php?type=SUGGESTION"
+            <a href="<?php echo BASE_URL; ?>admin/submissions?type=SUGGESTION"
                class="admin-nav-link <?php echo ($current_page==='submissions.php' && isset($_GET['type']) && $_GET['type']==='SUGGESTION')?'active':''; ?>"
                style="font-size:0.82rem;padding:0.45rem 1rem;color:rgba(251,191,36,0.95) !important;">
                 <i class="fas fa-lightbulb"></i> Suggestions
             </a>
-            <a href="<?php echo BASE_URL; ?>admin/submissions.php?type=REQUEST"
+            <a href="<?php echo BASE_URL; ?>admin/submissions?type=REQUEST"
                class="admin-nav-link <?php echo ($current_page==='submissions.php' && isset($_GET['type']) && $_GET['type']==='REQUEST')?'active':''; ?>"
                style="font-size:0.82rem;padding:0.45rem 1rem;color:rgba(200,180,255,0.95) !important;">
                 <i class="fas fa-hand-holding"></i> Requests
@@ -62,29 +62,29 @@ $pending_users     = $is_admin ? $conn->query("SELECT COUNT(*) as c FROM users W
     </div>
 
 
-    <a href="<?php echo BASE_URL; ?>admin/complaints.php" class="admin-nav-link <?php echo $current_page === 'complaints.php' ? 'active' : ''; ?>" style="color:rgba(255,180,180,0.95) !important;">
+    <a href="<?php echo BASE_URL; ?>admin/complaints" class="admin-nav-link <?php echo $current_page === 'complaints.php' ? 'active' : ''; ?>" style="color:rgba(255,180,180,0.95) !important;">
         <i class="fas fa-exclamation-triangle"></i> Complaints
         <?php if ($open_complaints > 0): ?>
         <span style="margin-left:auto;background:#ef4444;color:white;border-radius:9px;min-width:18px;height:18px;font-size:0.65rem;font-weight:800;display:inline-flex;align-items:center;justify-content:center;padding:0 4px;"><?php echo $open_complaints; ?></span>
         <?php endif; ?>
     </a>
 
-    <a href="<?php echo BASE_URL; ?>admin/appreciations.php" class="admin-nav-link <?php echo $current_page === 'appreciations.php' ? 'active' : ''; ?>" style="color:rgba(251,191,36,0.95) !important;">
+    <a href="<?php echo BASE_URL; ?>admin/appreciations" class="admin-nav-link <?php echo $current_page === 'appreciations.php' ? 'active' : ''; ?>" style="color:rgba(251,191,36,0.95) !important;">
         <i class="fas fa-star"></i> Appreciations
         <?php if ($total_appreciations > 0): ?>
         <span style="margin-left:auto;background:#f59e0b;color:white;border-radius:9px;min-width:18px;height:18px;font-size:0.65rem;font-weight:800;display:inline-flex;align-items:center;justify-content:center;padding:0 4px;"><?php echo $total_appreciations; ?></span>
         <?php endif; ?>
     </a>
 
-    <a href="<?php echo BASE_URL; ?>admin/surveys.php" class="admin-nav-link <?php echo $current_page === 'surveys.php' ? 'active' : ''; ?>">
+    <a href="<?php echo BASE_URL; ?>admin/surveys" class="admin-nav-link <?php echo $current_page === 'surveys.php' ? 'active' : ''; ?>">
         <i class="fas fa-poll"></i> Surveys
     </a>
 
-    <a href="<?php echo BASE_URL; ?>admin/spam.php" class="admin-nav-link <?php echo $current_page === 'spam.php' ? 'active' : ''; ?>" style="color:rgba(255,180,180,0.95) !important;">
+    <a href="<?php echo BASE_URL; ?>admin/spam" class="admin-nav-link <?php echo $current_page === 'spam.php' ? 'active' : ''; ?>" style="color:rgba(255,180,180,0.95) !important;">
         <i class="fas fa-ban"></i> Spam
     </a>
 
-    <a href="<?php echo BASE_URL; ?>admin/closed.php" class="admin-nav-link <?php echo $current_page === 'closed.php' ? 'active' : ''; ?>" style="color:rgba(200,180,255,0.95) !important;">
+    <a href="<?php echo BASE_URL; ?>admin/closed" class="admin-nav-link <?php echo $current_page === 'closed.php' ? 'active' : ''; ?>" style="color:rgba(200,180,255,0.95) !important;">
         <i class="fas fa-archive"></i> Closed Records
         <?php if ($closed_total > 0): ?>
         <span style="margin-left:auto;background:#8b5cf6;color:white;border-radius:9px;min-width:18px;height:18px;font-size:0.65rem;font-weight:800;display:inline-flex;align-items:center;justify-content:center;padding:0 4px;"><?php echo $closed_total; ?></span>
@@ -94,18 +94,18 @@ $pending_users     = $is_admin ? $conn->query("SELECT COUNT(*) as c FROM users W
     <?php if ($is_admin): ?>
     <div style="padding:0.75rem 1.25rem 0.25rem;font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.45);font-weight:700;">Admin Only</div>
 
-    <a href="<?php echo BASE_URL; ?>admin/users.php" class="admin-nav-link <?php echo $current_page === 'users.php' ? 'active' : ''; ?>">
+    <a href="<?php echo BASE_URL; ?>admin/users" class="admin-nav-link <?php echo $current_page === 'users.php' ? 'active' : ''; ?>">
         <i class="fas fa-users"></i> Manage Users
         <?php if ($pending_users > 0): ?>
         <span style="margin-left:auto;background:#ef4444;color:white;border-radius:9px;min-width:18px;height:18px;font-size:0.65rem;font-weight:800;display:inline-flex;align-items:center;justify-content:center;padding:0 4px;"><?php echo $pending_users; ?></span>
         <?php endif; ?>
     </a>
 
-    <a href="<?php echo BASE_URL; ?>admin/branches.php" class="admin-nav-link <?php echo $current_page === 'branches.php' ? 'active' : ''; ?>">
+    <a href="<?php echo BASE_URL; ?>admin/branches" class="admin-nav-link <?php echo $current_page === 'branches.php' ? 'active' : ''; ?>">
         <i class="fas fa-code-branch"></i> Branches
     </a>
 
-    <a href="<?php echo BASE_URL; ?>admin/dropdowns.php" class="admin-nav-link <?php echo $current_page === 'dropdowns.php' ? 'active' : ''; ?>">
+    <a href="<?php echo BASE_URL; ?>admin/dropdowns" class="admin-nav-link <?php echo $current_page === 'dropdowns.php' ? 'active' : ''; ?>">
         <i class="fas fa-list"></i> Categories
     </a>
 
@@ -124,24 +124,24 @@ $pending_users     = $is_admin ? $conn->query("SELECT COUNT(*) as c FROM users W
             <i class="fas fa-chevron-down" id="reports-chevron" style="font-size:0.7rem;transition:transform 0.25s;<?php echo $on_report?'transform:rotate(180deg)':'';?>"></i>
         </button>
         <div id="reports-submenu" style="overflow:hidden;max-height:<?php echo $on_report?'400px':'0';?>;transition:max-height 0.35s ease;padding-left:0.75rem;">
-            <a href="<?php echo BASE_URL; ?>admin/report_submissions.php"
+            <a href="<?php echo BASE_URL; ?>admin/report_submissions"
                class="admin-nav-link <?php echo $current_page==='report_submissions.php'?'active':''; ?>"
                style="font-size:0.82rem;padding:0.45rem 1rem;">
                 <i class="fas fa-layer-group"></i> Submissions
             </a>
-            <a href="<?php echo BASE_URL; ?>admin/report_complaints.php"
+            <a href="<?php echo BASE_URL; ?>admin/report_complaints"
                class="admin-nav-link <?php echo $current_page==='report_complaints.php'?'active':''; ?>"
                style="font-size:0.82rem;padding:0.45rem 1rem;color:rgba(255,180,180,0.95) !important;">
                 <i class="fas fa-exclamation-triangle"></i> Complaints
             </a>
-            <a href="<?php echo BASE_URL; ?>admin/report_surveys.php"
+            <a href="<?php echo BASE_URL; ?>admin/report_surveys"
                class="admin-nav-link <?php echo $current_page==='report_surveys.php'?'active':''; ?>"
                style="font-size:0.82rem;padding:0.45rem 1rem;display:flex;align-items:center;gap:0.5rem;">
                 <i class="fas fa-poll-h" style="color:rgba(192,160,255,0.95);"></i>
                 <span style="color:rgba(192,160,255,0.95);">Surveys</span>
                 <span style="margin-left:auto;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;font-size:0.6rem;font-weight:800;padding:0.1rem 0.45rem;border-radius:1rem;letter-spacing:0.04em;text-transform:uppercase;">New</span>
             </a>
-            <a href="<?php echo BASE_URL; ?>admin/report_visitor.php"
+            <a href="<?php echo BASE_URL; ?>admin/report_visitor"
                class="admin-nav-link <?php echo $current_page==='report_visitor.php'?'active':''; ?>"
                style="font-size:0.82rem;padding:0.45rem 1rem;display:flex;align-items:center;gap:0.5rem;">
                 <i class="fas fa-eye" style="color:rgba(56,189,248,0.95);"></i>

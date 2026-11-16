@@ -1,5 +1,6 @@
 Options -Indexes
 Options +FollowSymLinks
+DirectoryIndex index.php dashboard.php
 
 RewriteEngine On
 
@@ -8,9 +9,10 @@ RewriteEngine On
 # Live site: https://fcpams.bansalancoop.com
 # ─────────────────────────────────────────────────────────────────────────────
 
-# 1. If someone visits /page.php, redirect them to /page (301 permanent)
-#    This keeps URLs canonical so search engines and bookmarks update cleanly.
-#    Skip real files that are intentionally accessed with .php (e.g. AJAX endpoints).
+# 1. If someone visits /page.php via GET/HEAD, redirect them to /page (301 permanent).
+#    IMPORTANT: Skip POST requests — POST to .php must NOT be redirected or the
+#    POST data is lost (browser converts to GET after a 301).
+RewriteCond %{REQUEST_METHOD} !POST
 RewriteCond %{THE_REQUEST} \s/+(.+?)\.php[\s?] [NC]
 RewriteRule ^ /%1 [R=301,L,NE]
 

@@ -25,7 +25,7 @@
                 <?php echo htmlspecialchars($_SESSION['name'] ?? ''); ?>
                 <span style="background:#dcfce7;color:#166534;padding:0.1rem 0.45rem;border-radius:0.3rem;font-size:0.72rem;font-weight:700;margin-left:0.35rem;">STAFF</span>
             </span>
-            <a href="<?php echo BASE_URL; ?>logout.php" style="color:#ef4444;font-weight:700;font-size:0.85rem;display:flex;align-items:center;gap:0.3rem;text-decoration:none;">
+            <a href="<?php echo BASE_URL; ?>logout" style="color:#ef4444;font-weight:700;font-size:0.85rem;display:flex;align-items:center;gap:0.3rem;text-decoration:none;">
                 <i class="fas fa-sign-out-alt"></i> Logout
             </a>
         </div>

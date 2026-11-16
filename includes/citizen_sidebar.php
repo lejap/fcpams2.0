@@ -28,32 +28,32 @@
 
         <!-- Nav Links -->
         <nav class="sidebar-nav">
-            <a href="<?php echo BASE_URL; ?>citizen/dashboard.php" class="sidebar-link">
+            <a href="<?php echo BASE_URL; ?>citizen/dashboard" class="sidebar-link">
                 <i class="fas fa-home"></i> Home
             </a>
-            <a href="<?php echo BASE_URL; ?>citizen/submit_complaint.php" class="sidebar-link">
+            <a href="<?php echo BASE_URL; ?>citizen/submit_complaint" class="sidebar-link">
                 <i class="fas fa-exclamation-triangle"></i> File a Complaint
             </a>
-            <a href="<?php echo BASE_URL; ?>citizen/submit_ticket.php?type=INQUIRY" class="sidebar-link">
+            <a href="<?php echo BASE_URL; ?>citizen/submit_ticket?type=INQUIRY" class="sidebar-link">
                 <i class="fas fa-comment-dots"></i> Submit Inquiry
             </a>
-            <a href="<?php echo BASE_URL; ?>citizen/submit_ticket.php?type=REQUEST" class="sidebar-link">
+            <a href="<?php echo BASE_URL; ?>citizen/submit_ticket?type=REQUEST" class="sidebar-link">
                 <i class="fas fa-file-alt"></i> Submit Request
             </a>
-            <a href="<?php echo BASE_URL; ?>citizen/submit_ticket.php?type=SUGGESTION" class="sidebar-link">
+            <a href="<?php echo BASE_URL; ?>citizen/submit_ticket?type=SUGGESTION" class="sidebar-link">
                 <i class="fas fa-lightbulb"></i> Make Suggestion
             </a>
-            <a href="<?php echo BASE_URL; ?>citizen/submit_appreciation.php" class="sidebar-link">
+            <a href="<?php echo BASE_URL; ?>citizen/submit_appreciation" class="sidebar-link">
                 <i class="fas fa-star"></i> Commendation
             </a>
-            <a href="<?php echo BASE_URL; ?>citizen/surveys.php" class="sidebar-link">
+            <a href="<?php echo BASE_URL; ?>citizen/surveys" class="sidebar-link">
                 <i class="fas fa-poll"></i> Surveys
             </a>
         </nav>
 
         <!-- Logout -->
         <div style="margin-top:auto;padding-top:2rem;">
-            <a href="<?php echo BASE_URL; ?>logout.php" class="sidebar-link"
+            <a href="<?php echo BASE_URL; ?>logout" class="sidebar-link"
                 style="color:#f43f5e;background:rgba(244,63,94,0.1);justify-content:center;display:flex;align-items:center;gap:0.5rem;text-decoration:none;border-radius:0.6rem;">
                 <i class="fas fa-sign-out-alt"></i> Logout
             </a>

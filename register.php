@@ -73,7 +73,7 @@ include 'includes/header.php';
             </div>
         <?php else: ?>
 
-        <form action="register.php" method="POST">
+        <form method="POST">
             <div class="form-group">
                 <label class="form-label">Full Name *</label>
                 <input type="text" name="name" class="form-input" placeholder="John Doe" required>
@@ -117,7 +117,7 @@ include 'includes/header.php';
         <?php endif; ?>
 
         <div style="text-align: center; margin-top: 1.5rem;">
-            <a href="login.php" style="color: var(--text-secondary); text-decoration: none; font-size: 0.9rem;">Already have an account? Login here</a>
+            <a href="<?php echo BASE_URL; ?>login" style="color: var(--text-secondary); text-decoration: none; font-size: 0.9rem;">Already have an account? Login here</a>
         </div>
     </div>
 </main>
